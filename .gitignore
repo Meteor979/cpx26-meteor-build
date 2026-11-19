@@ -1,0 +1,44 @@
+# Local planning and generated artifacts
+/outputs/
+/work/
+/LibreOffice_26.8.3_Win_x86-64/
+
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.p12
+*.mobileprovision
+Secrets.xcconfig
+GoogleService-Info.plist
+
+# Xcode
+DerivedData/
+build/
+*.xcuserstate
+*.xcresult
+xcuserdata/
+*.ipa
+*.dSYM
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# JavaScript tooling
+node_modules/
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Local or confidential user content
+private-data/
+

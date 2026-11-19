@@ -1,0 +1,49 @@
+# CrossPointX 2026 Team Repository
+
+This repository contains the team's iOS client, backend service, interface contract, design assets, and submission documentation for CrossPointX 2026.
+
+The product scope remains provisional until both track briefs are released. The current candidate concept is WearWise, an outfit decision assistant that recommends three explainable outfits from clothing the user already owns.
+
+## Repository structure
+
+```text
+apps/ios/          SwiftUI client and Xcode project
+services/api/      FastAPI backend and recommendation logic
+specs/             OpenAPI contract and request/response examples
+design/            UI, poster, AMD proof assets, and source assets
+docs/              Product, research, branch ownership, and compliance notes
+.github/workflows/ GitHub Actions build and test workflows
+```
+
+## Branch model
+
+- `main`: submission-ready versions that can build and run.
+- `dev`: daily integration branch.
+- `feat/*`: one focused feature per branch.
+- `docs/*`: product and research documentation.
+- `design/*`: visual, poster, and submission assets.
+
+The iOS development and testing owner is the only person who modifies `WearWise.xcodeproj`. The Windows backend owner does not modify iOS project files. Interface changes must be reflected in `specs/openapi.yaml`.
+
+## Local development
+
+Project code will be created during the event. Until then, this repository contains planning and compliance files only.
+
+1. Copy `.env.example` to `.env` for local backend configuration.
+2. Never commit `.env`, API keys, certificates, personal photos, or temporary build output.
+3. Keep API keys on the backend only.
+4. Keep garment photos on the iOS device. The backend receives structured metadata only.
+5. Use mock mode before a remote AI provider is configured.
+
+## Required submission materials
+
+- Public repository with the Apache License 2.0.
+- Reachable demo or prototype link.
+- Project description and all four team members.
+- Poster PDF and Devpost project image.
+- Raw, unedited AMD-generated image.
+- AMD Creative Factory Gallery screenshot.
+- Disclosure of frameworks, open-source libraries, AI tools, and third-party APIs.
+
+The submission deadline is November 22, 2026 at 13:00 Beijing time.
+
