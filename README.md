@@ -20,6 +20,7 @@ docs/              Product, research, branch ownership, and compliance notes
 - `main`: submission-ready versions that can build and run.
 - `dev`: daily integration branch.
 - `feat/*`: one focused feature per branch.
+- `feat/web-*`: public interactive web demo.
 - `docs/product-*`: product and user research documentation.
 - `docs/eng-*`: engineering workflow and integration documentation.
 - `design/*`: visual, poster, and submission assets.

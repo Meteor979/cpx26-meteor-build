@@ -6,7 +6,7 @@
 
 | 角色 | 主要目录 | 负责内容 |
 |---|---|---|
-| iOS 负责人 | `apps/ios/**` | SwiftUI、Xcode 工程、网络层、本地缓存、模拟器测试 |
+| iOS/前端负责人 | `apps/ios/**`、`apps/web-demo/**` | SwiftUI、Xcode 工程、网络层、本地缓存、模拟器测试和公开网页 Demo |
 | 后端负责人 | `services/api/**`、`.env.example`、后端 CI/CD | FastAPI、推荐规则、Provider、后端测试和部署 |
 | 产品与用户研究负责人 | `docs/product/**`（新建） | 需求、访谈、范围、演示脚本和提交文案 |
 | 视觉与传播负责人 | `design/**` | UI 规范、海报、AMD 证明和展示材料 |
@@ -37,6 +37,7 @@ specs/examples/sample-data.json
 - `main`：只放经过测试、可以现场演示的版本。
 - `dev`：所有功能的日常集成分支。
 - `feat/ios-*`：iOS 功能。
+- `feat/web-*`：公开网页 Demo 功能。
 - `feat/api-*`：后端功能。
 - `docs/product-*`：产品与用户研究文档。
 - `docs/eng-*`：工程协作与联调文档。

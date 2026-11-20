@@ -7,6 +7,7 @@ The canonical rules are in the root [CONTRIBUTING.md](../CONTRIBUTING.md).
 | `main` | iOS development and testing owner | Tested, demo-ready releases only |
 | `dev` | iOS development and testing owner | Daily integration |
 | `feat/ios-*` | iOS development and testing owner | SwiftUI client, Xcode project, Simulator testing |
+| `feat/web-*` | iOS/front-end owner | Public interactive web demo |
 | `feat/api-*` | Windows backend owner | FastAPI, recommendation rules, AI provider, tests |
 | `docs/product-*` | Product and user research owner | Research, scope, demo script, submission copy |
 | `docs/eng-*` | iOS/backend integration coordinator | Engineering workflow and integration documentation |
