@@ -10,5 +10,7 @@ Rules:
 - Keep the shared scheme committed.
 - Use local sample data before the backend is available.
 - Handle mock, remote API, network failure, and fallback states.
+- Require coarse while-in-use location at app launch and load weather as structured context.
+- Do not show a standalone weather card or offer manual temperature fallback.
 - Do not store API keys or personal photos in the repository.
 

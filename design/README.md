@@ -2,6 +2,12 @@
 
 Owner: visual and communication owner.
 
+The reviewed product interaction and page-state specification is in
+[page-flow.md](page-flow.md). It covers first launch, automatic weather
+initialization, free-text occasion search with local preset matching, both
+garment-recognition modes, recommendations, replacement, fallback states, and
+the public web demo scope.
+
 Suggested structure:
 
 ```text

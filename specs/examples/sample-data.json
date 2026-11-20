@@ -1,0 +1,1098 @@
+{
+  "schema_version": "0.4.0",
+  "generated_for": "CrossPointX 2026 WearWise frontend and backend contract",
+  "notes": [
+    "Paths under wardrobe are local-only fields and must be stripped from recommendation requests.",
+    "Only temporary compressed images may be sent to recognition or matching endpoints.",
+    "AI results are drafts and must be confirmed by the user.",
+    "Product matching returns candidates, not an authenticity verdict.",
+    "Recommendation cache keys are computed by the client and are not API fields.",
+    "The homepage is search-led; presets are suggestion data rather than a mandatory picker.",
+    "Occasion input is matched against local aliases and policies before any AI call.",
+    "Location permission is required at app launch and weather is always an automatic structured context."
+  ],
+  "homepage": {
+    "headline": "今天是什么场合？",
+    "search_placeholder": "输入社团演讲、实习面试、朋友生日聚餐……",
+    "recent_queries": [
+      "社团演讲",
+      "第一次去女朋友家吃饭"
+    ],
+    "suggestion_ids": [
+      "club-speech",
+      "first-date",
+      "anniversary-date",
+      "salon-performance"
+    ],
+    "location_permission_required": "when_in_use",
+    "weather_loading_mode": "automatic_on_launch",
+    "wardrobe_ready_count": 8
+  },
+  "presets": {
+    "version": 1,
+    "cached": true,
+    "generated_at": "2026-11-20T10:00:00+08:00",
+    "presets": [
+      {
+        "id": "first-date",
+        "name": "初次约会",
+        "aliases": [
+          "第一次约会",
+          "首次约会",
+          "初次见面的约会"
+        ],
+        "description": "保持整洁、亲近和低压迫感。",
+        "target_formality": "smart_casual",
+        "allowed_formality": [
+          "casual",
+          "smart_casual"
+        ],
+        "required_slots": [
+          "top",
+          "bottom",
+          "shoes"
+        ],
+        "style_keywords": [
+          "干净",
+          "亲近",
+          "自然",
+          "低压迫感"
+        ],
+        "avoid_rules": [
+          "避免全套正装",
+          "避免明显舞台化",
+          "避免颜色和配饰过度抢眼"
+        ],
+        "explanation_guidelines": [
+          "解释正式程度是否自然",
+          "解释颜色之间是否协调",
+          "解释是否适合当前温度"
+        ],
+        "source": "precomputed",
+        "version": 1,
+        "generated_at": "2026-11-20T10:00:00+08:00"
+      },
+      {
+        "id": "anniversary-date",
+        "name": "纪念日约会",
+        "aliases": [
+          "结婚纪念日约会",
+          "纪念日",
+          "周年约会",
+          "结婚纪念日"
+        ],
+        "description": "在日常穿搭上增加适度的精致感和仪式感。",
+        "target_formality": "smart_casual",
+        "allowed_formality": [
+          "smart_casual",
+          "business"
+        ],
+        "required_slots": [
+          "top",
+          "bottom",
+          "shoes"
+        ],
+        "style_keywords": [
+          "精致",
+          "温和",
+          "浪漫",
+          "仪式感"
+        ],
+        "avoid_rules": [
+          "避免完全日常",
+          "避免过度夸张",
+          "避免冰冷和攻击性的全黑组合"
+        ],
+        "explanation_guidelines": [
+          "解释整体是否比日常略精致",
+          "解释单品之间是否形成统一风格",
+          "保留至少一处轻松元素"
+        ],
+        "source": "precomputed",
+        "version": 1,
+        "generated_at": "2026-11-20T10:00:00+08:00"
+      },
+      {
+        "id": "salon-performance",
+        "name": "沙龙表演",
+        "aliases": [
+          "沙龙",
+          "演奏会",
+          "节目演出",
+          "小型演出"
+        ],
+        "description": "兼顾舞台辨识度、行动便利和现场气质。",
+        "target_formality": "smart_casual",
+        "allowed_formality": [
+          "casual",
+          "smart_casual",
+          "business"
+        ],
+        "required_slots": [
+          "top",
+          "bottom",
+          "shoes"
+        ],
+        "style_keywords": [
+          "舞台辨识度",
+          "层次感",
+          "便于行动",
+          "个人表达"
+        ],
+        "avoid_rules": [
+          "避免妨碍行动的紧身下装",
+          "避免距离较远时完全缺少层次",
+          "避免与表演主题冲突的过度商务化"
+        ],
+        "explanation_guidelines": [
+          "解释颜色和轮廓在舞台上的可识别度",
+          "解释衣物是否方便活动和演奏",
+          "解释个人风格是否明确"
+        ],
+        "source": "precomputed",
+        "version": 1,
+        "generated_at": "2026-11-20T10:00:00+08:00"
+      },
+      {
+        "id": "club-speech",
+        "name": "社团演讲",
+        "aliases": [
+          "社团汇报",
+          "社团分享",
+          "社团路演"
+        ],
+        "description": "专业可信，但不因为全套正装而产生距离感。",
+        "target_formality": "business",
+        "allowed_formality": [
+          "smart_casual",
+          "business"
+        ],
+        "required_slots": [
+          "top",
+          "bottom",
+          "shoes"
+        ],
+        "style_keywords": [
+          "可信",
+          "清晰",
+          "利落",
+          "可接近"
+        ],
+        "avoid_rules": [
+          "避免过强休闲感",
+          "避免全套正装造成的僵硬距离感",
+          "避免过多分散注意力的图案"
+        ],
+        "explanation_guidelines": [
+          "解释正式程度是否适合公开表达",
+          "解释整体轮廓是否利落",
+          "解释是否方便走动和上台"
+        ],
+        "source": "precomputed",
+        "version": 1,
+        "generated_at": "2026-11-20T10:00:00+08:00"
+      }
+    ]
+  },
+  "local_occasion_match_example": {
+    "input": "第一次约会",
+    "normalized": "第一次约会",
+    "matched_alias": "第一次约会",
+    "matched_profile_id": "first-date",
+    "match_reason": "exact_alias",
+    "score": 1,
+    "calls_ai": false
+  },
+  "occasion_resolution_example": {
+    "request": {
+      "request_id": "req-occasion-demo-001",
+      "query": "第一次去女朋友家吃饭",
+      "locale": "zh-CN"
+    },
+    "response": {
+      "query": "第一次去女朋友家吃饭",
+      "profile": {
+        "id": "generated-family-dinner",
+        "name": "第一次去对方家里吃饭",
+        "aliases": [
+          "第一次去女朋友家吃饭",
+          "第一次去对象家吃饭",
+          "见家长前聚餐"
+        ],
+        "description": "偏自然的家庭聚餐，需要整洁但避免像正式面试。",
+        "target_formality": "smart_casual",
+        "allowed_formality": [
+          "casual",
+          "smart_casual"
+        ],
+        "required_slots": [
+          "top",
+          "bottom",
+          "shoes"
+        ],
+        "style_keywords": [
+          "干净",
+          "自然",
+          "有礼貌",
+          "不过分正式"
+        ],
+        "avoid_rules": [
+          "避免全套商务正装",
+          "避免过度舞台化",
+          "避免过于随意的居家感"
+        ],
+        "explanation_guidelines": [
+          "解释整体是否自然且整洁",
+          "解释正式程度是否适合家庭聚餐",
+          "解释是否方便室内活动和天气变化"
+        ],
+        "source": "generated",
+        "version": 1,
+        "generated_at": "2026-11-20T11:00:00+08:00"
+      },
+      "match_type": "generated",
+      "confidence": 0.86,
+      "cached": false,
+      "alternatives": [
+        {
+          "id": "first-date",
+          "name": "初次约会",
+          "aliases": [
+            "第一次约会",
+            "首次约会",
+            "初次见面的约会"
+          ],
+          "description": "保持整洁、亲近和低压迫感。",
+          "target_formality": "smart_casual",
+          "allowed_formality": [
+            "casual",
+            "smart_casual"
+          ],
+          "required_slots": [
+            "top",
+            "bottom",
+            "shoes"
+          ],
+          "style_keywords": [
+            "干净",
+            "亲近",
+            "自然"
+          ],
+          "avoid_rules": [
+            "避免全套正装",
+            "避免明显舞台化"
+          ],
+          "explanation_guidelines": [
+            "解释正式程度是否自然"
+          ],
+          "source": "precomputed",
+          "version": 1,
+          "generated_at": "2026-11-20T10:00:00+08:00"
+        }
+      ],
+      "warning": null,
+      "request_id": "req-occasion-demo-001"
+    }
+  },
+  "weather_example": {
+    "request": {
+      "request_id": "req-weather-demo-001",
+      "latitude": 31.23,
+      "longitude": 121.47,
+      "accuracy_m": 1200,
+      "timezone": "Asia/Shanghai",
+      "target_at": "2026-11-20T18:00:00+08:00"
+    },
+    "response": {
+      "status": "ok",
+      "location_label": "上海",
+      "weather": {
+        "temperature_c": 16,
+        "feels_like_c": 15,
+        "condition": "partly_cloudy",
+        "precipitation_probability": 0.2,
+        "wind_speed_kph": 12
+      },
+      "observed_at": "2026-11-20T11:20:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "cached": false,
+      "source": "remote_weather",
+      "warning": null,
+      "request_id": "req-weather-demo-001"
+    }
+  },
+  "wardrobe": {
+    "revision": 7,
+    "garments": [
+      {
+        "id": "g-top-shirt",
+        "local_photo_path": "Wardrobe/g-top-shirt/photo.jpg",
+        "local_label_photo_path": "Wardrobe/g-top-shirt/label.jpg",
+        "brand": "UNIQLO",
+        "product_name": "Oxford Shirt",
+        "product_code": "123456",
+        "source_url": "https://example.com/products/oxford-shirt-123456",
+        "slot": "top",
+        "category": "shirt",
+        "colors": [
+          "light_blue"
+        ],
+        "pattern": "solid",
+        "fit": "regular",
+        "material": "cotton",
+        "formality_score": 3,
+        "formality_band": "smart_casual",
+        "warmth_score": 2,
+        "match_confidence": 0.93,
+        "enrichment_status": "matched",
+        "user_confirmed": true,
+        "last_enriched_at": "2026-11-20T10:15:00+08:00"
+      },
+      {
+        "id": "g-top-knit",
+        "local_photo_path": "Wardrobe/g-top-knit/photo.jpg",
+        "local_label_photo_path": null,
+        "brand": null,
+        "product_name": "Cream Crew Neck Knit",
+        "product_code": null,
+        "source_url": null,
+        "slot": "top",
+        "category": "knitwear",
+        "colors": [
+          "cream"
+        ],
+        "pattern": "solid",
+        "fit": "regular",
+        "material": "wool_blend",
+        "formality_score": 2,
+        "formality_band": "casual",
+        "warmth_score": 4,
+        "match_confidence": null,
+        "enrichment_status": "recognized",
+        "user_confirmed": true,
+        "last_enriched_at": "2026-11-20T10:18:00+08:00"
+      },
+      {
+        "id": "g-top-tee",
+        "local_photo_path": "Wardrobe/g-top-tee/photo.jpg",
+        "local_label_photo_path": null,
+        "brand": null,
+        "product_name": "White Crew T-Shirt",
+        "product_code": null,
+        "source_url": null,
+        "slot": "top",
+        "category": "t_shirt",
+        "colors": [
+          "white"
+        ],
+        "pattern": "solid",
+        "fit": "regular",
+        "material": "cotton",
+        "formality_score": 1,
+        "formality_band": "casual",
+        "warmth_score": 1,
+        "match_confidence": null,
+        "enrichment_status": "manual",
+        "user_confirmed": true,
+        "last_enriched_at": null
+      },
+      {
+        "id": "g-bottom-jeans",
+        "local_photo_path": "Wardrobe/g-bottom-jeans/photo.jpg",
+        "local_label_photo_path": null,
+        "brand": null,
+        "product_name": "Dark Straight Jeans",
+        "product_code": null,
+        "source_url": null,
+        "slot": "bottom",
+        "category": "jeans",
+        "colors": [
+          "dark_blue"
+        ],
+        "pattern": "solid",
+        "fit": "straight",
+        "material": "denim",
+        "formality_score": 2,
+        "formality_band": "casual",
+        "warmth_score": 3,
+        "match_confidence": 0.88,
+        "enrichment_status": "recognized",
+        "user_confirmed": true,
+        "last_enriched_at": "2026-11-20T10:20:00+08:00"
+      },
+      {
+        "id": "g-bottom-slacks",
+        "local_photo_path": "Wardrobe/g-bottom-slacks/photo.jpg",
+        "local_label_photo_path": "Wardrobe/g-bottom-slacks/label.jpg",
+        "brand": "Example Studio",
+        "product_name": "Black Tailored Trousers",
+        "product_code": "TRO-BLK-02",
+        "source_url": "https://example.com/products/black-tailored-trousers",
+        "slot": "bottom",
+        "category": "trousers",
+        "colors": [
+          "black"
+        ],
+        "pattern": "solid",
+        "fit": "straight",
+        "material": "polyester_blend",
+        "formality_score": 3,
+        "formality_band": "smart_casual",
+        "warmth_score": 3,
+        "match_confidence": 0.96,
+        "enrichment_status": "matched",
+        "user_confirmed": true,
+        "last_enriched_at": "2026-11-20T10:22:00+08:00"
+      },
+      {
+        "id": "g-bottom-skirt",
+        "local_photo_path": "Wardrobe/g-bottom-skirt/photo.jpg",
+        "local_label_photo_path": null,
+        "brand": null,
+        "product_name": "Charcoal Midi Skirt",
+        "product_code": null,
+        "source_url": null,
+        "slot": "bottom",
+        "category": "skirt",
+        "colors": [
+          "charcoal"
+        ],
+        "pattern": "solid",
+        "fit": "a_line",
+        "material": "wool_blend",
+        "formality_score": 3,
+        "formality_band": "smart_casual",
+        "warmth_score": 3,
+        "match_confidence": 0.84,
+        "enrichment_status": "recognized",
+        "user_confirmed": true,
+        "last_enriched_at": "2026-11-20T10:24:00+08:00"
+      },
+      {
+        "id": "g-shoes-white",
+        "local_photo_path": "Wardrobe/g-shoes-white/photo.jpg",
+        "local_label_photo_path": null,
+        "brand": null,
+        "product_name": "White Leather Sneakers",
+        "product_code": null,
+        "source_url": null,
+        "slot": "shoes",
+        "category": "sneakers",
+        "colors": [
+          "white"
+        ],
+        "pattern": "solid",
+        "fit": "regular",
+        "material": "leather",
+        "formality_score": 2,
+        "formality_band": "casual",
+        "warmth_score": 2,
+        "match_confidence": null,
+        "enrichment_status": "manual",
+        "user_confirmed": true,
+        "last_enriched_at": null
+      },
+      {
+        "id": "g-shoes-loafers",
+        "local_photo_path": "Wardrobe/g-shoes-loafers/photo.jpg",
+        "local_label_photo_path": null,
+        "brand": null,
+        "product_name": "Brown Leather Loafers",
+        "product_code": null,
+        "source_url": null,
+        "slot": "shoes",
+        "category": "loafers",
+        "colors": [
+          "brown"
+        ],
+        "pattern": "solid",
+        "fit": "regular",
+        "material": "leather",
+        "formality_score": 3,
+        "formality_band": "smart_casual",
+        "warmth_score": 2,
+        "match_confidence": 0.91,
+        "enrichment_status": "recognized",
+        "user_confirmed": true,
+        "last_enriched_at": "2026-11-20T10:26:00+08:00"
+      },
+      {
+        "id": "g-outer-cardigan",
+        "local_photo_path": "Wardrobe/g-outer-cardigan/photo.jpg",
+        "local_label_photo_path": null,
+        "brand": null,
+        "product_name": "Beige Light Cardigan",
+        "product_code": null,
+        "source_url": null,
+        "slot": "outerwear",
+        "category": "cardigan",
+        "colors": [
+          "beige"
+        ],
+        "pattern": "solid",
+        "fit": "relaxed",
+        "material": "cotton_blend",
+        "formality_score": 2,
+        "formality_band": "casual",
+        "warmth_score": 2,
+        "match_confidence": null,
+        "enrichment_status": "recognized",
+        "user_confirmed": true,
+        "last_enriched_at": "2026-11-20T10:28:00+08:00"
+      },
+      {
+        "id": "g-outer-blazer",
+        "local_photo_path": "Wardrobe/g-outer-blazer/photo.jpg",
+        "local_label_photo_path": "Wardrobe/g-outer-blazer/label.jpg",
+        "brand": "Example Studio",
+        "product_name": "Navy Single-Breasted Blazer",
+        "product_code": "BLZ-NVY-01",
+        "source_url": "https://example.com/products/navy-blazer",
+        "slot": "outerwear",
+        "category": "blazer",
+        "colors": [
+          "navy"
+        ],
+        "pattern": "solid",
+        "fit": "tailored",
+        "material": "wool_blend",
+        "formality_score": 4,
+        "formality_band": "business",
+        "warmth_score": 3,
+        "match_confidence": 0.95,
+        "enrichment_status": "matched",
+        "user_confirmed": true,
+        "last_enriched_at": "2026-11-20T10:30:00+08:00"
+      }
+    ]
+  },
+  "formality_index": {
+    "casual": {
+      "top": [
+        "g-top-knit",
+        "g-top-tee"
+      ],
+      "bottom": [
+        "g-bottom-jeans"
+      ],
+      "outerwear": [
+        "g-outer-cardigan"
+      ],
+      "shoes": [
+        "g-shoes-white"
+      ]
+    },
+    "smart_casual": {
+      "top": [
+        "g-top-shirt"
+      ],
+      "bottom": [
+        "g-bottom-slacks",
+        "g-bottom-skirt"
+      ],
+      "outerwear": [],
+      "shoes": [
+        "g-shoes-loafers"
+      ]
+    },
+    "business": {
+      "top": [],
+      "bottom": [],
+      "outerwear": [
+        "g-outer-blazer"
+      ],
+      "shoes": []
+    },
+    "formal": {}
+  },
+  "recognition_examples": {
+    "visual_request": {
+      "image": "local-file:g-top-shirt/photo.jpg",
+      "request_id": "req-analyze-demo-001",
+      "client_mode": "mock"
+    },
+    "visual_response": {
+      "status": "partial",
+      "attributes": {
+        "slot": "top",
+        "category": "shirt",
+        "colors": [
+          "light_blue"
+        ],
+        "pattern": "solid",
+        "fit": "regular",
+        "formality_score": 3,
+        "warmth_score": 2,
+        "material_guess": "cotton"
+      },
+      "confidence": {
+        "slot": 0.97,
+        "category": 0.91,
+        "colors": 0.9,
+        "pattern": 0.86,
+        "fit": 0.72,
+        "formality_score": 0.65,
+        "warmth_score": 0.7,
+        "material_guess": 0.42
+      },
+      "partial": true,
+      "source": "mock",
+      "warnings": [
+        "材质识别置信度较低，请用户确认。"
+      ],
+      "request_id": "req-analyze-demo-001"
+    },
+    "match_request": {
+      "request_id": "req-match-demo-001",
+      "match_mode": "auto",
+      "label_text": "UNIQLO OXFORD SHIRT 100% COTTON STYLE 123456",
+      "brand_hint": "UNIQLO",
+      "product_name_hint": "Oxford Shirt",
+      "product_code": "123456",
+      "appearance": {
+        "slot": "top",
+        "category": "shirt",
+        "colors": [
+          "light_blue"
+        ],
+        "pattern": "solid",
+        "fit": "regular",
+        "formality_score": 3,
+        "warmth_score": 2,
+        "material_guess": "cotton"
+      }
+    },
+    "match_response": {
+      "status": "candidates_found",
+      "candidates": [
+        {
+          "id": "candidate-uniqlo-oxford-123456",
+          "brand": "UNIQLO",
+          "product_name": "Oxford Shirt",
+          "product_code": "123456",
+          "barcode": null,
+          "source_url": "https://example.com/products/oxford-shirt-123456",
+          "image_url": "https://example.com/images/oxford-shirt-123456.jpg",
+          "match_type": "exact",
+          "match_confidence": 0.93,
+          "matched_signals": [
+            "brand",
+            "product_code",
+            "color",
+            "category"
+          ],
+          "attributes": {
+            "slot": "top",
+            "category": "shirt",
+            "colors": [
+              "light_blue"
+            ],
+            "pattern": "solid",
+            "fit": "regular",
+            "formality_score": 3,
+            "warmth_score": 2,
+            "material_guess": "cotton"
+          },
+          "fetched_at": "2026-11-20T10:15:00+08:00"
+        },
+        {
+          "id": "candidate-oxford-similar-001",
+          "brand": "Example",
+          "product_name": "Light Blue Cotton Oxford",
+          "product_code": "OX-7890",
+          "barcode": null,
+          "source_url": "https://example.com/products/light-blue-oxford",
+          "image_url": null,
+          "match_type": "similar",
+          "match_confidence": 0.71,
+          "matched_signals": [
+            "color",
+            "category",
+            "material"
+          ],
+          "attributes": {
+            "slot": "top",
+            "category": "shirt",
+            "colors": [
+              "light_blue"
+            ],
+            "pattern": "solid",
+            "fit": "regular",
+            "formality_score": 3,
+            "warmth_score": 2,
+            "material_guess": "cotton"
+          },
+          "fetched_at": "2026-11-20T10:15:00+08:00"
+        }
+      ],
+      "source": "mock",
+      "cached": false,
+      "warning": "商品匹配不代表正版鉴定，请用户确认。",
+      "request_id": "req-match-demo-001"
+    }
+  },
+  "recommendation_example": {
+    "request": {
+      "request_id": "req-recommend-demo-001",
+      "preset_id": "first-date",
+      "occasion": "初次约会",
+      "weather": {
+        "temperature_c": 16,
+        "feels_like_c": 15,
+        "condition": "partly_cloudy",
+        "precipitation_probability": 0.2,
+        "wind_speed_kph": 12
+      },
+      "formality": "smart_casual",
+      "garments": [
+        {
+          "id": "g-top-shirt",
+          "brand": "UNIQLO",
+          "product_name": "Oxford Shirt",
+          "slot": "top",
+          "category": "shirt",
+          "colors": [
+            "light_blue"
+          ],
+          "pattern": "solid",
+          "fit": "regular",
+          "formality_score": 3,
+          "warmth_score": 2,
+          "user_confirmed": true
+        },
+        {
+          "id": "g-top-knit",
+          "brand": null,
+          "product_name": "Cream Crew Neck Knit",
+          "slot": "top",
+          "category": "knitwear",
+          "colors": [
+            "cream"
+          ],
+          "pattern": "solid",
+          "fit": "regular",
+          "formality_score": 2,
+          "warmth_score": 4,
+          "user_confirmed": true
+        },
+        {
+          "id": "g-bottom-jeans",
+          "brand": null,
+          "product_name": "Dark Straight Jeans",
+          "slot": "bottom",
+          "category": "jeans",
+          "colors": [
+            "dark_blue"
+          ],
+          "pattern": "solid",
+          "fit": "straight",
+          "formality_score": 2,
+          "warmth_score": 3,
+          "user_confirmed": true
+        },
+        {
+          "id": "g-bottom-slacks",
+          "brand": "Example Studio",
+          "product_name": "Black Tailored Trousers",
+          "slot": "bottom",
+          "category": "trousers",
+          "colors": [
+            "black"
+          ],
+          "pattern": "solid",
+          "fit": "straight",
+          "formality_score": 3,
+          "warmth_score": 3,
+          "user_confirmed": true
+        },
+        {
+          "id": "g-bottom-skirt",
+          "brand": null,
+          "product_name": "Charcoal Midi Skirt",
+          "slot": "bottom",
+          "category": "skirt",
+          "colors": [
+            "charcoal"
+          ],
+          "pattern": "solid",
+          "fit": "a_line",
+          "formality_score": 3,
+          "warmth_score": 3,
+          "user_confirmed": true
+        },
+        {
+          "id": "g-shoes-white",
+          "brand": null,
+          "product_name": "White Leather Sneakers",
+          "slot": "shoes",
+          "category": "sneakers",
+          "colors": [
+            "white"
+          ],
+          "pattern": "solid",
+          "fit": "regular",
+          "formality_score": 2,
+          "warmth_score": 2,
+          "user_confirmed": true
+        },
+        {
+          "id": "g-shoes-loafers",
+          "brand": null,
+          "product_name": "Brown Leather Loafers",
+          "slot": "shoes",
+          "category": "loafers",
+          "colors": [
+            "brown"
+          ],
+          "pattern": "solid",
+          "fit": "regular",
+          "formality_score": 3,
+          "warmth_score": 2,
+          "user_confirmed": true
+        },
+        {
+          "id": "g-outer-cardigan",
+          "brand": null,
+          "product_name": "Beige Light Cardigan",
+          "slot": "outerwear",
+          "category": "cardigan",
+          "colors": [
+            "beige"
+          ],
+          "pattern": "solid",
+          "fit": "relaxed",
+          "formality_score": 2,
+          "warmth_score": 2,
+          "user_confirmed": true
+        }
+      ]
+    },
+    "response": {
+      "outfits": [
+        {
+          "id": "outfit-a",
+          "item_ids": [
+            "g-top-shirt",
+            "g-bottom-jeans",
+            "g-shoes-white"
+          ],
+          "title": "清晰但不过分正式",
+          "reasons": [
+            "浅蓝衬衫符合初次约会的智能休闲正式程度。",
+            "深色牛仔裤降低正装距离感。",
+            "白鞋让整体更轻松，同时保持整洁。"
+          ],
+          "tradeoffs": [
+            "白鞋比乐福鞋略休闲。"
+          ],
+          "source": "remote_api",
+          "score": 0.9
+        },
+        {
+          "id": "outfit-b",
+          "item_ids": [
+            "g-top-knit",
+            "g-bottom-skirt",
+            "g-shoes-loafers"
+          ],
+          "title": "温和而有仪式感",
+          "reasons": [
+            "米白针织衫带来柔和、容易接近的观感。",
+            "炭灰半裙提高精致度，但没有进入全套正装。",
+            "乐福鞋与整体正式程度保持一致。"
+          ],
+          "tradeoffs": [
+            "针织材质在较暖环境中可能偏热。"
+          ],
+          "source": "remote_api",
+          "score": 0.87
+        },
+        {
+          "id": "outfit-c",
+          "item_ids": [
+            "g-top-shirt",
+            "g-bottom-slacks",
+            "g-shoes-loafers"
+          ],
+          "title": "更利落的晚间选择",
+          "reasons": [
+            "衬衫和西裤形成清晰的上下装结构。",
+            "深色西裤让整体更精致。",
+            "棕色乐福鞋保留温和感，不会过度商务。"
+          ],
+          "tradeoffs": [
+            "整体比前两套更正式，适合晚间约会。"
+          ],
+          "source": "remote_api",
+          "score": 0.84
+        }
+      ],
+      "requested_count": 3,
+      "result_count_reason": "three_available",
+      "fallback_used": false,
+      "warning": null,
+      "provider": "mock_remote_api",
+      "generated_at": "2026-11-20T10:40:00+08:00",
+      "request_id": "req-recommend-demo-001"
+    }
+  },
+  "outfit_revision_example": {
+    "request": {
+      "request_id": "req-revise-demo-001",
+      "preset_id": "first-date",
+      "occasion": "初次约会",
+      "weather": {
+        "temperature_c": 16,
+        "feels_like_c": 15,
+        "condition": "partly_cloudy",
+        "precipitation_probability": 0.2,
+        "wind_speed_kph": 12
+      },
+      "formality": "smart_casual",
+      "base_item_ids": [
+        "g-top-shirt",
+        "g-bottom-jeans",
+        "g-shoes-white"
+      ],
+      "replacement_item_id": "g-shoes-loafers",
+      "garments": [
+        {
+          "id": "g-top-shirt",
+          "brand": "UNIQLO",
+          "product_name": "Oxford Shirt",
+          "slot": "top",
+          "category": "shirt",
+          "colors": [
+            "light_blue"
+          ],
+          "pattern": "solid",
+          "fit": "regular",
+          "formality_score": 3,
+          "warmth_score": 2,
+          "user_confirmed": true
+        },
+        {
+          "id": "g-bottom-jeans",
+          "brand": null,
+          "product_name": "Dark Straight Jeans",
+          "slot": "bottom",
+          "category": "jeans",
+          "colors": [
+            "dark_blue"
+          ],
+          "pattern": "solid",
+          "fit": "straight",
+          "formality_score": 2,
+          "warmth_score": 3,
+          "user_confirmed": true
+        },
+        {
+          "id": "g-shoes-white",
+          "brand": null,
+          "product_name": "White Leather Sneakers",
+          "slot": "shoes",
+          "category": "sneakers",
+          "colors": [
+            "white"
+          ],
+          "pattern": "solid",
+          "fit": "regular",
+          "formality_score": 2,
+          "warmth_score": 2,
+          "user_confirmed": true
+        },
+        {
+          "id": "g-shoes-loafers",
+          "brand": null,
+          "product_name": "Brown Leather Loafers",
+          "slot": "shoes",
+          "category": "loafers",
+          "colors": [
+            "brown"
+          ],
+          "pattern": "solid",
+          "fit": "regular",
+          "formality_score": 3,
+          "warmth_score": 2,
+          "user_confirmed": true
+        }
+      ]
+    },
+    "response": {
+      "outfit": {
+        "id": "outfit-a-revised-001",
+        "item_ids": [
+          "g-top-shirt",
+          "g-bottom-jeans",
+          "g-shoes-loafers"
+        ],
+        "title": "保留轻松上装，增加一点精致度",
+        "reasons": [
+          "衬衫和牛仔裤维持初次约会的自然感。",
+          "乐福鞋比运动鞋略正式，但仍适合休闲上装。",
+          "棕色鞋子为浅蓝和深蓝组合增加温和层次。"
+        ],
+        "tradeoffs": [
+          "整体比原方案稍正式。"
+        ],
+        "source": "remote_api",
+        "score": 0.86
+      },
+      "fallback_used": false,
+      "warning": null,
+      "provider": "mock_remote_api",
+      "generated_at": "2026-11-20T10:50:00+08:00",
+      "request_id": "req-revise-demo-001"
+    }
+  },
+  "fallback_example": {
+    "outfits": [
+      {
+        "id": "fallback-outfit-a",
+        "item_ids": [
+          "g-top-shirt",
+          "g-bottom-jeans",
+          "g-shoes-white"
+        ],
+        "title": "智能休闲基础组合",
+        "reasons": [
+          "正式程度符合当前场合。",
+          "上装、下装和鞋子完整。",
+          "组合适合当前温和温度。"
+        ],
+        "tradeoffs": [
+          "当前为规则备用结果。"
+        ],
+        "source": "fallback",
+        "score": 0.72
+      }
+    ],
+    "requested_count": 3,
+    "result_count_reason": "fallback_degraded",
+    "fallback_used": true,
+    "warning": "AI 服务暂不可用，当前显示规则备用搭配。",
+    "provider": "rule_engine_with_template_explanations",
+    "generated_at": "2026-11-20T10:45:00+08:00",
+    "request_id": "req-recommend-fallback-001"
+  },
+  "error_examples": {
+    "insufficient_wardrobe": {
+      "code": "INSUFFICIENT_WARDROBE",
+      "message": "至少需要一件上装、一件下装和一双鞋。",
+      "request_id": "req-recommend-demo-002",
+      "details": {
+        "missing_slots": [
+          "shoes"
+        ]
+      }
+    },
+    "provider_unavailable": {
+      "code": "PROVIDER_UNAVAILABLE",
+      "message": "图片识别服务暂不可用，请手动录入。",
+      "request_id": "req-analyze-demo-002",
+      "details": {
+        "provider": "remote_vision"
+      }
+    }
+  }
+}
