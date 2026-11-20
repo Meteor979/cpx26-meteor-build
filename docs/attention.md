@@ -12,7 +12,7 @@
 
 - Never commit API keys, `.env`, certificates, or personal data.
 - Keep API keys on the backend only.
-- Keep garment photos local to iOS and send metadata only.
+- Keep garment originals local. Send only temporary compressed images for explicit analysis and send metadata only for recommendations.
 - Do not save team credentials permanently on the borrowed Mac.
 
 ## Demo
