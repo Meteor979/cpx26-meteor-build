@@ -20,7 +20,8 @@ docs/              Product, research, branch ownership, and compliance notes
 - `main`: submission-ready versions that can build and run.
 - `dev`: daily integration branch.
 - `feat/*`: one focused feature per branch.
-- `docs/*`: product and research documentation.
+- `docs/product-*`: product and user research documentation.
+- `docs/eng-*`: engineering workflow and integration documentation.
 - `design/*`: visual, poster, and submission assets.
 
 The iOS development and testing owner is the only person who modifies `WearWise.xcodeproj`. The Windows backend owner does not modify iOS project files. Interface changes must be reflected in `specs/openapi.yaml`.
@@ -42,7 +43,7 @@ Track ownership, commits, tests, and integration status in
 1. Copy `.env.example` to `.env` for local backend configuration.
 2. Never commit `.env`, API keys, certificates, personal photos, or temporary build output.
 3. Keep API keys on the backend only.
-4. Keep garment photos on the iOS device. The backend receives structured metadata only.
+4. Keep garment originals on the iOS device. A temporary compressed image may be sent for explicit image analysis or appearance matching and must not be retained.
 5. Use mock mode before a remote AI provider is configured.
 
 ## Required submission materials

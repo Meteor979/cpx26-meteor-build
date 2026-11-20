@@ -30,8 +30,7 @@ iOS 负责人：
 
 ```text
 apps/ios/**
-design/**
-Xcode 工程、模拟器、页面、交互
+Xcode 工程、模拟器、页面、网络层和交互
 ```
 
 后端负责人：
@@ -46,10 +45,13 @@ services/api/**
 ```text
 specs/openapi.yaml
 specs/examples/sample-data.json
-docs/**
+docs/backend-execution-guide.md
+docs/frontend-backend-integration.md
+docs/build-status.md
 ```
 
 共享文件每次只能有一个负责人修改。建议后端提出字段变更，iOS 负责人确认后再合并。
+目录和角色的完整权威规则见 [CONTRIBUTING.md](../CONTRIBUTING.md)。
 
 ## 3. 前端不等待后端
 
