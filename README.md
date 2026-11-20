@@ -29,6 +29,16 @@ The iOS development and testing owner is the only person who modifies `WearWise.
 
 Project code will be created during the event. Until then, this repository contains planning and compliance files only.
 
+The backend owner should start with
+[docs/backend-execution-guide.md](docs/backend-execution-guide.md), which defines
+the first runnable milestone, task order, Mock policy, and acceptance evidence.
+
+Both developers should follow
+[docs/frontend-backend-integration.md](docs/frontend-backend-integration.md) to
+keep the iOS client and backend on the same contract and integration schedule.
+Track ownership, commits, tests, and integration status in
+[docs/build-status.md](docs/build-status.md).
+
 1. Copy `.env.example` to `.env` for local backend configuration.
 2. Never commit `.env`, API keys, certificates, personal photos, or temporary build output.
 3. Keep API keys on the backend only.
