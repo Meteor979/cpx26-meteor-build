@@ -48,6 +48,7 @@ Status owner: iOS/backend integration coordinator
 | 标签与商品候选 | iOS | 未开始 | `feat/ios-garment-match` | - | - | - | 不鉴定正版 |
 | 三套推荐与详情 | iOS | 未开始 | `feat/ios-recommendation` | - | - | - | Mock 和三态处理 |
 | 替换、确认与缓存 | iOS | 未开始 | `feat/ios-outfit-edit` | - | - | - | 支持本地降级 |
+| 公开网页交互 Demo | iOS/前端 | 未开始 | `feat/web-demo` | - | - | - | 使用静态 Mock，不依赖后端 |
 
 ## 4. 里程碑
 
