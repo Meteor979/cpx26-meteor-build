@@ -181,15 +181,16 @@ final class OccasionRecommendationTests: XCTestCase {
         XCTAssertEqual(resolved.sourceLabel, "后端结果")
     }
 
-    func testFewerThanThreeOutfitsExplainsLimit() {
+    func testLimitedWardrobeCreatesThreeExplicitVariants() {
         let response = LocalRecommendationEngine.recommend(
             context: context(),
             garments: makeCoreGarments()
         )
 
-        XCTAssertEqual(response.outfits.count, 1)
-        XCTAssertEqual(response.resultCountReason, "limited_candidates")
+        XCTAssertEqual(response.outfits.count, 3)
+        XCTAssertEqual(response.resultCountReason, "fallback_degraded")
         XCTAssertNotNil(response.warning)
+        XCTAssertEqual(Set(response.outfits.map(\.itemIDs)).count, 1)
     }
 
     func testLocalRevisionUpdatesOnlyMatchingSlot() {

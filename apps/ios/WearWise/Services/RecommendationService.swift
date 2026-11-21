@@ -160,12 +160,26 @@ enum LocalRecommendationEngine {
             }
             return left > right
         }
-        let selected = Array(candidates.prefix(3))
-        let reason = selected.count >= 3
+        let distinctCount = candidates.count
+        var selected = Array(candidates.prefix(3))
+        if selected.count < 3, !tops.isEmpty, !bottoms.isEmpty, !shoes.isEmpty {
+            let baseItems = [tops[0], bottoms[0], shoes[0]]
+            while selected.count < 3 {
+                selected.append(
+                    makeOutfit(
+                        items: baseItems,
+                        target: context.formality,
+                        index: selected.count,
+                        isFallbackVariant: true
+                    )
+                )
+            }
+        }
+        let reason = distinctCount >= 3
             ? "three_available"
-            : "limited_candidates"
-        let warning = selected.count < 3
-            ? "当前衣柜最多可组成 \(selected.count) 套不同搭配。"
+            : "fallback_degraded"
+        let warning = distinctCount < 3
+            ? "当前衣柜组合有限，备用方案会复用同一组衣物照片。"
             : nil
 
         return RecommendationResponse(
@@ -224,7 +238,8 @@ enum LocalRecommendationEngine {
     private static func makeOutfit(
         items: [Garment],
         target: FormalityBand,
-        index: Int
+        index: Int,
+        isFallbackVariant: Bool = false
     ) -> Outfit {
         let average = Double(items.map(\.formalityScore).reduce(0, +))
             / Double(max(1, items.count))
@@ -242,18 +257,23 @@ enum LocalRecommendationEngine {
         }
         let formalReason = "正式度接近\(target.label)，适合当前场合。"
         let names = items.map(\.name).joined(separator: "、")
-        let reasons = [
+        var reasons = [
             colorReason,
             formalReason,
             "\(names)均来自本地照片衣柜。"
         ]
+        var tradeoffs = ["当前为本地规则结果，未经过真实 AI 生成解释。"]
+        if isFallbackVariant {
+            reasons.append("当前为备用变体，复用同一组衣物照片。")
+            tradeoffs.append("如需更多不同组合，请继续添加同类衣物。")
+        }
 
         return Outfit(
             id: "local-\(index + 1)-\(items.map { $0.id.uuidString.prefix(4) }.joined(separator: "-").lowercased())",
             itemIDs: items.map { $0.id.uuidString.lowercased() },
             title: title,
             reasons: reasons,
-            tradeoffs: ["当前为本地规则结果，未经过真实 AI 生成解释。"],
+            tradeoffs: tradeoffs,
             source: .mock,
             score: score
         )
