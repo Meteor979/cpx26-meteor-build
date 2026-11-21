@@ -1,8 +1,8 @@
 # WearWise Backend
 
-Backend service for WearWise. The current milestone implements `GET /health`,
-`GET /v1/presets`, and `POST /v1/occasions/resolve` with deterministic Mock data.
-It does not call external AI, weather, or search services.
+Backend service for WearWise. The current milestone implements health, occasion
+context, rule-based recommendation, and outfit revision with deterministic Mock
+data. It does not call external AI, weather, or search services.
 
 ## Requirements
 
@@ -87,6 +87,22 @@ The presets endpoint returns the four fixed policies from
 `specs/examples/sample-data.json`. The occasion resolver performs local
 normalization, exact name/alias matching, and deterministic keyword matching.
 Unknown queries receive a low-confidence fixed fallback.
+
+## Recommendation Mock endpoints
+
+```powershell
+curl.exe -i -X POST "http://127.0.0.1:8000/v1/recommendations" `
+  -H "Content-Type: application/json" `
+  --data-binary "@examples/recommendation-rule-request.json"
+
+curl.exe -i -X POST "http://127.0.0.1:8000/v1/outfits/revise" `
+  -H "Content-Type: application/json" `
+  --data-binary "@examples/outfit-revision-rule-request.json"
+```
+
+The recommendation endpoints return deterministic rules with
+`provider=rule_engine_mock`, `fallback_used=true`, and an explicit warning. They
+return only stable garment IDs and never include local photo paths or image URLs.
 
 Do not commit `.env`, credentials, recordings, personal photos, or generated
 build output.

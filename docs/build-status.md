@@ -34,8 +34,8 @@ Status owner: iOS/backend integration coordinator
 | `GET /v1/presets` | 后端 | Mock | `feat/api-context` | `9beadf7` | Python 3.14.7；pytest 14 passed；presets HTTP 200；version=1 HTTP 304；Python 3.9.x 待独立 Mac 验证 | 返回 sample-data 的 4 个固定预设，不访问外网 |
 | `POST /v1/occasions/resolve` | 后端 | Mock | `feat/api-context` | `9beadf7` | pytest 14 passed；精确 first-date 200；alias club-speech 200；fallback confidence 0.35；空查询 422；Python 3.9.x 待独立 Mac 验证 | 本地规范化、名称/alias/关键词匹配与低置信度 fallback |
 | `POST /v1/weather/current` | 后端 | 未开始 | `feat/api-context` | - | - | 坐标不得持久化 |
-| `POST /v1/recommendations` | 后端 | 未开始 | `feat/api-core` | - | - | Mock 优先 |
-| `POST /v1/outfits/revise` | 后端 | 未开始 | `feat/api-core` | - | - | 保持其他槽位锁定 |
+| `POST /v1/recommendations` | 后端 | Mock | `feat/api-recommendation` | `9c2e2da` | Python 3.14.7；pytest 25 passed；UUID 请求 HTTP 200，返回 3 套；Python 3.9.x 待独立 Mac 验证 | `rule_engine_mock`，fallback_used=true；item_ids 均来自请求且无照片字段 |
+| `POST /v1/outfits/revise` | 后端 | Mock | `feat/api-recommendation` | `9c2e2da` | pytest 25 passed；替换鞋 HTTP 200；top/bottom ID 不变，仅鞋 ID 变化 | 完整 Outfit 响应；不调用 AI |
 | `POST /v1/garments/analyze` | 后端 | 未开始 | `feat/api-garment` | - | - | 先返回固定识别结果 |
 | `POST /v1/garments/match` | 后端 | 未开始 | `feat/api-garment` | - | - | 先返回固定商品候选 |
 

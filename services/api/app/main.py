@@ -7,7 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.errors import ApiError
-from app.routers import context, system
+from app.routers import context, recommendations, system
 
 app = FastAPI(
     title="WearWise API",
@@ -16,6 +16,7 @@ app = FastAPI(
 )
 app.include_router(system.router)
 app.include_router(context.router)
+app.include_router(recommendations.router)
 
 
 def _request_id_from_body(body: Any) -> Optional[str]:
