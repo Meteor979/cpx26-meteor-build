@@ -123,13 +123,17 @@ struct WardrobeView: View {
 
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
                         ForEach(items) { garment in
-                            Button {
-                                activeSheet = .edit(garment)
-                            } label: {
+                            VStack(spacing: 8) {
                                 GarmentCard(garment: garment)
+
+                                Button {
+                                    activeSheet = .edit(garment)
+                                } label: {
+                                    Label("编辑衣物", systemImage: "pencil")
+                                }
+                                .buttonStyle(WearWiseSecondaryButtonStyle())
+                                .accessibilityHint("修改衣物类型和标签")
                             }
-                            .buttonStyle(.plain)
-                            .accessibilityHint("编辑衣物类型和标签")
                         }
                     }
                 }
@@ -177,6 +181,7 @@ private struct GarmentCard: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(Color.wearWiseBorder, lineWidth: 1)
         }
+        .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
         .accessibilityLabel(
             "\(garment.name)，\(garment.slot.label)，\(garment.colorLabel)，\(garment.formalityLabel)，\(garment.source.label)"
