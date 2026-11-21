@@ -66,18 +66,20 @@ the repository, sent to a backend, or included in logs.
 
 Deleting or resetting the Simulator app removes its local wardrobe.
 
-## Generate and run
+## Open and run
 
-On macOS with Xcode and XcodeGen:
+The shared Xcode project is committed:
 
 ```bash
 cd apps/ios
-xcodegen generate
 open WearWise.xcodeproj
 ```
 
 Choose the shared `WearWise` scheme and run on an iOS 17 or newer Simulator.
 The Simulator has no camera; use **从相册选择** to test the local photo flow.
+
+`project.yml` remains the source of truth for regeneration. If XcodeGen is
+installed, run `xcodegen generate` after changing that file.
 
 Run the persistence and missing-photo tests:
 
