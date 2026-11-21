@@ -14,44 +14,33 @@ private struct HomeView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 28) {
+            VStack(alignment: .leading, spacing: 26) {
                 header
                 mainActions
                 recentWardrobe
             }
             .frame(maxWidth: 720)
             .padding(.horizontal, 22)
-            .padding(.vertical, 20)
+            .padding(.top, 24)
+            .padding(.bottom, 20)
             .frame(maxWidth: .infinity)
         }
         .background(Color.wearWiseBackground)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Label("WearWise", systemImage: "circle.grid.cross")
-                    .font(.headline)
-                    .accessibilityLabel("WearWise 衣语")
-            }
-        }
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("WEARWISE")
-                .font(.caption.weight(.bold))
-                .tracking(2.4)
+        VStack(alignment: .leading, spacing: 18) {
+            Label("WearWise", systemImage: "circle.grid.cross")
+                .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
+                .accessibilityLabel("WearWise 衣语")
 
-            Text("看清已有衣物，\n穿得更有把握。")
+            Text("穿得更有把握。")
                 .font(.system(.largeTitle, design: .rounded, weight: .bold))
                 .tracking(-1.2)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityAddTraits(.isHeader)
-
-            Text("照片保留真实颜色，界面只保留清楚的黑色、白色与灰色层级。")
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -63,8 +52,8 @@ private struct HomeView: View {
                 HomeActionCard(
                     title: "我的衣柜",
                     detail: garmentStore.garments.isEmpty
-                        ? "还没有衣物，先添加一件"
-                        : "已有 \(garmentStore.garments.count) 件衣物",
+                        ? "添加第一件衣物"
+                        : "\(garmentStore.garments.count) 件衣物",
                     systemImage: "cabinet.fill"
                 )
             }
@@ -76,7 +65,7 @@ private struct HomeView: View {
             } label: {
                 HomeActionCard(
                     title: "今天穿什么？",
-                    detail: "场合与三套搭配将在下一分支接入",
+                    detail: "即将开放",
                     systemImage: "wand.and.stars"
                 )
             }
@@ -122,23 +111,23 @@ private struct HomeActionCard: View {
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: systemImage)
-                .font(.system(size: 25, weight: .semibold))
-                .frame(width: 52, height: 52)
-                .background(Color.primary.opacity(0.08), in: RoundedRectangle(cornerRadius: 14))
+                .font(.system(size: 24, weight: .semibold))
+                .frame(width: 40, height: 40)
                 .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .font(.title3.weight(.bold))
+                    .font(.headline)
                 Text(detail)
                     .font(.subheadline)
-                    .opacity(0.76)
+                    .opacity(0.72)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            .multilineTextAlignment(.leading)
 
             Image(systemName: "chevron.right")
-                .font(.headline)
+                .font(.subheadline.weight(.semibold))
                 .accessibilityHidden(true)
         }
         .accessibilityElement(children: .combine)
@@ -156,7 +145,7 @@ private struct OccasionFoundationView: View {
                 .font(.largeTitle.weight(.bold))
                 .accessibilityAddTraits(.isHeader)
 
-            Text("当前分支只完成图形首页和照片衣柜。下一分支接入场合输入、三套照片推荐和替换。")
+            Text("将在下一分支开放。")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

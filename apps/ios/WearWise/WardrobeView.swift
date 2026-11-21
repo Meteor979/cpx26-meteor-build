@@ -42,6 +42,7 @@ struct WardrobeView: View {
         .background(Color.wearWiseBackground)
         .navigationTitle("我的衣柜")
         .navigationBarTitleDisplayMode(.large)
+        .toolbar(.visible, for: .navigationBar)
         .sheet(isPresented: $showsAddGarment) {
             AddGarmentView()
                 .environmentObject(garmentStore)
@@ -63,14 +64,9 @@ struct WardrobeView: View {
 
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: 5) {
-                Text("照片衣柜")
-                    .font(.title2.weight(.bold))
-                    .accessibilityAddTraits(.isHeader)
-                Text("按上下装、鞋和外套整理")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
+            Text("照片衣柜")
+                .font(.title2.weight(.bold))
+                .accessibilityAddTraits(.isHeader)
 
             Spacer(minLength: 12)
 
@@ -94,7 +90,7 @@ struct WardrobeView: View {
             VStack(spacing: 6) {
                 Text("先拍下第一件衣物")
                     .font(.title3.weight(.bold))
-                Text("照片、名称和正式程度只保存在本机；之后推荐会直接使用这些照片。")
+                Text("照片只保存在本机。")
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)

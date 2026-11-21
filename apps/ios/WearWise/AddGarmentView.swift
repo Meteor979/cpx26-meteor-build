@@ -121,7 +121,7 @@ struct AddGarmentView: View {
             .disabled(!cameraAvailable)
 
             if !cameraAvailable {
-                Text("模拟器没有相机，可从相册选择一张测试图片。")
+                Text("模拟器请从相册选择。")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
