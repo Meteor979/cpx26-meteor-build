@@ -1,44 +1,42 @@
-# WearWise iOS Development Blueprint
+# WearWise iOS Foundation
 
-Owner: iOS development, testing, and release owner.
-
-Formal implementation has not started. Full requirements are in
+This branch contains the first graphical, photo-first WearWise milestone. Full
+product requirements are in
 [docs/eng-development-requirements.md](../../docs/eng-development-requirements.md).
 
 ## Product target
 
 The app targets people with color vision deficiency and low vision. Users can
-photograph garments, manage a local photo wardrobe, and view three outfits made
-from their own clothing images.
+photograph garments, manage a local photo wardrobe, and later view three outfits
+made from their own clothing images.
 
 Total blindness is out of scope. VoiceOver and optional voice narration remain
-supported, but the primary flow uses visible graphical controls.
+supported, but the primary flow uses visible graphical controls. Microphone
+permission is not requested in this milestone.
 
-## Required architecture
+## Included in this milestone
+
+- Black-and-white, Dynamic Type-aware home screen.
+- Large icon-and-text actions with a minimum 56 pt tap height.
+- Photo wardrobe grouped by garment slot.
+- Camera capture and photo-library import.
+- Local image compression, thumbnail generation, and JSON metadata persistence.
+- Default two-column photo grid and a single-column layout at larger text sizes.
+- Fixed-aspect photo cards and a named placeholder when a local image is missing.
+- An explicit next-step state for occasion recommendations.
+
+## Architecture
 
 ```text
 SwiftUI View
-→ Wardrobe ViewModel
-    → Local Photo Store
-    → Garment Recognition Service
-→ Recommendation ViewModel
-    → Photo Collage Mapper
-→ Optional Voice Assistant
-→ RecommendationService
+→ GarmentStore (@MainActor)
+    → Local Photo Files
+    → garments.json
+→ Image Processor
 ```
 
-## Required interface behavior
-
-- Black-and-white, high-contrast design.
-- Buttons contain both an icon and text and are at least 56 pt high.
-- Selection, disabled, warning, and error states use shape, outline, labels, or
-  symbols in addition to color.
-- The wardrobe displays local garment thumbnails.
-- Each recommendation displays the actual garment photos associated with its
-  item IDs.
-- Missing photos render a labeled placeholder.
-- Main content remains usable at 200% Dynamic Type.
-- Voice narration is opt-in and cannot cover a control or block the visual flow.
+Views do not call remote services or parse API JSON. The first milestone has no
+network dependency and does not send photos anywhere.
 
 ## Photo storage
 
@@ -47,34 +45,54 @@ Store locally:
 ```text
 garment_id
 local_photo_path
-thumbnail
+thumbnail_path
 captured_at
+name
+slot
+category
+colors
+pattern
+fit
+material
+formality_score
+warmth_score
+user_confirmed
+source
 ```
 
-Never add these fields to recommendation requests. The client combines response
-item IDs with local wardrobe records when rendering a recommendation.
+Photos and thumbnails are stored in Application Support under
+`WearWiseGarments`; metadata is saved in `garments.json`. No photo is written to
+the repository, sent to a backend, or included in logs.
 
-## Required directories
+Deleting or resetting the Simulator app removes its local wardrobe.
 
-After implementation branches begin:
+## Generate and run
 
-```text
-apps/ios/
-├── project.yml
-├── WearWise/
-│   ├── WearWiseApp.swift
-│   ├── ContentView.swift
-│   ├── WardrobeView.swift
-│   ├── GarmentPhotoStore.swift
-│   ├── RecommendationView.swift
-│   ├── PhotoCollageView.swift
-│   ├── OptionalVoiceAssistant.swift
-│   ├── WearWiseModels.swift
-│   └── Info.plist
-└── README.md
+On macOS with Xcode and XcodeGen:
+
+```bash
+cd apps/ios
+xcodegen generate
+open WearWise.xcodeproj
 ```
 
-## First executable milestone
+Choose the shared `WearWise` scheme and run on an iOS 17 or newer Simulator.
+The Simulator has no camera; use **从相册选择** to test the local photo flow.
+
+Run the persistence and missing-photo tests:
+
+```bash
+xcodebuild test \
+  -project WearWise.xcodeproj \
+  -scheme WearWise \
+  -destination "platform=iOS Simulator,name=iPhone 17" \
+  CODE_SIGNING_ALLOWED=NO
+```
+
+The first milestone also requires screenshots at the default text size and at
+200% Dynamic Type.
+
+## Acceptance flow
 
 ```text
 App opens in black-and-white high-contrast UI
@@ -82,24 +100,7 @@ App opens in black-and-white high-contrast UI
 → add a garment photo from camera or photo library
 → save the local photo record
 → garment thumbnail appears in the wardrobe
-```
-
-The first milestone also requires a screenshot at the default text size and at a
-larger accessibility size.
-
-## Acceptance flow
-
-```text
-打开照片衣柜
-添加一件上装
-保存主图
-输入第一次去女朋友家吃饭
-选择自然
-生成三套搭配
-确认三套都显示衣柜照片
-打开一套详情
-替换鞋
-确认保存
+→ restart the app and confirm the photo and metadata remain
 ```
 
 Do not commit private photos, recordings, API keys, generated build output, or
