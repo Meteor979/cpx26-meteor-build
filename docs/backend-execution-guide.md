@@ -39,6 +39,16 @@ WearWise.xcodeproj
 接口字段需要变化时，必须在同一提交中修改 OpenAPI 和样例数据，并通知 iOS 负责人。
 不能只改 Python 模型，让前端自己猜字段。
 
+### Python 3.9 兼容规则
+
+- FastAPI 后端的最低支持版本是 Python 3.9，开发、CI 和部署环境都必须满足。
+- 类型标注使用 `Optional`、`List`、`Dict` 和 `Tuple`，从 `typing` 导入。
+- 禁止使用 `X | None`、`int | None`、`list[...]`、`dict[...]` 等只适用于较新
+  Python 的写法，避免 Mac 与 Windows 环境不一致。
+- 更换 Python 版本后必须删除或清空旧虚拟环境并重新创建 `.venv`，不能复用旧
+  Python 解释器生成的依赖。
+- 每次提交报告必须写明实际 Python 版本，并附上 `python --version` 的结果。
+
 ## 3. 第一天的第一个里程碑
 
 先建立独立分支：
