@@ -30,7 +30,7 @@ Status owner: iOS/backend integration coordinator
 
 | 接口 | 负责人 | 状态 | 分支 | Commit | 测试/证据 | 备注 |
 |---|---|---|---|---|---|---|
-| `GET /health` | 后端 | 实现 | `feat/api-foundation` | `56f3f6f` | Python 3.14.7；pytest: 2 passed；`/health`: HTTP 200，providers=[] | 等待 Mac 独立环境复测后改为完成 |
+| `GET /health` | 后端 | 完成 | `feat/api-foundation` | `56f3f6f` | Python 3.9.6；pytest 2 passed；Mac 环境 GET /health 200 | 响应包含 ok、UTC timestamp 和空 providers |
 | `GET /v1/presets` | 后端 | 未开始 | `feat/api-context` | - | - | 先使用固定预设 |
 | `POST /v1/occasions/resolve` | 后端 | 未开始 | `feat/api-context` | - | - | 本地匹配后再 AI |
 | `POST /v1/weather/current` | 后端 | 未开始 | `feat/api-context` | - | - | 坐标不得持久化 |
