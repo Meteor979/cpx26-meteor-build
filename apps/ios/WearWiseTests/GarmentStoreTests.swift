@@ -41,11 +41,16 @@ final class GarmentStoreTests: XCTestCase {
         )
 
         let reloaded = GarmentStore(rootDirectory: temporaryDirectory)
+        let garmentCount = reloaded.garments.count
+        let firstGarment = reloaded.garments.first
+        let image = firstGarment.flatMap {
+            reloaded.image(for: $0)
+        }
 
-        XCTAssertEqual(reloaded.garments.count, 1)
-        XCTAssertEqual(reloaded.garments.first?.name, "浅蓝牛津衬衫")
-        XCTAssertEqual(reloaded.garments.first?.slot, .top)
-        XCTAssertNotNil(reloaded.image(for: try XCTUnwrap(reloaded.garments.first)))
+        XCTAssertEqual(garmentCount, 1)
+        XCTAssertEqual(firstGarment?.name, "浅蓝牛津衬衫")
+        XCTAssertEqual(firstGarment?.slot, .top)
+        XCTAssertNotNil(image)
     }
 
     @MainActor
@@ -75,11 +80,14 @@ final class GarmentStoreTests: XCTestCase {
 
         let reloaded = GarmentStore(rootDirectory: temporaryDirectory)
         let reloadedGarment = try XCTUnwrap(reloaded.garments.first)
+        let garmentCount = reloaded.garments.count
+        let image = reloaded.image(for: reloadedGarment)
 
-        XCTAssertEqual(reloaded.garments.count, 1)
-        XCTAssertNil(reloaded.image(for: reloadedGarment))
+        XCTAssertEqual(garmentCount, 1)
+        XCTAssertNil(image)
     }
 
+    @MainActor
     func testEditingGarmentUpdatesSlotAndPreservesPhoto() throws {
         let prepared = try GarmentImageProcessor.prepare(makeTestImageData())
         let store = GarmentStore(rootDirectory: temporaryDirectory)
@@ -110,11 +118,16 @@ final class GarmentStoreTests: XCTestCase {
             warmthScore: 2
         )
         let reloaded = GarmentStore(rootDirectory: temporaryDirectory)
+        let garmentCount = reloaded.garments.count
+        let firstGarment = reloaded.garments.first
+        let image = firstGarment.flatMap {
+            reloaded.image(for: $0)
+        }
 
         XCTAssertEqual(updated.slot, .shoes)
-        XCTAssertEqual(reloaded.garments.count, 1)
-        XCTAssertEqual(reloaded.garments.first?.slot, .shoes)
-        XCTAssertNotNil(reloaded.image(for: try XCTUnwrap(reloaded.garments.first)))
+        XCTAssertEqual(garmentCount, 1)
+        XCTAssertEqual(firstGarment?.slot, .shoes)
+        XCTAssertNotNil(image)
     }
 
     private func makeTestImageData() -> Data {

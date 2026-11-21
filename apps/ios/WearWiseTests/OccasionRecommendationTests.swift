@@ -6,10 +6,12 @@ final class OccasionRecommendationTests: XCTestCase {
     func testEmptyOccasionCannotResolve() async {
         let viewModel = OccasionRecommendationViewModel()
         viewModel.query = "   "
+        let canResolve = viewModel.canResolve
 
-        XCTAssertFalse(viewModel.canResolve)
+        XCTAssertFalse(canResolve)
         await viewModel.resolveOccasion()
-        XCTAssertEqual(viewModel.errorMessage, "请先输入场合。")
+        let errorMessage = viewModel.errorMessage
+        XCTAssertEqual(errorMessage, "请先输入场合。")
     }
 
     func testLocalPresetMatchesWithoutNetwork() async throws {
@@ -30,16 +32,21 @@ final class OccasionRecommendationTests: XCTestCase {
         )
         viewModel.query = "社团演讲"
         await viewModel.resolveOccasion()
+        let clubFormality = viewModel.formality
 
-        XCTAssertEqual(viewModel.formality, .business)
+        XCTAssertEqual(clubFormality, .business)
 
         viewModel.query = "去夜店"
         viewModel.queryDidChange()
+        let profile = viewModel.profile
+        let resolvedQuery = viewModel.resolvedQuery
+        let source = viewModel.resolutionSource
+        let formality = viewModel.formality
 
-        XCTAssertNil(viewModel.profile)
-        XCTAssertEqual(viewModel.resolvedQuery, "")
-        XCTAssertEqual(viewModel.resolutionSource, "")
-        XCTAssertEqual(viewModel.formality, .smartCasual)
+        XCTAssertNil(profile)
+        XCTAssertEqual(resolvedQuery, "")
+        XCTAssertEqual(source, "")
+        XCTAssertEqual(formality, .smartCasual)
     }
 
     @MainActor
@@ -51,9 +58,11 @@ final class OccasionRecommendationTests: XCTestCase {
 
         viewModel.usePreset(preset)
         viewModel.queryDidChange()
+        let query = viewModel.query
+        let formality = viewModel.formality
 
-        XCTAssertEqual(viewModel.query, "社团演讲")
-        XCTAssertEqual(viewModel.formality, .business)
+        XCTAssertEqual(query, "社团演讲")
+        XCTAssertEqual(formality, .business)
     }
 
     func testNightOutOfflineFallbackIsCasual() async throws {
@@ -311,10 +320,13 @@ final class OccasionRecommendationTests: XCTestCase {
         try store.save(plan)
 
         let reloaded = SavedPlanStore(rootDirectory: directory)
+        let planCount = reloaded.plans.count
+        let latestOccasion = reloaded.latest?.occasion
+        let latestItemIDs = reloaded.latest?.itemIDs
 
-        XCTAssertEqual(reloaded.plans.count, 1)
-        XCTAssertEqual(reloaded.latest?.occasion, "第一次约会")
-        XCTAssertEqual(reloaded.latest?.itemIDs, plan.itemIDs)
+        XCTAssertEqual(planCount, 1)
+        XCTAssertEqual(latestOccasion, "第一次约会")
+        XCTAssertEqual(latestItemIDs, plan.itemIDs)
     }
 
     private func context() -> RecommendationContext {
