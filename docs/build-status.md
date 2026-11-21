@@ -31,8 +31,8 @@ Status owner: iOS/backend integration coordinator
 | 接口 | 负责人 | 状态 | 分支 | Commit | 测试/证据 | 备注 |
 |---|---|---|---|---|---|---|
 | `GET /health` | 后端 | 完成 | `feat/api-foundation` | `56f3f6f` | Python 3.9.6；pytest 2 passed；Mac 环境 GET /health 200 | 响应包含 ok、UTC timestamp 和空 providers |
-| `GET /v1/presets` | 后端 | Mock | `feat/api-context` | `bd5dd9e` | Python 3.14.7；pytest 14 passed；GET `/v1/presets?limit=4` HTTP 200；version=1 HTTP 304 | 返回 sample-data 的 4 个固定预设，不访问外网 |
-| `POST /v1/occasions/resolve` | 后端 | Mock | `feat/api-context` | `bd5dd9e` | Python 3.14.7；pytest 14 passed；POST `第一次约会` HTTP 200，返回 first-date | 本地规范化、名称/alias/关键词匹配与低置信度 fallback |
+| `GET /v1/presets` | 后端 | Mock | `feat/api-context` | `9beadf7` | Python 3.14.7；pytest 14 passed；presets HTTP 200；version=1 HTTP 304；Python 3.9.x 待独立 Mac 验证 | 返回 sample-data 的 4 个固定预设，不访问外网 |
+| `POST /v1/occasions/resolve` | 后端 | Mock | `feat/api-context` | `9beadf7` | pytest 14 passed；精确 first-date 200；alias club-speech 200；fallback confidence 0.35；空查询 422；Python 3.9.x 待独立 Mac 验证 | 本地规范化、名称/alias/关键词匹配与低置信度 fallback |
 | `POST /v1/weather/current` | 后端 | 未开始 | `feat/api-context` | - | - | 坐标不得持久化 |
 | `POST /v1/recommendations` | 后端 | 未开始 | `feat/api-core` | - | - | Mock 优先 |
 | `POST /v1/outfits/revise` | 后端 | 未开始 | `feat/api-core` | - | - | 保持其他槽位锁定 |
@@ -58,7 +58,7 @@ Status owner: iOS/backend integration coordinator
 | 检查点 | 目标 | 状态 | 最后验证 |
 |---|---|---|---|
 | 开始后 1 小时 | iOS 工程可启动；后端 `/health` 可运行 | 后端完成，iOS 待验证 | 本地 Windows：Python 3.14.7，pytest 2 passed；独立 Mac：Python 3.9.6，pytest 2 passed，`/health` HTTP 200（`56f3f6f`） |
-| 开始后 3 小时 | 黑白图形首页和照片衣柜列表可运行 | 未开始 | - |
+| 开始后 3 小时 | 黑白图形首页和照片衣柜列表可运行 | 后端完成，前端待联调 | presets 200/304、occasions exact/alias/fallback/422 已验证；pytest 14 passed |
 | 开始后 6 小时 | 三套照片推荐、替换和确认本地闭环 | 未开始 | - |
 | 开始后 14 小时 | iOS 调用推荐 Mock 并映射本地照片 | 未开始 | - |
 | 第一天结束 | 可演示版本和部署地址 | 未开始 | - |
