@@ -200,7 +200,7 @@ struct GarmentPhotoView: View {
     }
 }
 
-private struct GarmentPlaceholderView: View {
+struct GarmentPlaceholderView: View {
     let name: String
     let systemImage: String
 

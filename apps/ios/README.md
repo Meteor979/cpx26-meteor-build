@@ -23,7 +23,11 @@ permission is not requested in this milestone.
 - Local image compression, thumbnail generation, and JSON metadata persistence.
 - Default two-column photo grid and a single-column layout at larger text sizes.
 - Fixed-aspect photo cards and a named placeholder when a local image is missing.
-- An explicit next-step state for occasion recommendations.
+- Free-text occasion input with four local presets.
+- Backend presets and occasion resolution with local cache/fallback.
+- Three local photo outfit cards with outfit detail and source labels.
+- Same-slot replacement with local fallback.
+- Saved-plan persistence and a recent-plan card on the home screen.
 
 ## Architecture
 
@@ -36,7 +40,25 @@ SwiftUI View
 ```
 
 Views do not call remote services or parse API JSON. The first milestone has no
-network dependency and does not send photos anywhere.
+network dependency; the occasion layer is isolated behind API and service
+protocols. Photos are never sent to the backend.
+
+## API configuration
+
+The default API address is:
+
+```text
+http://127.0.0.1:8000
+```
+
+For a physical device, set this environment variable in the Xcode scheme:
+
+```text
+WEARWISE_API_BASE_URL=http://<Mac-LAN-IP>:8000
+```
+
+The bundled `NSAppTransportSecurity` exception only enables local network
+development. Do not use it for a public backend.
 
 ## Photo storage
 
@@ -93,6 +115,10 @@ xcodebuild test \
 
 The first milestone also requires screenshots at the default text size and at
 200% Dynamic Type.
+
+The occasion/recommendation suite also covers empty input, local matches,
+snake-case decoding, network fallback, 422 responses, 304 cache reuse, UUID
+mapping, reduced result counts, replacement, and saved-plan reload.
 
 ## Acceptance flow
 

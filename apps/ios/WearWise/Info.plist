@@ -26,6 +26,13 @@
     <string>衣语使用相机拍摄你的衣物，并把照片只保存在这台设备上。</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>衣语从照片中选择衣物图片，并把副本只保存在这台设备上。</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>衣语连接本机开发服务，以生成当前场合的搭配结果。</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+    </dict>
     <key>UILaunchScreen</key>
     <dict/>
     <key>UISupportedInterfaceOrientations</key>

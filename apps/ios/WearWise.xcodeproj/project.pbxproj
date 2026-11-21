@@ -15,7 +15,18 @@
 		A1000000000000000000010b /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000010a /* ContentView.swift */; };
 		A1000000000000000000010d /* WardrobeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000010c /* WardrobeView.swift */; };
 		A1000000000000000000010f /* AddGarmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000010e /* AddGarmentView.swift */; };
-		A10000000000000000000113 /* GarmentStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000112 /* GarmentStoreTests.swift */; };
+		A10000000000000000000111 /* Models/OccasionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000110 /* Models/OccasionModels.swift */; };
+		A10000000000000000000113 /* Models/RecommendationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000112 /* Models/RecommendationModels.swift */; };
+		A10000000000000000000115 /* Services/APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000114 /* Services/APIClient.swift */; };
+		A10000000000000000000117 /* Services/OccasionServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000116 /* Services/OccasionServices.swift */; };
+		A10000000000000000000119 /* Services/RecommendationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000118 /* Services/RecommendationService.swift */; };
+		A1000000000000000000011b /* Stores/SavedPlanStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000011a /* Stores/SavedPlanStore.swift */; };
+		A1000000000000000000011d /* ViewModels/OccasionRecommendationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000011c /* ViewModels/OccasionRecommendationViewModel.swift */; };
+		A1000000000000000000011f /* Views/OccasionInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000011e /* Views/OccasionInputView.swift */; };
+		A10000000000000000000121 /* Views/RecommendationResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000120 /* Views/RecommendationResultsView.swift */; };
+		A10000000000000000000123 /* Views/OutfitDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000122 /* Views/OutfitDetailView.swift */; };
+		A10000000000000000000127 /* GarmentStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000126 /* GarmentStoreTests.swift */; };
+		A10000000000000000000129 /* OccasionRecommendationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000128 /* OccasionRecommendationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,8 +50,19 @@
 		A1000000000000000000010a /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A1000000000000000000010c /* WardrobeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WardrobeView.swift; sourceTree = "<group>"; };
 		A1000000000000000000010e /* AddGarmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGarmentView.swift; sourceTree = "<group>"; };
-		A10000000000000000000112 /* GarmentStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarmentStoreTests.swift; sourceTree = "<group>"; };
-		A10000000000000000000110 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A10000000000000000000110 /* Models/OccasionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/OccasionModels.swift; sourceTree = "<group>"; };
+		A10000000000000000000112 /* Models/RecommendationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/RecommendationModels.swift; sourceTree = "<group>"; };
+		A10000000000000000000114 /* Services/APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/APIClient.swift; sourceTree = "<group>"; };
+		A10000000000000000000116 /* Services/OccasionServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/OccasionServices.swift; sourceTree = "<group>"; };
+		A10000000000000000000118 /* Services/RecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/RecommendationService.swift; sourceTree = "<group>"; };
+		A1000000000000000000011a /* Stores/SavedPlanStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/SavedPlanStore.swift; sourceTree = "<group>"; };
+		A1000000000000000000011c /* ViewModels/OccasionRecommendationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModels/OccasionRecommendationViewModel.swift; sourceTree = "<group>"; };
+		A1000000000000000000011e /* Views/OccasionInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/OccasionInputView.swift; sourceTree = "<group>"; };
+		A10000000000000000000120 /* Views/RecommendationResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RecommendationResultsView.swift; sourceTree = "<group>"; };
+		A10000000000000000000122 /* Views/OutfitDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/OutfitDetailView.swift; sourceTree = "<group>"; };
+		A10000000000000000000126 /* GarmentStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarmentStoreTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000128 /* OccasionRecommendationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OccasionRecommendationTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000124 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,7 +112,17 @@
 				A1000000000000000000010a /* ContentView.swift */,
 				A1000000000000000000010c /* WardrobeView.swift */,
 				A1000000000000000000010e /* AddGarmentView.swift */,
-				A10000000000000000000110 /* Info.plist */,
+				A10000000000000000000110 /* Models/OccasionModels.swift */,
+				A10000000000000000000112 /* Models/RecommendationModels.swift */,
+				A10000000000000000000114 /* Services/APIClient.swift */,
+				A10000000000000000000116 /* Services/OccasionServices.swift */,
+				A10000000000000000000118 /* Services/RecommendationService.swift */,
+				A1000000000000000000011a /* Stores/SavedPlanStore.swift */,
+				A1000000000000000000011c /* ViewModels/OccasionRecommendationViewModel.swift */,
+				A1000000000000000000011e /* Views/OccasionInputView.swift */,
+				A10000000000000000000120 /* Views/RecommendationResultsView.swift */,
+				A10000000000000000000122 /* Views/OutfitDetailView.swift */,
+				A10000000000000000000124 /* Info.plist */,
 			);
 			path = WearWise;
 			sourceTree = "<group>";
@@ -98,7 +130,8 @@
 		A10000000000000000000005 /* WearWiseTests */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000112 /* GarmentStoreTests.swift */,
+				A10000000000000000000126 /* GarmentStoreTests.swift */,
+				A10000000000000000000128 /* OccasionRecommendationTests.swift */,
 			);
 			path = WearWiseTests;
 			sourceTree = "<group>";
@@ -210,6 +243,16 @@
 				A1000000000000000000010b /* ContentView.swift in Sources */,
 				A1000000000000000000010d /* WardrobeView.swift in Sources */,
 				A1000000000000000000010f /* AddGarmentView.swift in Sources */,
+				A10000000000000000000111 /* Models/OccasionModels.swift in Sources */,
+				A10000000000000000000113 /* Models/RecommendationModels.swift in Sources */,
+				A10000000000000000000115 /* Services/APIClient.swift in Sources */,
+				A10000000000000000000117 /* Services/OccasionServices.swift in Sources */,
+				A10000000000000000000119 /* Services/RecommendationService.swift in Sources */,
+				A1000000000000000000011b /* Stores/SavedPlanStore.swift in Sources */,
+				A1000000000000000000011d /* ViewModels/OccasionRecommendationViewModel.swift in Sources */,
+				A1000000000000000000011f /* Views/OccasionInputView.swift in Sources */,
+				A10000000000000000000121 /* Views/RecommendationResultsView.swift in Sources */,
+				A10000000000000000000123 /* Views/OutfitDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,7 +260,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A10000000000000000000113 /* GarmentStoreTests.swift in Sources */,
+				A10000000000000000000127 /* GarmentStoreTests.swift in Sources */,
+				A10000000000000000000129 /* OccasionRecommendationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

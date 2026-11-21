@@ -1,6 +1,6 @@
 import Foundation
 
-enum GarmentSlot: String, CaseIterable, Codable, Identifiable {
+enum GarmentSlot: String, CaseIterable, Codable, Identifiable, Hashable {
     case top
     case bottom
     case shoes
