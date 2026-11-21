@@ -124,7 +124,9 @@ struct WardrobeView: View {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
                         ForEach(items) { garment in
                             VStack(spacing: 8) {
-                                GarmentCard(garment: garment)
+                                SwipeableGarmentCard(garment: garment) {
+                                    activeSheet = .edit(garment)
+                                }
 
                                 Button {
                                     activeSheet = .edit(garment)
@@ -139,6 +141,85 @@ struct WardrobeView: View {
                 }
             }
         }
+    }
+}
+
+private struct SwipeableGarmentCard: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let garment: Garment
+    let onEdit: () -> Void
+
+    @State private var offset: CGFloat = 0
+    private let actionWidth: CGFloat = 88
+
+    var body: some View {
+        ZStack(alignment: .trailing) {
+            Button {
+                onEdit()
+                closeActions()
+            } label: {
+                VStack(spacing: 7) {
+                    Image(systemName: "pencil")
+                        .font(.title3.weight(.semibold))
+                    Text("编辑")
+                        .font(.caption.weight(.bold))
+                }
+                .foregroundStyle(Color(uiColor: .systemBackground))
+                .frame(width: actionWidth)
+                .frame(maxHeight: .infinity)
+                .background(Color.wearWiseInk)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("编辑\(garment.name)")
+
+            GarmentCard(garment: garment)
+                .background(Color.wearWiseBackground)
+                .offset(x: offset)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    if offset < 0 {
+                        closeActions()
+                    } else {
+                        onEdit()
+                    }
+                }
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 18)
+                        .onChanged { value in
+                            guard
+                                abs(value.translation.width)
+                                    > abs(value.translation.height)
+                            else {
+                                return
+                            }
+                            offset = min(
+                                0,
+                                max(-actionWidth, offset + value.translation.width)
+                            )
+                        }
+                        .onEnded { value in
+                            guard
+                                abs(value.translation.width)
+                                    > abs(value.translation.height)
+                            else {
+                                return
+                            }
+                            offset = value.translation.width < -36
+                                ? -actionWidth
+                                : 0
+                        }
+                )
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .animation(
+            reduceMotion ? nil : .easeOut(duration: 0.18),
+            value: offset
+        )
+        .accessibilityHint("向左滑动可显示编辑操作")
+    }
+
+    private func closeActions() {
+        offset = 0
     }
 }
 
@@ -166,7 +247,7 @@ private struct GarmentCard: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
 
-                Label("编辑", systemImage: "pencil")
+                Label("点击或左滑编辑", systemImage: "pencil")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
             }
