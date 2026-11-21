@@ -30,7 +30,7 @@ Status owner: iOS/backend integration coordinator
 
 | 接口 | 负责人 | 状态 | 分支 | Commit | 测试/证据 | 备注 |
 |---|---|---|---|---|---|---|
-| `GET /health` | 后端 | 未开始 | `feat/api-foundation` | - | - | 第一个可运行里程碑 |
+| `GET /health` | 后端 | 实现 | `feat/api-foundation` | `56f3f6f` | Python 3.14.7；pytest: 2 passed；`/health`: HTTP 200，providers=[] | 等待 Mac 独立环境复测后改为完成 |
 | `GET /v1/presets` | 后端 | 未开始 | `feat/api-context` | - | - | 先使用固定预设 |
 | `POST /v1/occasions/resolve` | 后端 | 未开始 | `feat/api-context` | - | - | 本地匹配后再 AI |
 | `POST /v1/weather/current` | 后端 | 未开始 | `feat/api-context` | - | - | 坐标不得持久化 |
@@ -57,7 +57,7 @@ Status owner: iOS/backend integration coordinator
 
 | 检查点 | 目标 | 状态 | 最后验证 |
 |---|---|---|---|
-| 开始后 1 小时 | iOS 工程可启动；后端 `/health` 可运行 | 未开始 | - |
+| 开始后 1 小时 | iOS 工程可启动；后端 `/health` 可运行 | 后端实现，iOS 待验证 | Python 3.14.7；pytest: 2 passed；`/health`: HTTP 200（`56f3f6f`） |
 | 开始后 3 小时 | 场合、天气和预设接口 Mock 可用 | 未开始 | - |
 | 开始后 6 小时 | iOS 第一次调用推荐 Mock 接口 | 未开始 | - |
 | 开始后 14 小时 | 推荐、替换、确认完整闭环 | 未开始 | - |
