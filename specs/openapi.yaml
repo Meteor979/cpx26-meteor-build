@@ -1,0 +1,1005 @@
+openapi: 3.1.0
+info:
+  title: WearWise API
+  version: 0.4.0
+  description: |
+    WearWise 的共享接口草案。该契约覆盖场合搜索、可选当地天气、衣物图片识别、
+    标签商品匹配和可解释穿搭推荐。客户端负责无障碍朗读与确定性穿衣顺序；
+    自动天气不可用不应阻断推荐或声音穿衣流程。
+    客户端还负责用推荐结果中的 item_ids 映射本地衣柜主图，并生成三套照片式
+    搭配卡片。推荐请求和响应不得包含本地照片路径。
+
+    所有外部 AI 和搜索能力都必须可替换。推荐接口在远程 AI 失败时应返回
+    规则生成的 fallback 结果，而不是让整个演示失败。
+servers:
+  - url: http://localhost:8000
+    description: Local backend
+  - url: https://api.example.com
+    description: Placeholder for the deployed HTTPS backend
+tags:
+  - name: System
+  - name: Presets
+  - name: Occasions
+  - name: Weather
+  - name: Garments
+  - name: Recommendations
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: 检查后端和外部能力状态
+      tags: [System]
+      responses:
+        "200":
+          description: 服务状态
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /v1/presets:
+    get:
+      operationId: listOccasionPresets
+      summary: 获取预计算的场合策略
+      description: |
+        优先返回后端启动时预计算并缓存的策略。前端可缓存整个响应。
+        AI 不可用时返回内置固定配置，仍使用 200。
+      tags: [Presets]
+      parameters:
+        - name: version
+          in: query
+          required: false
+          description: 客户端已有的预设版本；版本一致时可返回 not_modified。
+          schema:
+            type: integer
+            minimum: 1
+        - name: q
+          in: query
+          required: false
+          description: 可选的场合关键词，用于服务端返回相关建议。
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 120
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 8
+      responses:
+        "200":
+          description: 预设列表
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PresetListResponse"
+        "304":
+          description: 客户端预设版本未变化，继续使用本地缓存
+
+  /v1/occasions/resolve:
+    post:
+      operationId: resolveOccasion
+      summary: 将用户输入的自由文本场合解析为搭配策略
+      description: |
+        客户端先匹配内置预设、别名和本地缓存。只有本地低于匹配阈值时才调用
+        此接口。服务端仍会再次执行精确预设和缓存匹配，最后才调用可替换 AI
+        Provider 生成结构化策略。只返回可执行结果，不返回内部思维过程。
+      tags: [Occasions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OccasionResolveRequest"
+      responses:
+        "200":
+          description: 已解析的场合策略
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OccasionResolveResponse"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "503":
+          $ref: "#/components/responses/ProviderUnavailable"
+
+  /v1/weather/current:
+    post:
+      operationId: getCurrentWeather
+      summary: 根据粗略位置获取当前天气
+      description: |
+        用户启用自动天气时调用此接口。客户端传入粗略经纬度，
+        后端调用可替换天气 Provider，返回当前温度、体感温度、天气状况、
+        降水概率和风速等结构化特征。
+        后端不得持久化原始坐标；日志中的坐标必须脱敏。
+        用户拒绝定位权限时，客户端继续使用演示天气或稍后设置，不阻断主流程。
+      tags: [Weather]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WeatherRequest"
+      responses:
+        "200":
+          description: 天气结果、缓存结果或明确不可用状态
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WeatherResponse"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /v1/garments/analyze:
+    post:
+      operationId: analyzeGarmentImage
+      summary: AI 识别衣物外观特征
+      description: |
+        接收一张压缩后的衣物照片，返回可编辑的结构化建议。响应不得直接
+        写入正式衣柜，必须由用户审核确认。图片不得被长期保存或用于训练。
+      tags: [Garments]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [image]
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: JPEG、PNG 或 HEIC，建议小于 5 MB。
+                request_id:
+                  type: string
+                  description: 客户端生成的请求 ID，用于日志关联。
+                client_mode:
+                  type: string
+                  enum: [remote, mock]
+                  default: remote
+      responses:
+        "200":
+          description: 识别成功或返回部分字段
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GarmentAnalyzeResponse"
+        "413":
+          $ref: "#/components/responses/PayloadTooLarge"
+        "415":
+          description: 不支持的图片格式
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "503":
+          $ref: "#/components/responses/ProviderUnavailable"
+
+  /v1/garments/match:
+    post:
+      operationId: matchGarmentProduct
+      summary: 根据标签和外观查找品牌商品候选
+      description: |
+        优先使用品牌与商品货号。外形特征用于构建查询和重排候选。
+        该接口只返回商品匹配候选，不提供正版鉴定。
+        后端读取 product_url 时必须只允许 HTTPS，并拒绝 localhost、内网 IP、
+        私有地址和云元数据地址，避免 SSRF。
+      tags: [Garments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GarmentMatchRequest"
+      responses:
+        "200":
+          description: |
+            可能返回 exact_match、candidates_found、similar_only 或 not_found。
+            未找到商品不是 HTTP 错误，前端应允许手动录入。
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GarmentMatchResponse"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "503":
+          $ref: "#/components/responses/ProviderUnavailable"
+
+  /v1/recommendations:
+    post:
+      operationId: createRecommendations
+      summary: 从已确认衣物中生成最多三套搭配
+      description: |
+        后端先按正式程度和槽位生成合法候选，再由可替换 AI Provider 排序
+        和生成理由。AI 失败时返回规则结果并设置 fallback_used=true。
+        响应必须返回稳定的 item_ids；客户端用这些 ID 从本地照片衣柜取图，
+        把每套搭配渲染成真实衣物照片组合。后端不得返回或推断本地照片路径。
+      tags: [Recommendations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecommendationRequest"
+      responses:
+        "200":
+          description: 推荐结果或后端 fallback 结果
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecommendationResponse"
+        "422":
+          description: 字段错误或衣柜不足以组成完整搭配
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                insufficientWardrobe:
+                  value:
+                    code: INSUFFICIENT_WARDROBE
+                    message: 至少需要一件上装、一件下装和一双鞋。
+                    request_id: req-demo-001
+                    details:
+                      missing_slots: [shoes]
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /v1/outfits/revise:
+    post:
+      operationId: reviseOutfit
+      summary: 替换单件衣物并重新生成该方案的说明
+      description: |
+        保持基础方案中未被替换的其他衣物不变，只替换同一槽位的一件衣物。
+        base_item_ids 和 replacement_item_id 必须来自 garments，且替换前后槽位必须相同。
+        如果远程 AI 失败，则返回规则和模板理由生成的 fallback 结果。
+      tags: [Recommendations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OutfitRevisionRequest"
+      responses:
+        "200":
+          description: 修改后的方案或规则 fallback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutfitRevisionResponse"
+        "422":
+          description: 替换衣物不符合原方案槽位或缺少必要数据
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+components:
+  responses:
+    PayloadTooLarge:
+      description: 上传图片超过大小限制
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            code: IMAGE_TOO_LARGE
+            message: 图片超过 5 MB，请在客户端压缩后重试。
+            request_id: req-demo-001
+            details: {}
+    ValidationError:
+      description: 请求字段不符合契约
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            code: VALIDATION_ERROR
+            message: 请求字段不符合接口契约。
+            request_id: req-demo-001
+            details:
+              field: garments
+    RateLimited:
+      description: 请求过于频繁
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            code: RATE_LIMITED
+            message: 请求过于频繁，请稍后重试。
+            request_id: req-demo-001
+            details:
+              retry_after_seconds: 5
+    ProviderUnavailable:
+      description: 外部 AI 或搜索服务暂不可用
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            code: PROVIDER_UNAVAILABLE
+            message: 识别服务暂不可用，请使用手动录入。
+            request_id: req-demo-001
+            details:
+              provider: remote_vision
+
+  schemas:
+    ProviderStatus:
+      type: object
+      required: [name, mode, available]
+      properties:
+        name:
+          type: string
+          example: remote_vision
+        mode:
+          type: string
+          example: remote_api
+        available:
+          type: boolean
+        latency_ms:
+          type: [integer, "null"]
+          minimum: 0
+
+    HealthResponse:
+      type: object
+      required: [status, timestamp, providers]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded, down]
+        timestamp:
+          type: string
+          format: date-time
+        providers:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProviderStatus"
+
+    FormalityBand:
+      type: string
+      description: |
+        正式程度层只能由 formality_score 按以下固定规则派生：
+        1-2 = casual，3 = smart_casual，4 = business，5 = formal。
+      enum: [casual, smart_casual, business, formal]
+
+    GarmentSlot:
+      type: string
+      enum: [top, bottom, outerwear, shoes, accessory]
+
+    OccasionPreset:
+      type: object
+      required:
+        - id
+        - name
+        - aliases
+        - target_formality
+        - allowed_formality
+        - required_slots
+        - style_keywords
+        - avoid_rules
+        - explanation_guidelines
+        - version
+        - source
+      properties:
+        id:
+          type: string
+          pattern: "^[a-z0-9-]+$"
+        name:
+          type: string
+        description:
+          type: string
+        aliases:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+            minLength: 1
+        target_formality:
+          $ref: "#/components/schemas/FormalityBand"
+        allowed_formality:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/FormalityBand"
+        required_slots:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/GarmentSlot"
+        style_keywords:
+          type: array
+          items:
+            type: string
+        avoid_rules:
+          type: array
+          items:
+            type: string
+        explanation_guidelines:
+          type: array
+          items:
+            type: string
+        source:
+          type: string
+          enum: [precomputed, bundled, generated, fallback]
+        version:
+          type: integer
+          minimum: 1
+        generated_at:
+          type: string
+          format: date-time
+
+    PresetListResponse:
+      type: object
+      required: [version, presets, cached]
+      properties:
+        version:
+          type: integer
+          minimum: 1
+        cached:
+          type: boolean
+        generated_at:
+          type: string
+          format: date-time
+        presets:
+          type: array
+          items:
+            $ref: "#/components/schemas/OccasionPreset"
+
+    OccasionResolveRequest:
+      type: object
+      additionalProperties: false
+      required: [query]
+      properties:
+        request_id:
+          type: string
+          minLength: 1
+          maxLength: 128
+        query:
+          type: string
+          minLength: 1
+          maxLength: 240
+        locale:
+          type: string
+          default: zh-CN
+        formality_hint:
+          $ref: "#/components/schemas/FormalityBand"
+
+    OccasionResolveResponse:
+      type: object
+      required:
+        - query
+        - profile
+        - match_type
+        - confidence
+        - cached
+        - alternatives
+      properties:
+        query:
+          type: string
+        profile:
+          $ref: "#/components/schemas/OccasionPreset"
+        match_type:
+          type: string
+          enum: [exact_preset, semantic_match, generated, fallback]
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        cached:
+          type: boolean
+        alternatives:
+          type: array
+          maxItems: 5
+          items:
+            $ref: "#/components/schemas/OccasionPreset"
+        warning:
+          type: [string, "null"]
+        request_id:
+          type: string
+
+    WeatherData:
+      type: object
+      required:
+        - temperature_c
+        - feels_like_c
+        - condition
+        - precipitation_probability
+      properties:
+        temperature_c:
+          type: number
+          minimum: -60
+          maximum: 60
+        feels_like_c:
+          type: number
+          minimum: -70
+          maximum: 70
+        condition:
+          type: string
+          enum:
+            - clear
+            - partly_cloudy
+            - cloudy
+            - rain
+            - snow
+            - storm
+            - fog
+            - unknown
+        precipitation_probability:
+          type: number
+          minimum: 0
+          maximum: 1
+        wind_speed_kph:
+          type: [number, "null"]
+          minimum: 0
+
+    WeatherRequest:
+      type: object
+      additionalProperties: false
+      required: [request_id, latitude, longitude, timezone]
+      properties:
+        request_id:
+          type: string
+          minLength: 1
+          maxLength: 128
+        latitude:
+          type: number
+          minimum: -90
+          maximum: 90
+          description: 客户端应使用粗粒度位置，不建议保留更多小数位。
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+          description: 客户端应使用粗粒度位置，不建议保留更多小数位。
+        accuracy_m:
+          type: [number, "null"]
+          minimum: 0
+        timezone:
+          type: string
+          example: Asia/Shanghai
+        target_at:
+          type: [string, "null"]
+          format: date-time
+          description: 可选的目标时间；为空时返回当前天气。
+
+    WeatherResponse:
+      type: object
+      required: [status, cached, source, warning]
+      properties:
+        status:
+          type: string
+          enum: [ok, stale, unavailable]
+        location_label:
+          type: [string, "null"]
+          description: 粗粒度地点名，不得返回超出展示需要的坐标。
+        weather:
+          oneOf:
+            - $ref: "#/components/schemas/WeatherData"
+            - type: "null"
+        observed_at:
+          type: [string, "null"]
+          format: date-time
+        timezone:
+          type: string
+        cached:
+          type: boolean
+        source:
+          type: string
+          enum: [remote_weather, cache, mock, fallback]
+        warning:
+          type: [string, "null"]
+        request_id:
+          type: string
+
+    AppearanceFeatures:
+      type: object
+      properties:
+        slot:
+          oneOf:
+            - $ref: "#/components/schemas/GarmentSlot"
+            - type: "null"
+        category:
+          type: [string, "null"]
+          example: shirt
+        colors:
+          type: array
+          items:
+            type: string
+        pattern:
+          type: [string, "null"]
+          example: solid
+        fit:
+          type: [string, "null"]
+          example: regular
+        formality_score:
+          type: [integer, "null"]
+          minimum: 1
+          maximum: 5
+        warmth_score:
+          type: [integer, "null"]
+          minimum: 1
+          maximum: 5
+        material_guess:
+          type: [string, "null"]
+          example: cotton
+
+    GarmentAnalyzeResponse:
+      type: object
+      required: [status, attributes, confidence, partial, source, warnings]
+      properties:
+        status:
+          type: string
+          enum: [success, partial]
+        attributes:
+          $ref: "#/components/schemas/AppearanceFeatures"
+        confidence:
+          type: object
+          additionalProperties:
+            type: number
+            minimum: 0
+            maximum: 1
+        partial:
+          type: boolean
+        source:
+          type: string
+          enum: [mock, remote_vision, fallback]
+        warnings:
+          type: array
+          items:
+            type: string
+        request_id:
+          type: string
+
+    GarmentMatchRequest:
+      type: object
+      required: [appearance]
+      description: |
+        至少提供 label_text、product_code、product_url 或外观图片中的一项。
+        product_code 与品牌同时存在时应优先使用。
+        match_mode=image_similarity 时，appearance_image_base64 必填。
+        图片只在本次查询中被解码使用，不得长期保存。
+      anyOf:
+        - required: [label_text]
+        - required: [product_code]
+        - required: [product_url]
+        - required: [appearance_image_base64]
+      allOf:
+        - if:
+            properties:
+              match_mode:
+                const: image_similarity
+            required: [match_mode]
+          then:
+            required: [appearance_image_base64, appearance_image_mime]
+      properties:
+        request_id:
+          type: string
+          minLength: 1
+          maxLength: 128
+        match_mode:
+          type: string
+          enum: [auto, label_or_sku, attribute_similarity, image_similarity]
+          default: auto
+        label_text:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        brand_hint:
+          type: string
+          minLength: 1
+          maxLength: 120
+        product_name_hint:
+          type: string
+          minLength: 1
+          maxLength: 240
+        product_code:
+          type: string
+          minLength: 1
+          maxLength: 120
+        barcode:
+          type: string
+          minLength: 1
+          maxLength: 64
+        product_url:
+          type: string
+          minLength: 1
+          format: uri
+          pattern: "^https://"
+        appearance:
+          $ref: "#/components/schemas/AppearanceFeatures"
+        appearance_image_base64:
+          type: string
+          format: byte
+          minLength: 1
+          maxLength: 3000000
+          description: 压缩后的 JPEG 或 PNG，解码后不得超过 2 MB。
+        appearance_image_mime:
+          type: string
+          enum: [image/jpeg, image/png]
+
+    MatchCandidate:
+      type: object
+      required:
+        - id
+        - brand
+        - product_name
+        - match_confidence
+        - attributes
+      properties:
+        id:
+          type: string
+        brand:
+          type: string
+        product_name:
+          type: string
+        product_code:
+          type: [string, "null"]
+        barcode:
+          type: [string, "null"]
+        source_url:
+          type: [string, "null"]
+          format: uri
+        image_url:
+          type: [string, "null"]
+          format: uri
+        match_type:
+          type: string
+          enum: [exact, similar]
+        match_confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        matched_signals:
+          type: array
+          items:
+            type: string
+        attributes:
+          $ref: "#/components/schemas/AppearanceFeatures"
+        fetched_at:
+          type: string
+          format: date-time
+
+    GarmentMatchResponse:
+      type: object
+      required: [status, candidates, source, warning]
+      properties:
+        status:
+          type: string
+          enum: [exact_match, candidates_found, similar_only, not_found]
+        candidates:
+          type: array
+          maxItems: 5
+          items:
+            $ref: "#/components/schemas/MatchCandidate"
+        source:
+          type: string
+          enum: [remote_search, cache, mock, fallback]
+        cached:
+          type: boolean
+        warning:
+          type: [string, "null"]
+        request_id:
+          type: string
+
+    RecommendationGarment:
+      type: object
+      additionalProperties: false
+      description: |
+        推荐接口专用 DTO。不得包含设备文件路径、标签照片路径或密钥。
+        formality_band 由后端根据 formality_score 派生。
+      required:
+        - id
+        - slot
+        - category
+        - colors
+        - formality_score
+        - warmth_score
+        - user_confirmed
+      properties:
+        id:
+          type: string
+          minLength: 1
+        brand:
+          type: [string, "null"]
+        product_name:
+          type: [string, "null"]
+        slot:
+          $ref: "#/components/schemas/GarmentSlot"
+        category:
+          type: string
+          minLength: 1
+          example: shirt
+        colors:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        pattern:
+          type: [string, "null"]
+        fit:
+          type: [string, "null"]
+        material:
+          type: [string, "null"]
+        formality_score:
+          type: integer
+          minimum: 1
+          maximum: 5
+        warmth_score:
+          type: integer
+          minimum: 1
+          maximum: 5
+        user_confirmed:
+          type: boolean
+          const: true
+
+    RecommendationRequest:
+      type: object
+      additionalProperties: false
+      required: [occasion, weather, formality, garments]
+      properties:
+        request_id:
+          type: string
+        preset_id:
+          type: string
+        occasion:
+          type: string
+        weather:
+          $ref: "#/components/schemas/WeatherData"
+        formality:
+          $ref: "#/components/schemas/FormalityBand"
+        garments:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/RecommendationGarment"
+
+    OutfitRevisionRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - occasion
+        - weather
+        - formality
+        - garments
+        - base_item_ids
+        - replacement_item_id
+      properties:
+        request_id:
+          type: string
+        preset_id:
+          type: string
+        occasion:
+          type: string
+        weather:
+          $ref: "#/components/schemas/WeatherData"
+        formality:
+          $ref: "#/components/schemas/FormalityBand"
+        garments:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/RecommendationGarment"
+        base_item_ids:
+          type: array
+          minItems: 2
+          uniqueItems: true
+          items:
+            type: string
+        replacement_item_id:
+          type: string
+
+    OutfitRevisionResponse:
+      type: object
+      required: [outfit, fallback_used, warning, generated_at]
+      properties:
+        outfit:
+          $ref: "#/components/schemas/Outfit"
+        fallback_used:
+          type: boolean
+        warning:
+          type: [string, "null"]
+        provider:
+          type: string
+        generated_at:
+          type: string
+          format: date-time
+        request_id:
+          type: string
+
+    Outfit:
+      type: object
+      required: [id, item_ids, title, reasons, tradeoffs, source]
+      properties:
+        id:
+          type: string
+        item_ids:
+          type: array
+          minItems: 2
+          uniqueItems: true
+          items:
+            type: string
+        title:
+          type: string
+        reasons:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        tradeoffs:
+          type: array
+          items:
+            type: string
+        source:
+          type: string
+          enum: [mock, remote_api, fallback]
+        score:
+          type: number
+
+    RecommendationResponse:
+      type: object
+      required:
+        - outfits
+        - requested_count
+        - result_count_reason
+        - fallback_used
+        - warning
+        - generated_at
+      properties:
+        outfits:
+          type: array
+          minItems: 1
+          maxItems: 3
+          items:
+            $ref: "#/components/schemas/Outfit"
+        requested_count:
+          type: integer
+          const: 3
+        result_count_reason:
+          type: string
+          enum: [three_available, limited_candidates, fallback_degraded]
+        fallback_used:
+          type: boolean
+        warning:
+          type: [string, "null"]
+        provider:
+          type: string
+          example: rule_engine_with_template_explanations
+        generated_at:
+          type: string
+          format: date-time
+        request_id:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+        request_id:
+          type: string
+        details:
+          type: object
+          additionalProperties: true

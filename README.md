@@ -1,8 +1,40 @@
 # CrossPointX 2026 Team Repository
 
-This repository contains the team's iOS client, backend service, interface contract, design assets, and submission documentation for CrossPointX 2026.
+This repository contains the team's CrossPointX 2026 requirements, interface
+contract, engineering rules, design materials, and future iOS/backend structure.
 
-The product scope remains provisional until both track briefs are released. The current candidate concept is WearWise, an outfit decision assistant that recommends three explainable outfits from clothing the user already owns.
+The current concept is WearWise, an outfit system for people with color vision
+deficiency and low vision. Users photograph clothing they already own, store the
+images in a local wardrobe, and receive three explainable outfit combinations
+rendered with those same garment photos.
+
+The primary interaction uses black-and-white, high-contrast Apple-style screens
+with large graphical buttons containing both icons and labels. Selected,
+disabled, warning, and error states must not rely on color alone. Voice narration
+and sound-guided dressing remain optional enhancements.
+
+The original occasion search, weather context, wardrobe capture, garment
+recognition, product matching, outfit replacement, fallback, and public web demo
+remain in scope. Garment photo capture is required for the intended visual
+wardrobe flow; location and voice guidance are optional. See
+[docs/product/accessible-wearwise-pivot.md](docs/product/accessible-wearwise-pivot.md).
+
+## Development status
+
+The requirements baseline is frozen. Formal product implementation has not yet
+started. Any local prototype is exploratory and is not an accepted completion
+until it follows the repository contract, is committed, and has runtime evidence.
+
+Every developer and AI agent must read:
+
+1. [CONTRIBUTING.md](CONTRIBUTING.md)
+2. [Detailed development requirements](docs/eng-development-requirements.md)
+3. [Accessibility product direction](docs/product/accessible-wearwise-pivot.md)
+4. [Frontend/backend integration workflow](docs/frontend-backend-integration.md)
+5. [Build status](docs/build-status.md)
+6. [OpenAPI contract](specs/openapi.yaml)
+7. [Shared sample data](specs/examples/sample-data.json)
+8. [Page flow](design/page-flow.md)
 
 ## Repository structure
 
@@ -20,7 +52,9 @@ docs/              Product, research, branch ownership, and compliance notes
 - `main`: submission-ready versions that can build and run.
 - `dev`: daily integration branch.
 - `feat/*`: one focused feature per branch.
-- `docs/*`: product and research documentation.
+- `feat/web-*`: public interactive web demo.
+- `docs/product-*`: product and user research documentation.
+- `docs/eng-*`: engineering workflow and integration documentation.
 - `design/*`: visual, poster, and submission assets.
 
 The iOS development and testing owner is the only person who modifies `WearWise.xcodeproj`. The Windows backend owner does not modify iOS project files. Interface changes must be reflected in `specs/openapi.yaml`.
@@ -29,10 +63,20 @@ The iOS development and testing owner is the only person who modifies `WearWise.
 
 Project code will be created during the event. Until then, this repository contains planning and compliance files only.
 
+The backend owner should start with
+[docs/backend-execution-guide.md](docs/backend-execution-guide.md), which defines
+the first runnable milestone, task order, Mock policy, and acceptance evidence.
+
+Both developers should follow
+[docs/frontend-backend-integration.md](docs/frontend-backend-integration.md) to
+keep the iOS client and backend on the same contract and integration schedule.
+Track ownership, commits, tests, and integration status in
+[docs/build-status.md](docs/build-status.md).
+
 1. Copy `.env.example` to `.env` for local backend configuration.
 2. Never commit `.env`, API keys, certificates, personal photos, or temporary build output.
 3. Keep API keys on the backend only.
-4. Keep garment photos on the iOS device. The backend receives structured metadata only.
+4. Keep garment originals on the iOS device. A temporary compressed image may be sent for explicit image analysis or appearance matching and must not be retained.
 5. Use mock mode before a remote AI provider is configured.
 
 ## Required submission materials
