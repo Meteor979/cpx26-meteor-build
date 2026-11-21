@@ -172,8 +172,19 @@ enum LocalPresetCatalog {
         keywords: ["干净", "自然", "有礼貌", "不过度正式"]
     )
 
+    static let nightOut = preset(
+        id: "night-out",
+        name: "夜店",
+        aliases: ["去夜店", "夜店", "夜生活", "派对", "酒吧", "clubbing"],
+        description: "轻松、有个人表达，避免像商务会面。",
+        formality: .casual,
+        allowed: [.casual, .smartCasual],
+        keywords: ["夜间社交", "个人表达", "轻松", "有辨识度"]
+    )
+
     static let all = choices + [
         familyDinner,
+        nightOut,
         preset(
             id: "anniversary-date",
             name: "纪念日约会",

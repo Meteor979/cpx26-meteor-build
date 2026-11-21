@@ -95,7 +95,11 @@ final class OccasionService: OccasionServiceProtocol {
         if let local = LocalPresetCatalog.resolve(
             cleanQuery,
             formalityHint: formalityHint
-        ), local.matchType != "fallback", local.matchType != "generated" {
+        ),
+            local.matchType != "fallback",
+            local.profile.id != "night-out",
+            local.matchType != "generated"
+        {
             return OccasionResolution(
                 response: local,
                 sourceLabel: "本地预设"

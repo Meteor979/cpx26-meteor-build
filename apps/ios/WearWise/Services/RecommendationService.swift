@@ -40,7 +40,7 @@ final class RecommendationService: RecommendationServiceProtocol {
                 RecommendationResponse.self,
                 from: data
             )
-            if !response.outfits.isEmpty {
+            if response.outfits.count >= 3 {
                 return response
             }
         } catch let error as APIError where error.statusCode == 422 {

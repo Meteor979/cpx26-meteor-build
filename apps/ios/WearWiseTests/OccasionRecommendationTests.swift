@@ -23,6 +23,52 @@ final class OccasionRecommendationTests: XCTestCase {
         XCTAssertEqual(result.sourceLabel, "本地预设")
     }
 
+    @MainActor
+    func testChangingQueryClearsPreviousBusinessFormality() async {
+        let viewModel = OccasionRecommendationViewModel(
+            occasionService: OccasionService(api: StubAPIClient())
+        )
+        viewModel.query = "社团演讲"
+        await viewModel.resolveOccasion()
+
+        XCTAssertEqual(viewModel.formality, .business)
+
+        viewModel.query = "去夜店"
+        viewModel.queryDidChange()
+
+        XCTAssertNil(viewModel.profile)
+        XCTAssertEqual(viewModel.resolvedQuery, "")
+        XCTAssertEqual(viewModel.resolutionSource, "")
+        XCTAssertEqual(viewModel.formality, .smartCasual)
+    }
+
+    @MainActor
+    func testUsingPresetAppliesItsFormality() {
+        let viewModel = OccasionRecommendationViewModel()
+        let preset = LocalPresetCatalog.choices.first {
+            $0.id == "club-speech"
+        }!
+
+        viewModel.usePreset(preset)
+        viewModel.queryDidChange()
+
+        XCTAssertEqual(viewModel.query, "社团演讲")
+        XCTAssertEqual(viewModel.formality, .business)
+    }
+
+    func testNightOutOfflineFallbackIsCasual() async throws {
+        let service = OccasionService(
+            api: StubAPIClient(resolveError: APIError.network("offline"))
+        )
+        let result = try await service.resolve(
+            query: "去夜店",
+            formalityHint: .business
+        )
+
+        XCTAssertEqual(result.response.profile.id, "night-out")
+        XCTAssertEqual(result.response.profile.targetFormality, .casual)
+    }
+
     func testOccasionResponseDecodesSnakeCase() throws {
         let data = Data(
             """

@@ -1,10 +1,33 @@
 from typing import Any, Dict, List
 
-PRESET_VERSION = 1
+PRESET_VERSION = 2
 PRESET_GENERATED_AT = "2026-11-20T10:00:00+08:00"
 FALLBACK_GENERATED_AT = "2026-11-21T00:00:00+08:00"
 
 PRESETS: List[Dict[str, Any]] = [
+    {
+        "id": "night-out",
+        "name": "夜店",
+        "aliases": ["去夜店", "夜店", "夜生活", "派对", "酒吧", "clubbing"],
+        "description": "轻松、有个人表达，避免像商务会面或正式面试。",
+        "target_formality": "casual",
+        "allowed_formality": ["casual", "smart_casual"],
+        "required_slots": ["top", "bottom", "shoes"],
+        "style_keywords": ["夜间社交", "个人表达", "轻松", "有辨识度"],
+        "avoid_rules": [
+            "避免全套商务正装",
+            "避免领带和过分拘谨的轮廓",
+            "避免像正式面试",
+        ],
+        "explanation_guidelines": [
+            "解释整体是否适合夜间社交",
+            "解释是否保留个人表达",
+            "解释是否避免商务正装感",
+        ],
+        "source": "precomputed",
+        "version": 2,
+        "generated_at": PRESET_GENERATED_AT,
+    },
     {
         "id": "first-date",
         "name": "初次约会",
@@ -25,7 +48,30 @@ PRESETS: List[Dict[str, Any]] = [
             "解释是否适合当前温度",
         ],
         "source": "precomputed",
-        "version": 1,
+        "version": 2,
+        "generated_at": PRESET_GENERATED_AT,
+    },
+    {
+        "id": "internship-interview",
+        "name": "实习面试",
+        "aliases": ["面试", "实习面试", "工作面试", "校招面试"],
+        "description": "清楚、可靠、专业，避免过度张扬。",
+        "target_formality": "business",
+        "allowed_formality": ["smart_casual", "business"],
+        "required_slots": ["top", "bottom", "shoes"],
+        "style_keywords": ["专业", "清晰", "可靠", "正式表达"],
+        "avoid_rules": [
+            "避免过度休闲",
+            "避免醒目图案",
+            "避免像夜生活装扮",
+        ],
+        "explanation_guidelines": [
+            "解释正式度是否适合面试",
+            "解释整体是否清楚可靠",
+            "解释是否避免过度张扬",
+        ],
+        "source": "precomputed",
+        "version": 2,
         "generated_at": PRESET_GENERATED_AT,
     },
     {
@@ -48,7 +94,7 @@ PRESETS: List[Dict[str, Any]] = [
             "保留至少一处轻松元素",
         ],
         "source": "precomputed",
-        "version": 1,
+        "version": 2,
         "generated_at": PRESET_GENERATED_AT,
     },
     {
@@ -71,7 +117,7 @@ PRESETS: List[Dict[str, Any]] = [
             "解释个人风格是否明确",
         ],
         "source": "precomputed",
-        "version": 1,
+        "version": 2,
         "generated_at": PRESET_GENERATED_AT,
     },
     {
@@ -94,7 +140,7 @@ PRESETS: List[Dict[str, Any]] = [
             "解释是否方便走动和上台",
         ],
         "source": "precomputed",
-        "version": 1,
+        "version": 2,
         "generated_at": PRESET_GENERATED_AT,
     },
 ]

@@ -53,14 +53,19 @@ final class OccasionRecommendationViewModel: ObservableObject {
     }
 
     func usePreset(_ preset: OccasionPreset) {
+        resolvedQuery = preset.name
         query = preset.name
         profile = nil
+        resolutionSource = ""
+        formality = preset.targetFormality
     }
 
     func queryDidChange() {
         if query.trimmingCharacters(in: .whitespacesAndNewlines) != resolvedQuery {
             profile = nil
             resolutionSource = ""
+            resolvedQuery = ""
+            formality = .smartCasual
         }
     }
 

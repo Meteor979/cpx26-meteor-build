@@ -16,7 +16,7 @@ SAMPLE_DATA = json.loads(
 
 
 def test_presets_return_fixed_sample_data() -> None:
-    response = client.get("/v1/presets", params={"limit": 4})
+    response = client.get("/v1/presets", params={"limit": 20})
 
     assert response.status_code == 200
     assert response.json() == SAMPLE_DATA["presets"]
@@ -39,7 +39,7 @@ def test_presets_limit() -> None:
 
 
 def test_presets_version_not_modified() -> None:
-    response = client.get("/v1/presets", params={"version": 1})
+    response = client.get("/v1/presets", params={"version": 2})
 
     assert response.status_code == 304
     assert response.content == b""
@@ -92,6 +92,34 @@ def test_keyword_match_returns_semantic_result() -> None:
     assert body["profile"]["id"] == "club-speech"
     assert body["match_type"] == "semantic_match"
     assert 0.7 <= body["confidence"] <= 0.88
+
+
+def test_night_out_wins_over_business_formality_hint() -> None:
+    response = client.post(
+        "/v1/occasions/resolve",
+        json={
+            "query": "去夜店",
+            "formality_hint": "business",
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["profile"]["id"] == "night-out"
+    assert body["profile"]["target_formality"] == "casual"
+    assert body["match_type"] in {"exact_preset", "semantic_match"}
+
+
+def test_internship_interview_remains_business() -> None:
+    response = client.post(
+        "/v1/occasions/resolve",
+        json={"query": "实习面试"},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["profile"]["id"] == "internship-interview"
+    assert body["profile"]["target_formality"] == "business"
 
 
 def test_unknown_query_returns_low_confidence_fallback() -> None:
