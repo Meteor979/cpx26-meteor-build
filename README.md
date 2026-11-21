@@ -1,8 +1,41 @@
 # CrossPointX 2026 Team Repository
 
-This repository contains the team's iOS client, backend service, interface contract, design assets, and submission documentation for CrossPointX 2026.
+This repository contains the team's CrossPointX 2026 requirements, interface
+contract, engineering rules, design materials, and future iOS/backend structure.
 
-The product scope remains provisional until both track briefs are released. The current candidate concept is WearWise, an outfit decision assistant that recommends three explainable outfits from clothing the user already owns.
+The current concept is WearWise, an accessibility-first outfit system for blind
+and low-vision users. It recommends three explainable outfits from clothing the
+user already owns, describes their aesthetic and social tone with audio, and
+provides a repeatable sound-guided dressing sequence.
+
+The primary interaction is a continuous foreground voice loop. After the
+one-time operating-system microphone permission, the user can complete the core
+flow with short commands such as "开始", "确认", "A", and "完成" without finding
+or tapping interface controls. The iOS visual state is intentionally minimal and
+follows Apple's clarity, deference, and depth principles.
+
+The original occasion search, weather context, wardrobe capture, garment
+recognition, product matching, outfit replacement, fallback, and public web demo
+remain in scope. Location and image recognition are optional to the core audio
+experience. See
+[docs/product/accessible-wearwise-pivot.md](docs/product/accessible-wearwise-pivot.md).
+
+## Development status
+
+The requirements baseline is frozen. Formal product implementation has not yet
+started. Any local prototype is exploratory and is not an accepted completion
+until it follows the repository contract, is committed, and has runtime evidence.
+
+Every developer and AI agent must read:
+
+1. [CONTRIBUTING.md](CONTRIBUTING.md)
+2. [Detailed development requirements](docs/eng-development-requirements.md)
+3. [Accessibility product direction](docs/product/accessible-wearwise-pivot.md)
+4. [Frontend/backend integration workflow](docs/frontend-backend-integration.md)
+5. [Build status](docs/build-status.md)
+6. [OpenAPI contract](specs/openapi.yaml)
+7. [Shared sample data](specs/examples/sample-data.json)
+8. [Page flow](design/page-flow.md)
 
 ## Repository structure
 

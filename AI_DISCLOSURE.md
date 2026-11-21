@@ -18,6 +18,12 @@ The team must keep this file current before submission. List only tools actually
 - Recommendation requests contain structured garment metadata only.
 - API keys remain in server environment variables or local `.env`.
 - No user identity, body measurements, or face photos are sent to the AI provider.
+- Native iOS microphone audio is processed with on-device speech recognition and
+  is not saved by WearWise.
+- The public web demo does not store audio. Depending on the browser, its Web
+  Speech implementation may send microphone audio to the browser or operating
+  system speech service; this limitation must be disclosed to demo users.
+- Listening stops in the background and while the assistant speaks.
 
 ## Fallback disclosure
 
