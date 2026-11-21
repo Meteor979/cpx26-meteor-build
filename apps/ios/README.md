@@ -1,40 +1,62 @@
-# iOS Client Development Blueprint
+# WearWise iOS Development Blueprint
 
 Owner: iOS development, testing, and release owner.
 
-Formal implementation has not started. The complete product and engineering
-requirements are in
+Formal implementation has not started. Full requirements are in
 [docs/eng-development-requirements.md](../../docs/eng-development-requirements.md).
+
+## Product target
+
+The app targets people with color vision deficiency and low vision. Users can
+photograph garments, manage a local photo wardrobe, and view three outfits made
+from their own clothing images.
+
+Total blindness is out of scope. VoiceOver and optional voice narration remain
+supported, but the primary flow uses visible graphical controls.
 
 ## Required architecture
 
 ```text
 SwiftUI View
-→ AssistantCoordinator
-→ VoiceSession
-→ SFSpeechRecognizer + AVAudioEngine
-→ AVSpeechSynthesizer
-→ DeterministicDressingPlanner
+→ Wardrobe ViewModel
+    → Local Photo Store
+    → Garment Recognition Service
+→ Recommendation ViewModel
+    → Photo Collage Mapper
+→ Optional Voice Assistant
 → RecommendationService
 ```
 
-The app must not depend on tapping cards or business buttons. The primary flow is
-continuous foreground speech recognition, with automatic listening resume after
-each assistant response.
+## Required interface behavior
 
-## Required permissions
+- Black-and-white, high-contrast design.
+- Buttons contain both an icon and text and are at least 56 pt high.
+- Selection, disabled, warning, and error states use shape, outline, labels, or
+  symbols in addition to color.
+- The wardrobe displays local garment thumbnails.
+- Each recommendation displays the actual garment photos associated with its
+  item IDs.
+- Missing photos render a labeled placeholder.
+- Main content remains usable at 200% Dynamic Type.
+- Voice narration is opt-in and cannot cover a control or block the visual flow.
 
-The app needs a one-time system request for:
+## Photo storage
 
-- Microphone.
-- Speech recognition.
+Store locally:
 
-`Info.plist` must include both concise usage descriptions. Native recognition
-must use on-device processing. Do not silently fall back to cloud recognition.
+```text
+garment_id
+local_photo_path
+thumbnail
+captured_at
+```
+
+Never add these fields to recommendation requests. The client combines response
+item IDs with local wardrobe records when rendering a recommendation.
 
 ## Required directories
 
-After the requirements commit is merged, create:
+After implementation branches begin:
 
 ```text
 apps/ios/
@@ -42,74 +64,43 @@ apps/ios/
 ├── WearWise/
 │   ├── WearWiseApp.swift
 │   ├── ContentView.swift
-│   ├── AssistantCoordinator.swift
-│   ├── VoiceSession.swift
-│   ├── CuePlayer.swift
+│   ├── WardrobeView.swift
+│   ├── GarmentPhotoStore.swift
+│   ├── RecommendationView.swift
+│   ├── PhotoCollageView.swift
+│   ├── OptionalVoiceAssistant.swift
 │   ├── WearWiseModels.swift
 │   └── Info.plist
 └── README.md
 ```
 
-Only the iOS owner modifies the generated `WearWise.xcodeproj`.
-
 ## First executable milestone
 
-On a physical iPhone:
+```text
+App opens in black-and-white high-contrast UI
+→ “我的衣柜” button is visible with icon and label
+→ add a garment photo from camera or photo library
+→ save the local photo record
+→ garment thumbnail appears in the wardrobe
+```
+
+The first milestone also requires a screenshot at the default text size and at a
+larger accessibility size.
+
+## Acceptance flow
 
 ```text
-App opens
-→ permission requested once
-→ assistant says “说开始”
-→ listening cue plays
-→ user says “开始”
-→ app asks for the occasion
+打开照片衣柜
+添加一件上装
+保存主图
+输入第一次去女朋友家吃饭
+选择自然
+生成三套搭配
+确认三套都显示衣柜照片
+打开一套详情
+替换鞋
+确认保存
 ```
 
-This milestone is not complete until the following cycle works reliably:
-
-```text
-assistant finishes speaking
-→ recognition starts again automatically
-→ the assistant does not recognize its own voice
-→ user speech produces exactly one state transition
-```
-
-## Build commands
-
-Once `project.yml` exists on the development branch:
-
-```bash
-cd apps/ios
-xcodegen generate
-xcodebuild \
-  -project WearWise.xcodeproj \
-  -scheme WearWise \
-  -sdk iphonesimulator \
-  -destination "platform=iOS Simulator,name=iPhone 17" \
-  CODE_SIGNING_ALLOWED=NO \
-  build
-```
-
-Simulator audio does not replace physical-device microphone testing.
-
-## Required acceptance flow
-
-```text
-开始
-第一次去女朋友家吃饭
-确认
-自然
-A
-换鞋
-开始穿衣
-左
-右
-完成
-完成
-完成
-完成
-重新开始
-```
-
-Do not commit recordings, private photos, API keys, generated build output, or
+Do not commit private photos, recordings, API keys, generated build output, or
 credentials.

@@ -29,11 +29,15 @@ Shared rules:
 - Coarse location is requested only when the user enables automatic weather.
 - Weather is an automatic structured context rather than a primary visual card.
 - Weather failures use a cache no older than 60 minutes, then bundled demo weather or a manual city path.
-- Every visual interaction must have an equivalent screen-reader, keyboard, and spoken path.
-- The primary product flow is operable with continuous foreground speech and
-  short commands; visual buttons are not required for business actions.
-- The native client uses on-device speech recognition and does not retain audio.
-- Recognition pauses while the assistant speaks, then resumes after a listening cue.
+- The target users are people with color vision deficiency and low vision; total
+  blindness is out of scope because users must be able to photograph garments.
+- The primary flow uses large black-and-white controls with labels and icons.
+- Color must never be the only signal for selected, disabled, warning, or error states.
+- Users build a local photo wardrobe before requesting recommendations.
+- Each recommendation must be rendered with the user's local garment photos by
+  mapping response item IDs to local wardrobe records.
+- Recommendation requests never contain local photo paths.
+- Voice guidance is optional and must never block the graphical primary flow.
 - Deterministic local rules generate dressing order; remote AI may explain but must not control safety-critical steps.
 
 Shared sample fixtures are in [examples/sample-data.json](examples/sample-data.json). Both clients and the backend should use these fixtures before connecting a real provider.
