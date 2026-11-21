@@ -55,6 +55,13 @@ struct OccasionResolveRequest: Encodable {
     let query: String
     let locale: String
     let formalityHint: FormalityBand?
+
+    enum CodingKeys: String, CodingKey {
+        case requestID = "requestId"
+        case query
+        case locale
+        case formalityHint
+    }
 }
 
 struct OccasionResolveResponse: Codable {
@@ -66,6 +73,17 @@ struct OccasionResolveResponse: Codable {
     let alternatives: [OccasionPreset]
     let warning: String?
     let requestID: String?
+
+    enum CodingKeys: String, CodingKey {
+        case query
+        case profile
+        case matchType
+        case confidence
+        case cached
+        case alternatives
+        case warning
+        case requestID = "requestId"
+    }
 }
 
 struct OccasionResolution {

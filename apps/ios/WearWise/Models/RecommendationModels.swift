@@ -24,6 +24,16 @@ struct Outfit: Codable, Identifiable, Hashable {
     let tradeoffs: [String]
     let source: OutfitSource
     let score: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case itemIDs = "itemIds"
+        case title
+        case reasons
+        case tradeoffs
+        case source
+        case score
+    }
 }
 
 struct RecommendationResponse: Codable {
@@ -35,6 +45,17 @@ struct RecommendationResponse: Codable {
     let provider: String?
     let generatedAt: String?
     let requestID: String?
+
+    enum CodingKeys: String, CodingKey {
+        case outfits
+        case requestedCount
+        case resultCountReason
+        case fallbackUsed
+        case warning
+        case provider
+        case generatedAt
+        case requestID = "requestId"
+    }
 }
 
 struct RecommendationGarment: Encodable {
@@ -59,6 +80,15 @@ struct RecommendationRequest: Encodable {
     let weather: WeatherData
     let formality: FormalityBand
     let garments: [RecommendationGarment]
+
+    enum CodingKeys: String, CodingKey {
+        case requestID = "requestId"
+        case presetID = "presetId"
+        case occasion
+        case weather
+        case formality
+        case garments
+    }
 }
 
 struct OutfitRevisionRequest: Encodable {
@@ -70,6 +100,17 @@ struct OutfitRevisionRequest: Encodable {
     let garments: [RecommendationGarment]
     let baseItemIDs: [String]
     let replacementItemID: String
+
+    enum CodingKeys: String, CodingKey {
+        case requestID = "requestId"
+        case presetID = "presetId"
+        case occasion
+        case weather
+        case formality
+        case garments
+        case baseItemIDs = "baseItemIds"
+        case replacementItemID = "replacementItemId"
+    }
 }
 
 struct OutfitRevisionResponse: Codable {
@@ -79,6 +120,15 @@ struct OutfitRevisionResponse: Codable {
     let provider: String?
     let generatedAt: String?
     let requestID: String?
+
+    enum CodingKeys: String, CodingKey {
+        case outfit
+        case fallbackUsed
+        case warning
+        case provider
+        case generatedAt
+        case requestID = "requestId"
+    }
 }
 
 struct ResolvedOutfitItem: Identifiable {

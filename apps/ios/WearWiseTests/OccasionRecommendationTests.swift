@@ -62,6 +62,37 @@ final class OccasionRecommendationTests: XCTestCase {
         XCTAssertEqual(response.requestID, "req-1")
     }
 
+    func testAcronymFieldsUseSnakeCase() throws {
+        let request = OccasionResolveRequest(
+            requestID: "req-1",
+            query: "第一次约会",
+            locale: "zh-CN",
+            formalityHint: nil
+        )
+        let data = try JSONCoding.encoder.encode(request)
+        let object = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: data) as? [String: Any]
+        )
+
+        XCTAssertEqual(object["request_id"] as? String, "req-1")
+        XCTAssertNil(object["requestId"])
+
+        let outfitData = Data(
+            """
+            {
+              "id": "outfit-a",
+              "item_ids": ["a", "b", "c"],
+              "title": "测试搭配",
+              "reasons": ["理由"],
+              "tradeoffs": [],
+              "source": "mock"
+            }
+            """.utf8
+        )
+        let outfit = try JSONCoding.decoder.decode(Outfit.self, from: outfitData)
+        XCTAssertEqual(outfit.itemIDs, ["a", "b", "c"])
+    }
+
     func testNetworkFailureUsesLocalFallback() async throws {
         let api = StubAPIClient(
             resolveError: APIError.network("offline")
