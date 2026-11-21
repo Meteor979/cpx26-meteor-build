@@ -1,8 +1,8 @@
 # WearWise Backend
 
-Backend service for WearWise. The current milestone implements only the
-contract-defined `GET /health` endpoint and does not call external AI, weather,
-or search services.
+Backend service for WearWise. The current milestone implements `GET /health`,
+`GET /v1/presets`, and `POST /v1/occasions/resolve` with deterministic Mock data.
+It does not call external AI, weather, or search services.
 
 ## Requirements
 
@@ -72,6 +72,21 @@ virtual environment after changing the Python version.
 
 The response schema follows [`specs/openapi.yaml`](../../specs/openapi.yaml).
 No API keys or `.env` file are required for this milestone.
+
+## Context Mock endpoints
+
+```powershell
+curl.exe -i "http://127.0.0.1:8000/v1/presets?limit=4"
+
+curl.exe -i -X POST "http://127.0.0.1:8000/v1/occasions/resolve" `
+  -H "Content-Type: application/json" `
+  -d '{"query":"第一次约会","locale":"zh-CN"}'
+```
+
+The presets endpoint returns the four fixed policies from
+`specs/examples/sample-data.json`. The occasion resolver performs local
+normalization, exact name/alias matching, and deterministic keyword matching.
+Unknown queries receive a low-confidence fixed fallback.
 
 Do not commit `.env`, credentials, recordings, personal photos, or generated
 build output.
