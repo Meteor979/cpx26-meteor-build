@@ -1,0 +1,119 @@
+{
+  "request_id": "c8064499-c574-4100-b9ee-4f552f668508",
+  "preset_id": "first-date",
+  "occasion": "第一次约会",
+  "weather": {
+    "temperature_c": 16,
+    "feels_like_c": 15,
+    "condition": "partly_cloudy",
+    "precipitation_probability": 0.2,
+    "wind_speed_kph": 12
+  },
+  "formality": "smart_casual",
+  "garments": [
+    {
+      "id": "9070beb6-c7ec-4758-bd65-c26732cb936b",
+      "brand": "Mock",
+      "product_name": "Light Blue Shirt",
+      "slot": "top",
+      "category": "shirt",
+      "colors": ["light_blue"],
+      "pattern": "solid",
+      "fit": "regular",
+      "material": "cotton",
+      "formality_score": 3,
+      "warmth_score": 2,
+      "user_confirmed": true
+    },
+    {
+      "id": "8267ef97-aec1-4342-95ca-f6ae049e537a",
+      "brand": "Mock",
+      "product_name": "Cream Knit",
+      "slot": "top",
+      "category": "knitwear",
+      "colors": ["cream"],
+      "pattern": "solid",
+      "fit": "regular",
+      "material": "wool",
+      "formality_score": 2,
+      "warmth_score": 4,
+      "user_confirmed": true
+    },
+    {
+      "id": "e4ab316b-32c9-4dd7-b308-3f90f808f98e",
+      "brand": "Mock",
+      "product_name": "Dark Jeans",
+      "slot": "bottom",
+      "category": "jeans",
+      "colors": ["dark_blue"],
+      "pattern": "solid",
+      "fit": "straight",
+      "material": "denim",
+      "formality_score": 2,
+      "warmth_score": 3,
+      "user_confirmed": true
+    },
+    {
+      "id": "79b23691-31ba-4a6b-9892-00aef122943b",
+      "brand": "Mock",
+      "product_name": "Black Trousers",
+      "slot": "bottom",
+      "category": "trousers",
+      "colors": ["black"],
+      "pattern": "solid",
+      "fit": "straight",
+      "material": "polyester",
+      "formality_score": 4,
+      "warmth_score": 3,
+      "user_confirmed": true
+    },
+    {
+      "id": "d2f8c3fe-5a0a-4c99-8f8e-eea8fc8b7ddd",
+      "brand": "Mock",
+      "product_name": "White Sneakers",
+      "slot": "shoes",
+      "category": "sneakers",
+      "colors": ["white"],
+      "pattern": "solid",
+      "fit": "regular",
+      "material": "leather",
+      "formality_score": 2,
+      "warmth_score": 2,
+      "user_confirmed": true
+    },
+    {
+      "id": "d6e1b0a5-aac3-49a0-b4e9-b5ffb95e904a",
+      "brand": "Mock",
+      "product_name": "Brown Loafers",
+      "slot": "shoes",
+      "category": "loafers",
+      "colors": ["brown"],
+      "pattern": "solid",
+      "fit": "regular",
+      "material": "leather",
+      "formality_score": 4,
+      "warmth_score": 2,
+      "user_confirmed": true
+    },
+    {
+      "id": "c5c7fe89-a29f-48ab-ac97-f6f7a022a331",
+      "brand": "Mock",
+      "product_name": "Navy Jacket",
+      "slot": "outerwear",
+      "category": "jacket",
+      "colors": ["navy"],
+      "pattern": "solid",
+      "fit": "regular",
+      "material": "polyester",
+      "formality_score": 3,
+      "warmth_score": 4,
+      "user_confirmed": true
+    }
+  ],
+  "base_item_ids": [
+    "8267ef97-aec1-4342-95ca-f6ae049e537a",
+    "79b23691-31ba-4a6b-9892-00aef122943b",
+    "d2f8c3fe-5a0a-4c99-8f8e-eea8fc8b7ddd"
+  ],
+  "replacement_item_id": "d6e1b0a5-aac3-49a0-b4e9-b5ffb95e904a"
+}
