@@ -80,6 +80,43 @@ final class GarmentStoreTests: XCTestCase {
         XCTAssertNil(reloaded.image(for: reloadedGarment))
     }
 
+    func testEditingGarmentUpdatesSlotAndPreservesPhoto() throws {
+        let prepared = try GarmentImageProcessor.prepare(makeTestImageData())
+        let store = GarmentStore(rootDirectory: temporaryDirectory)
+        let original = try store.addGarment(
+            name: "浅蓝衬衫",
+            slot: .top,
+            category: "衬衫",
+            colors: ["浅蓝"],
+            pattern: "纯色",
+            fit: "常规",
+            material: "棉",
+            formalityScore: 3,
+            warmthScore: 2,
+            photoData: prepared.main,
+            thumbnailData: prepared.thumbnail
+        )
+
+        let updated = try store.updateGarment(
+            id: original.id,
+            name: "浅蓝衬衫",
+            slot: .shoes,
+            category: "衬衫",
+            colors: ["浅蓝"],
+            pattern: "纯色",
+            fit: "常规",
+            material: "棉",
+            formalityScore: 3,
+            warmthScore: 2
+        )
+        let reloaded = GarmentStore(rootDirectory: temporaryDirectory)
+
+        XCTAssertEqual(updated.slot, .shoes)
+        XCTAssertEqual(reloaded.garments.count, 1)
+        XCTAssertEqual(reloaded.garments.first?.slot, .shoes)
+        XCTAssertNotNil(reloaded.image(for: try XCTUnwrap(reloaded.garments.first)))
+    }
+
     private func makeTestImageData() -> Data {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 80, height: 100))
         let image = renderer.image { context in

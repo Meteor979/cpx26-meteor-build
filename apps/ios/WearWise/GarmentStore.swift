@@ -2,6 +2,20 @@ import Combine
 import Foundation
 import UIKit
 
+enum GarmentStoreError: LocalizedError {
+    case garmentNotFound
+    case incompleteImageUpdate
+
+    var errorDescription: String? {
+        switch self {
+        case .garmentNotFound:
+            "没有找到这件衣物。"
+        case .incompleteImageUpdate:
+            "图片数据不完整，请重新选择照片。"
+        }
+    }
+}
+
 @MainActor
 final class GarmentStore: ObservableObject {
     @Published private(set) var garments: [Garment] = []
@@ -104,6 +118,68 @@ final class GarmentStore: ObservableObject {
         return UIImage(contentsOfFile: fallback.path)
     }
 
+    @discardableResult
+    func updateGarment(
+        id: UUID,
+        name: String,
+        slot: GarmentSlot,
+        category: String,
+        colors: [String],
+        pattern: String,
+        fit: String,
+        material: String,
+        formalityScore: Int,
+        warmthScore: Int,
+        photoData: Data? = nil,
+        thumbnailData: Data? = nil
+    ) throws -> Garment {
+        guard let index = garments.firstIndex(where: { $0.id == id }) else {
+            throw GarmentStoreError.garmentNotFound
+        }
+        guard (photoData == nil) == (thumbnailData == nil) else {
+            throw GarmentStoreError.incompleteImageUpdate
+        }
+
+        let current = garments[index]
+        let photoURL = imageURL(for: current.localPhotoPath)
+        let thumbnailURL = imageURL(for: current.thumbnailPath)
+        let oldPhoto = try? Data(contentsOf: photoURL)
+        let oldThumbnail = try? Data(contentsOf: thumbnailURL)
+
+        let updated = Garment(
+            id: current.id,
+            localPhotoPath: current.localPhotoPath,
+            thumbnailPath: current.thumbnailPath,
+            capturedAt: current.capturedAt,
+            name: name.trimmingCharacters(in: .whitespacesAndNewlines),
+            slot: slot,
+            category: category.trimmingCharacters(in: .whitespacesAndNewlines),
+            colors: colors.filter { !$0.isEmpty },
+            pattern: pattern.trimmingCharacters(in: .whitespacesAndNewlines),
+            fit: fit.trimmingCharacters(in: .whitespacesAndNewlines),
+            material: material.trimmingCharacters(in: .whitespacesAndNewlines),
+            formalityScore: min(5, max(1, formalityScore)),
+            warmthScore: min(5, max(1, warmthScore)),
+            userConfirmed: true,
+            source: current.source
+        )
+
+        do {
+            if let photoData, let thumbnailData {
+                try photoData.write(to: photoURL, options: .atomic)
+                try thumbnailData.write(to: thumbnailURL, options: .atomic)
+            }
+            garments[index] = updated
+            try saveMetadata()
+            return updated
+        } catch {
+            garments[index] = current
+            restore(oldPhoto, to: photoURL)
+            restore(oldThumbnail, to: thumbnailURL)
+            throw error
+        }
+    }
+
     func clearError() {
         errorMessage = nil
     }
@@ -141,5 +217,13 @@ final class GarmentStore: ObservableObject {
         encoder.dateEncodingStrategy = .iso8601
         let data = try encoder.encode(garments)
         try data.write(to: metadataURL, options: .atomic)
+    }
+
+    private func restore(_ data: Data?, to url: URL) {
+        if let data {
+            try? data.write(to: url, options: .atomic)
+        } else {
+            try? fileManager.removeItem(at: url)
+        }
     }
 }

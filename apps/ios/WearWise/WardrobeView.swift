@@ -3,7 +3,7 @@ import SwiftUI
 struct WardrobeView: View {
     @EnvironmentObject private var garmentStore: GarmentStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @State private var showsAddGarment = false
+    @State private var activeSheet: WardrobeSheet?
 
     private var columns: [GridItem] {
         if dynamicTypeSize >= .xxxLarge {
@@ -21,7 +21,7 @@ struct WardrobeView: View {
                 header
 
                 Button {
-                    showsAddGarment = true
+                    activeSheet = .add
                 } label: {
                     Label("添加衣物", systemImage: "camera.fill")
                 }
@@ -43,9 +43,15 @@ struct WardrobeView: View {
         .navigationTitle("我的衣柜")
         .navigationBarTitleDisplayMode(.large)
         .toolbar(.visible, for: .navigationBar)
-        .sheet(isPresented: $showsAddGarment) {
-            AddGarmentView()
-                .environmentObject(garmentStore)
+        .sheet(item: $activeSheet) { sheet in
+            switch sheet {
+            case .add:
+                AddGarmentView()
+                    .environmentObject(garmentStore)
+            case let .edit(garment):
+                AddGarmentView(editingGarment: garment)
+                    .environmentObject(garmentStore)
+            }
         }
         .alert(
             "衣柜出现问题",
@@ -117,7 +123,13 @@ struct WardrobeView: View {
 
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
                         ForEach(items) { garment in
-                            GarmentCard(garment: garment)
+                            Button {
+                                activeSheet = .edit(garment)
+                            } label: {
+                                GarmentCard(garment: garment)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityHint("编辑衣物类型和标签")
                         }
                     }
                 }
@@ -149,6 +161,10 @@ private struct GarmentCard: View {
                 Label(garment.source.label, systemImage: "checkmark.seal")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
+
+                Label("编辑", systemImage: "pencil")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
             }
             .fixedSize(horizontal: false, vertical: true)
         }
@@ -165,6 +181,18 @@ private struct GarmentCard: View {
         .accessibilityLabel(
             "\(garment.name)，\(garment.slot.label)，\(garment.colorLabel)，\(garment.formalityLabel)，\(garment.source.label)"
         )
+    }
+}
+
+private enum WardrobeSheet: Identifiable {
+    case add
+    case edit(Garment)
+
+    var id: String {
+        switch self {
+        case .add: "add"
+        case let .edit(garment): "edit-\(garment.id.uuidString)"
+        }
     }
 }
 

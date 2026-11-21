@@ -19,6 +19,7 @@ permission is not requested in this milestone.
 - Black-and-white, Dynamic Type-aware home screen.
 - Large icon-and-text actions with a minimum 56 pt tap height.
 - Photo wardrobe grouped by garment slot.
+- Existing garments can be reopened to correct their slot, name, color, and tags.
 - Camera capture and photo-library import.
 - Local image compression, thumbnail generation, and JSON metadata persistence.
 - Default two-column photo grid and a single-column layout at larger text sizes.

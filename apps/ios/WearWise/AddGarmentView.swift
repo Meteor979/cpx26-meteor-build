@@ -5,6 +5,9 @@ import UIKit
 struct AddGarmentView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var garmentStore: GarmentStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    let editingGarment: Garment?
 
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var imageData: Data?
@@ -13,26 +16,60 @@ struct AddGarmentView: View {
     @State private var isSaving = false
     @State private var errorMessage: String?
 
-    @State private var name = ""
-    @State private var slot = GarmentSlot.top
-    @State private var category = ""
-    @State private var colorText = ""
-    @State private var pattern = ""
-    @State private var fit = ""
-    @State private var material = ""
-    @State private var formalityScore = 3
-    @State private var warmthScore = 3
+    @State private var name: String
+    @State private var slot: GarmentSlot
+    @State private var category: String
+    @State private var colorText: String
+    @State private var pattern: String
+    @State private var fit: String
+    @State private var material: String
+    @State private var formalityScore: Int
+    @State private var warmthScore: Int
     @State private var showsMoreDetails = false
+
+    init(editingGarment: Garment? = nil) {
+        self.editingGarment = editingGarment
+        _name = State(initialValue: editingGarment?.name ?? "")
+        _slot = State(initialValue: editingGarment?.slot ?? .top)
+        _category = State(initialValue: editingGarment?.category ?? "")
+        _colorText = State(
+            initialValue: editingGarment?.colors.joined(separator: "、") ?? ""
+        )
+        _pattern = State(initialValue: editingGarment?.pattern ?? "")
+        _fit = State(initialValue: editingGarment?.fit ?? "")
+        _material = State(initialValue: editingGarment?.material ?? "")
+        _formalityScore = State(initialValue: editingGarment?.formalityScore ?? 3)
+        _warmthScore = State(initialValue: editingGarment?.warmthScore ?? 3)
+    }
+
+    private var typeColumns: [GridItem] {
+        dynamicTypeSize >= .xxxLarge
+            ? [GridItem(.flexible())]
+            : [GridItem(.flexible()), GridItem(.flexible())]
+    }
 
     private var cameraAvailable: Bool {
         UIImagePickerController.isSourceTypeAvailable(.camera)
     }
 
     private var canSave: Bool {
-        imageData != nil
+        (imageData != nil || editingGarment != nil)
             && !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             && !isReadingPhoto
             && !isSaving
+    }
+
+    private var saveButtonTitle: String {
+        if isSaving {
+            return "正在保存"
+        }
+        if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return "请填写衣物名称"
+        }
+        if imageData == nil, editingGarment == nil {
+            return "请先选择照片"
+        }
+        return editingGarment == nil ? "保存衣物" : "保存修改"
     }
 
     var body: some View {
@@ -50,7 +87,7 @@ struct AddGarmentView: View {
                 .frame(maxWidth: .infinity)
             }
             .background(Color.wearWiseBackground)
-            .navigationTitle("添加衣物")
+            .navigationTitle(editingGarment == nil ? "添加衣物" : "编辑衣物")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -151,6 +188,21 @@ struct AddGarmentView: View {
                         .stroke(Color.wearWiseInk, lineWidth: 2)
                 }
                 .accessibilityLabel("待保存的衣物照片")
+        } else if
+            let editingGarment,
+            let image = garmentStore.image(for: editingGarment, thumbnail: false)
+        {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+                .aspectRatio(3.0 / 4.0, contentMode: .fit)
+                .frame(maxWidth: .infinity)
+                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(Color.wearWiseInk, lineWidth: 2)
+                }
+                .accessibilityLabel("当前衣物照片")
         } else {
             ZStack {
                 Color.wearWiseSurface
@@ -183,25 +235,58 @@ struct AddGarmentView: View {
 
             field("衣物名称", text: $name, prompt: "例如：浅蓝牛津衬衫")
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 10) {
                 Text("衣物类型")
                     .font(.subheadline.weight(.semibold))
-                Picker("衣物类型", selection: $slot) {
+
+                LazyVGrid(columns: typeColumns, spacing: 10) {
                     ForEach(GarmentSlot.allCases) { slot in
-                        Label(slot.label, systemImage: slot.systemImage)
-                            .tag(slot)
+                        Button {
+                            self.slot = slot
+                        } label: {
+                            HStack(spacing: 9) {
+                                Image(systemName: slot.systemImage)
+                                    .accessibilityHidden(true)
+                                Text(slot.label)
+                                Spacer(minLength: 4)
+                                if self.slot == slot {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .accessibilityHidden(true)
+                                }
+                            }
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(
+                                self.slot == slot
+                                    ? Color(uiColor: .systemBackground)
+                                    : Color.wearWiseInk
+                            )
+                            .padding(.horizontal, 14)
+                            .frame(maxWidth: .infinity, minHeight: 56)
+                            .background(
+                                self.slot == slot
+                                    ? Color.wearWiseInk
+                                    : Color.wearWiseSurface,
+                                in: RoundedRectangle(
+                                    cornerRadius: 14,
+                                    style: .continuous
+                                )
+                            )
+                            .overlay {
+                                RoundedRectangle(
+                                    cornerRadius: 14,
+                                    style: .continuous
+                                )
+                                .stroke(
+                                    Color.wearWiseInk,
+                                    lineWidth: self.slot == slot ? 2 : 1
+                                )
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(
+                            "\(slot.label)，\(self.slot == slot ? "已选择" : "未选择")"
+                        )
                     }
-                }
-                .pickerStyle(.menu)
-                .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
-                .padding(.horizontal, 14)
-                .background(
-                    Color.wearWiseSurface,
-                    in: RoundedRectangle(cornerRadius: 14, style: .continuous)
-                )
-                .overlay {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(Color.wearWiseBorder, lineWidth: 1)
                 }
             }
 
@@ -252,11 +337,7 @@ struct AddGarmentView: View {
             }
         } label: {
             Label(
-                isSaving
-                    ? "正在保存"
-                    : canSave
-                        ? "保存衣物"
-                        : "请先选择照片并填写名称",
+                saveButtonTitle,
                 systemImage: isSaving ? "hourglass" : "checkmark.circle.fill"
             )
         }
@@ -313,35 +394,60 @@ struct AddGarmentView: View {
 
     @MainActor
     private func save() async {
-        guard let imageData, canSave else {
+        guard canSave else {
             return
         }
         isSaving = true
         defer { isSaving = false }
 
         do {
-            let prepared = try await Task.detached(priority: .userInitiated) {
-                try GarmentImageProcessor.prepare(imageData)
-            }.value
+            let prepared: PreparedGarmentImage?
+            if let imageData {
+                prepared = try await Task.detached(priority: .userInitiated) {
+                    try GarmentImageProcessor.prepare(imageData)
+                }.value
+            } else {
+                prepared = nil
+            }
 
             let colors = colorText
                 .split(whereSeparator: { "，,、".contains($0) })
                 .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }
 
-            try garmentStore.addGarment(
-                name: name,
-                slot: slot,
-                category: category,
-                colors: colors,
-                pattern: pattern,
-                fit: fit,
-                material: material,
-                formalityScore: formalityScore,
-                warmthScore: warmthScore,
-                photoData: prepared.main,
-                thumbnailData: prepared.thumbnail
-            )
+            if let editingGarment {
+                try garmentStore.updateGarment(
+                    id: editingGarment.id,
+                    name: name,
+                    slot: slot,
+                    category: category,
+                    colors: colors,
+                    pattern: pattern,
+                    fit: fit,
+                    material: material,
+                    formalityScore: formalityScore,
+                    warmthScore: warmthScore,
+                    photoData: prepared?.main,
+                    thumbnailData: prepared?.thumbnail
+                )
+            } else {
+                guard let prepared else {
+                    throw GarmentImageError.unreadableImage
+                }
+                try garmentStore.addGarment(
+                    name: name,
+                    slot: slot,
+                    category: category,
+                    colors: colors,
+                    pattern: pattern,
+                    fit: fit,
+                    material: material,
+                    formalityScore: formalityScore,
+                    warmthScore: warmthScore,
+                    photoData: prepared.main,
+                    thumbnailData: prepared.thumbnail
+                )
+            }
             dismiss()
         } catch {
             errorMessage = error.localizedDescription
