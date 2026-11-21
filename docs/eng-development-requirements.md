@@ -274,6 +274,10 @@ SwiftUI View
 ### 10.2 后端
 
 - FastAPI。
+- 最低支持 Python 3.9；开发、CI 和部署环境必须满足该版本要求。
+- 类型标注使用 `typing.Optional`、`List`、`Dict` 和 `Tuple`；禁止使用
+  `X | None` 等 Python 3.10 专用联合类型语法。
+- 更换 Python 版本后必须重新创建虚拟环境，提交报告必须包含实际 Python 版本。
 - 无状态接口优先。
 - 外部 AI、天气和搜索必须可替换。
 - 推荐接口必须包含规则 fallback。

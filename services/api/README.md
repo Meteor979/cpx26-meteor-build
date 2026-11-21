@@ -6,10 +6,11 @@ or search services.
 
 ## Requirements
 
-- Python 3
+- Python 3.9+
 - Windows PowerShell
+- macOS/Linux shell
 
-## Setup and tests
+## Windows setup and tests
 
 ```powershell
 cd services/api
@@ -19,7 +20,17 @@ python -m pip install -r requirements.txt
 python -m pytest -q
 ```
 
-## Run locally
+## macOS/Linux setup and tests
+
+```bash
+cd services/api
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m pytest -q
+```
+
+## Run locally on Windows
 
 ```powershell
 python -m uvicorn app.main:app --reload --port 8000
@@ -31,7 +42,21 @@ In another terminal:
 curl.exe http://127.0.0.1:8000/health
 ```
 
+## Run locally on macOS/Linux
+
+```bash
+python -m uvicorn app.main:app --reload --port 8000
+curl http://127.0.0.1:8000/health
+```
+
 OpenAPI documentation is available at <http://127.0.0.1:8000/docs>.
+
+## Python compatibility
+
+The backend supports Python 3.9 and newer. Do not use Python 3.10-only syntax
+such as `X | None`, `int | None`, or union expressions in public models. Use
+`Optional`, `List`, `Dict`, and `Tuple` from `typing` instead. Recreate the
+virtual environment after changing the Python version.
 
 ## Current endpoint
 
