@@ -69,6 +69,9 @@ RecommendationResponse
 ```text
 SwiftUI View
   → ViewModel
+  → AssistantCoordinator
+      → VoiceSession
+      → DeterministicDressingPlanner
   → RecommendationService protocol
       ├─ LocalMockService
       └─ RemoteAPIService
@@ -80,13 +83,14 @@ SwiftUI View
 前端第一轮使用本地 Mock 完成：
 
 ```text
-自动读出天气上下文
-→ 输入场合
-→ 场合策略
-→ 选择衣物
+说“开始”
+→ 说出场合并确认
+→ 选择表达方向
 → 三套推荐
-→ 单品替换
-→ 确认
+→ 说 A/B/C 或比较
+→ 说“换鞋”
+→ 说“开始穿衣”
+→ 逐件说“完成”
 ```
 
 ## 4. 后端第一次交付
@@ -142,11 +146,11 @@ http://127.0.0.1:8000
 
 | 时间 | iOS | 后端 | 必须完成 |
 |---|---|---|---|
-| 开始后 1 小时 | 工程和 Mock 首页 | FastAPI 启动、/health | 两个工程可独立运行 |
-| 开始后 3 小时 | 场合搜索和天气 Mock | presets、occasions、weather | 字段解析一致 |
-| 开始后 6 小时 | 衣柜和推荐 Mock | recommendations Mock | 第一次真实接口调用 |
-| 开始后 10 小时 | 三套推荐和详情 | 推荐规则首版 | 核心流程联调 |
-| 开始后 14 小时 | 替换和确认 | revise 首版 | 完整演示闭环 |
+| 开始后 1 小时 | 工程启动、持续语音基本循环 | FastAPI 启动、/health | 两个工程可独立运行 |
+| 开始后 3 小时 | 开始、场合和确认口令 | presets、occasions、weather | 字段解析一致 |
+| 开始后 6 小时 | 三套推荐、换鞋和本地穿衣计划 | recommendations Mock | 第一次真实接口调用 |
+| 开始后 10 小时 | 真机语音推荐和左右提示 | 推荐规则首版 | 核心流程联调 |
+| 开始后 14 小时 | 真机完成逐件穿衣 | revise 首版 | 完整演示闭环 |
 | 第一天结束 | 可演示版本 | 部署地址或明确阻塞 | 不允许双方各自“快完成” |
 | 第二天 09:00 | 功能冻结 | 功能冻结 | 只修阻断问题 |
 
@@ -155,13 +159,14 @@ http://127.0.0.1:8000
 不要同时测试全部功能。第一次联调固定使用：
 
 ```text
-自动天气上下文
-→ 输入“第一次约会”
+语音说“开始”
+→ 说出“第一次约会”并说“确认”
+→ 选择“自然”
 → 本地命中 first-date
 → 选择已确认样例衣物
 → POST /v1/recommendations
 → 解码三套结果
-→ 显示第一套
+→ 语音选择第一套
 ```
 
 这条路径通过后，再测试：
@@ -264,7 +269,7 @@ AI 可以用于写代码，但不能代替接口确认。
 
 1. 双方打开同一个 OpenAPI。
 2. 后端运行 `/health`。
-3. iOS 使用样例 JSON 渲染静态首页。
+3. iOS 验证“开始→场合→确认→收听提示音→再次聆听”。
 4. 双方确认第一个联调接口。
 5. 固定一个 3 小时后的联调时间。
 

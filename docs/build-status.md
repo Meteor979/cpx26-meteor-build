@@ -5,9 +5,12 @@
 
 ```text
 Contract version: 0.4.0
-Last updated: 2026-11-20
+Last updated: 2026-11-21
 Status owner: iOS/backend integration coordinator
 ```
+
+正式产品开发从本状态文件提交后开始。仓库中未提交的本地原型不计入工程进度，
+也不能用 `git add .` 带入正式基线。
 
 ## 1. 状态定义
 
@@ -40,15 +43,15 @@ Status owner: iOS/backend integration coordinator
 
 | 页面/能力 | 负责人 | 状态 | 分支 | Commit | Mock 可用 | 真实接口已联调 | 备注 |
 |---|---|---|---|---|---|---|---|
-| Xcode 工程与导航 | iOS | 未开始 | `feat/ios-foundation` | - | - | - | 共享 Scheme |
-| 启动定位与天气上下文 | iOS | 未开始 | `feat/ios-context` | - | - | - | 拒绝定位则阻塞 |
-| 首页场合搜索 | iOS | 未开始 | `feat/ios-occasion` | - | - | - | 本地预设优先 |
+| Xcode 工程与导航 | iOS | 未开始 | `feat/ios-foundation` | - | - | - | 需求冻结后创建共享 Scheme |
+| 持续前台语音与自动恢复聆听 | iOS | 未开始 | `feat/ios-voice-loop` | - | - | - | 设备端识别、回声隔离和真机验证 |
+| 语音场合理解 | iOS | 未开始 | `feat/ios-occasion` | - | - | - | 开始/确认/重新说路径 |
 | 衣柜列表与添加衣物 | iOS | 未开始 | `feat/ios-wardrobe` | - | - | - | 照片保存在本地 |
 | AI 衣物识别审核 | iOS | 未开始 | `feat/ios-garment-recognition` | - | - | - | 用户确认后保存 |
 | 标签与商品候选 | iOS | 未开始 | `feat/ios-garment-match` | - | - | - | 不鉴定正版 |
-| 三套推荐与详情 | iOS | 未开始 | `feat/ios-recommendation` | - | - | - | Mock 和三态处理 |
-| 替换、确认与缓存 | iOS | 未开始 | `feat/ios-outfit-edit` | - | - | - | 支持本地降级 |
-| 公开网页交互 Demo | iOS/前端 | 未开始 | `feat/web-demo` | - | - | - | 使用静态 Mock，不依赖后端 |
+| 三套推荐与语音详情 | iOS | 未开始 | `feat/ios-recommendation` | - | - | - | A/B/C、比较和理由口令 |
+| 替换、确认与穿衣顺序 | iOS | 未开始 | `feat/ios-outfit-edit` | - | - | - | 换鞋后重新生成步骤 |
+| 公开网页纯语音 Demo | iOS/前端 | 未开始 | `feat/web-demo` | - | - | - | 需求冻结后按基线实现 |
 
 ## 4. 里程碑
 

@@ -25,9 +25,16 @@ Shared rules:
 - Recommendation cache keys are computed by the client.
 - The homepage starts with a free-text occasion search, not a mandatory preset picker.
 - Client-side preset and alias matching runs before any remote occasion-resolution call.
-- Location permission is required at app startup before entering the main flow.
-- Weather is an automatic structured context rather than a homepage card.
-- Weather failures use a cache no older than 60 minutes; otherwise the app shows a retry screen.
+- Automatic weather is optional and must never block the core audio flow.
+- Coarse location is requested only when the user enables automatic weather.
+- Weather is an automatic structured context rather than a primary visual card.
+- Weather failures use a cache no older than 60 minutes, then bundled demo weather or a manual city path.
+- Every visual interaction must have an equivalent screen-reader, keyboard, and spoken path.
+- The primary product flow is operable with continuous foreground speech and
+  short commands; visual buttons are not required for business actions.
+- The native client uses on-device speech recognition and does not retain audio.
+- Recognition pauses while the assistant speaks, then resumes after a listening cue.
+- Deterministic local rules generate dressing order; remote AI may explain but must not control safety-critical steps.
 
 Shared sample fixtures are in [examples/sample-data.json](examples/sample-data.json). Both clients and the backend should use these fixtures before connecting a real provider.
 
