@@ -3,21 +3,20 @@
 This repository contains the team's CrossPointX 2026 requirements, interface
 contract, engineering rules, design materials, and future iOS/backend structure.
 
-The current concept is WearWise, an accessibility-first outfit system for blind
-and low-vision users. It recommends three explainable outfits from clothing the
-user already owns, describes their aesthetic and social tone with audio, and
-provides a repeatable sound-guided dressing sequence.
+The current concept is WearWise, an outfit system for people with color vision
+deficiency and low vision. Users photograph clothing they already own, store the
+images in a local wardrobe, and receive three explainable outfit combinations
+rendered with those same garment photos.
 
-The primary interaction is a continuous foreground voice loop. After the
-one-time operating-system microphone permission, the user can complete the core
-flow with short commands such as "开始", "确认", "A", and "完成" without finding
-or tapping interface controls. The iOS visual state is intentionally minimal and
-follows Apple's clarity, deference, and depth principles.
+The primary interaction uses black-and-white, high-contrast Apple-style screens
+with large graphical buttons containing both icons and labels. Selected,
+disabled, warning, and error states must not rely on color alone. Voice narration
+and sound-guided dressing remain optional enhancements.
 
 The original occasion search, weather context, wardrobe capture, garment
 recognition, product matching, outfit replacement, fallback, and public web demo
-remain in scope. Location and image recognition are optional to the core audio
-experience. See
+remain in scope. Garment photo capture is required for the intended visual
+wardrobe flow; location and voice guidance are optional. See
 [docs/product/accessible-wearwise-pivot.md](docs/product/accessible-wearwise-pivot.md).
 
 ## Development status

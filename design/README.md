@@ -8,6 +8,11 @@ initialization, free-text occasion search with local preset matching, both
 garment-recognition modes, recommendations, replacement, fallback states, and
 the public web demo scope.
 
+The target audience is people with color vision deficiency and low vision.
+Primary UI assets must use a black-and-white high-contrast visual system with
+large icon-plus-label controls. Garment photos uploaded by the user are the first
+visual layer of every recommendation.
+
 Suggested structure:
 
 ```text

@@ -44,23 +44,23 @@ Status owner: iOS/backend integration coordinator
 | 页面/能力 | 负责人 | 状态 | 分支 | Commit | Mock 可用 | 真实接口已联调 | 备注 |
 |---|---|---|---|---|---|---|---|
 | Xcode 工程与导航 | iOS | 未开始 | `feat/ios-foundation` | - | - | - | 需求冻结后创建共享 Scheme |
-| 持续前台语音与自动恢复聆听 | iOS | 未开始 | `feat/ios-voice-loop` | - | - | - | 设备端识别、回声隔离和真机验证 |
-| 语音场合理解 | iOS | 未开始 | `feat/ios-occasion` | - | - | - | 开始/确认/重新说路径 |
-| 衣柜列表与添加衣物 | iOS | 未开始 | `feat/ios-wardrobe` | - | - | - | 照片保存在本地 |
+| 黑白高对比首页与图形按钮 | iOS | 未开始 | `feat/ios-foundation` | - | - | - | 按钮含图标和文字 |
+| 场合搜索与解析 | iOS | 未开始 | `feat/ios-occasion` | - | - | - | 大尺寸输入框和预设按钮 |
+| 照片衣柜与添加衣物 | iOS | 未开始 | `feat/ios-wardrobe` | - | - | - | 本地主图和缩略图 |
 | AI 衣物识别审核 | iOS | 未开始 | `feat/ios-garment-recognition` | - | - | - | 用户确认后保存 |
 | 标签与商品候选 | iOS | 未开始 | `feat/ios-garment-match` | - | - | - | 不鉴定正版 |
-| 三套推荐与语音详情 | iOS | 未开始 | `feat/ios-recommendation` | - | - | - | A/B/C、比较和理由口令 |
-| 替换、确认与穿衣顺序 | iOS | 未开始 | `feat/ios-outfit-edit` | - | - | - | 换鞋后重新生成步骤 |
-| 公开网页纯语音 Demo | iOS/前端 | 未开始 | `feat/web-demo` | - | - | - | 需求冻结后按基线实现 |
+| 三套照片搭配与详情 | iOS | 未开始 | `feat/ios-recommendation` | - | - | - | item ID 映射本地照片 |
+| 替换、确认与可选语音 | iOS | 未开始 | `feat/ios-outfit-edit` | - | - | - | 图形主路径，声音可选 |
+| 公开网页照片穿搭 Demo | iOS/前端 | 未开始 | `feat/web-demo` | - | - | - | 黑白界面和样例照片 |
 
 ## 4. 里程碑
 
 | 检查点 | 目标 | 状态 | 最后验证 |
 |---|---|---|---|
 | 开始后 1 小时 | iOS 工程可启动；后端 `/health` 可运行 | 未开始 | - |
-| 开始后 3 小时 | 场合、天气和预设接口 Mock 可用 | 未开始 | - |
-| 开始后 6 小时 | iOS 第一次调用推荐 Mock 接口 | 未开始 | - |
-| 开始后 14 小时 | 推荐、替换、确认完整闭环 | 未开始 | - |
+| 开始后 3 小时 | 黑白图形首页和照片衣柜列表可运行 | 未开始 | - |
+| 开始后 6 小时 | 三套照片推荐、替换和确认本地闭环 | 未开始 | - |
+| 开始后 14 小时 | iOS 调用推荐 Mock 并映射本地照片 | 未开始 | - |
 | 第一天结束 | 可演示版本和部署地址 | 未开始 | - |
 | 第二天 09:00 | 前后端功能冻结 | 未开始 | - |
 
