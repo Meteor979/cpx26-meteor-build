@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 from fastapi.testclient import TestClient
 
+from app.data.mock_data import SEMANTIC_PROFILES
 from app.main import app
 
 client = TestClient(app)
@@ -20,6 +21,10 @@ def test_presets_return_fixed_sample_data() -> None:
 
     assert response.status_code == 200
     assert response.json() == SAMPLE_DATA["presets"]
+
+
+def test_semantic_profiles_match_sample_data() -> None:
+    assert SEMANTIC_PROFILES == SAMPLE_DATA["semantic_profiles"]
 
 
 def test_presets_filter_by_query() -> None:
@@ -39,7 +44,7 @@ def test_presets_limit() -> None:
 
 
 def test_presets_version_not_modified() -> None:
-    response = client.get("/v1/presets", params={"version": 2})
+    response = client.get("/v1/presets", params={"version": 3})
 
     assert response.status_code == 304
     assert response.content == b""
@@ -108,6 +113,15 @@ def test_night_out_wins_over_business_formality_hint() -> None:
     assert body["profile"]["id"] == "night-out"
     assert body["profile"]["target_formality"] == "casual"
     assert body["match_type"] in {"exact_preset", "semantic_match"}
+
+
+def test_night_out_is_semantic_profile_not_public_preset() -> None:
+    response = client.get("/v1/presets")
+
+    assert response.status_code == 200
+    assert "night-out" not in {
+        preset["id"] for preset in response.json()["presets"]
+    }
 
 
 def test_internship_interview_remains_business() -> None:

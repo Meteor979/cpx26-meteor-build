@@ -15,7 +15,7 @@ from app.models import (
     RecommendationRequest,
     RecommendationResponse,
 )
-from app.services.occasion_matcher import PRESET_MODELS, resolve_occasion
+from app.services.occasion_matcher import PROFILE_MODELS, resolve_occasion
 
 RULE_PROVIDER = "rule_engine_with_occasion_scoring"
 RULE_WARNING = "当前为确定性规则 Mock，未调用真实 AI。"
@@ -74,7 +74,7 @@ def _preset_for_request(request: RecommendationRequest) -> OccasionPreset:
         preset = next(
             (
                 item
-                for item in PRESET_MODELS
+                for item in PROFILE_MODELS
                 if item.id == request.preset_id
             ),
             None,

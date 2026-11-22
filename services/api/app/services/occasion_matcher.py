@@ -8,6 +8,7 @@ from app.data.mock_data import (
     FALLBACK_GENERATED_AT,
     PRESET_GENERATED_AT,
     PRESETS,
+    SEMANTIC_PROFILES,
     PRESET_VERSION,
 )
 from app.errors import ApiError
@@ -22,6 +23,12 @@ from app.models import (
 PRESET_MODELS: List[OccasionPreset] = [
     OccasionPreset.model_validate(item) for item in PRESETS
 ]
+SEMANTIC_PROFILE_MODELS: List[OccasionPreset] = [
+    OccasionPreset.model_validate(item) for item in SEMANTIC_PROFILES
+]
+PROFILE_MODELS: List[OccasionPreset] = (
+    PRESET_MODELS + SEMANTIC_PROFILE_MODELS
+)
 SEMANTIC_THRESHOLD = 0.62
 FORMALITY_NEIGHBORS: Dict[FormalityBand, List[FormalityBand]] = {
     FormalityBand.CASUAL: [FormalityBand.CASUAL, FormalityBand.SMART_CASUAL],
@@ -102,7 +109,7 @@ def list_presets(
 
 
 def _exact_preset(query: str) -> Optional[OccasionPreset]:
-    for preset in PRESET_MODELS:
+    for preset in PROFILE_MODELS:
         if query in _normalized_values(preset):
             return preset
     return None
@@ -113,7 +120,7 @@ def _best_semantic_preset(
 ) -> Tuple[Optional[OccasionPreset], float]:
     scored = [
         (preset, _semantic_score(query, preset))
-        for preset in PRESET_MODELS
+        for preset in PROFILE_MODELS
     ]
     scored.sort(key=lambda item: (-item[1], item[0].id))
     if not scored or scored[0][1] < SEMANTIC_THRESHOLD:
@@ -161,13 +168,20 @@ def resolve_occasion(
 
     exact = _exact_preset(normalized_query)
     if exact is not None:
-        alternatives = [preset for preset in PRESET_MODELS if preset.id != exact.id]
+        is_semantic_profile = any(
+            preset.id == exact.id for preset in SEMANTIC_PROFILE_MODELS
+        )
+        alternatives = [
+            preset for preset in PRESET_MODELS if preset.id != exact.id
+        ]
         return OccasionResolveResponse(
             query=request.query,
             profile=exact,
-            match_type="exact_preset",
-            confidence=1.0,
-            cached=True,
+            match_type=(
+                "semantic_match" if is_semantic_profile else "exact_preset"
+            ),
+            confidence=0.94 if is_semantic_profile else 1.0,
+            cached=not is_semantic_profile,
             alternatives=alternatives[:3],
             warning=None,
             request_id=request.request_id,
@@ -175,13 +189,21 @@ def resolve_occasion(
 
     semantic, score = _best_semantic_preset(normalized_query)
     if semantic is not None:
-        alternatives = [preset for preset in PRESET_MODELS if preset.id != semantic.id]
+        is_semantic_profile = any(
+            preset.id == semantic.id for preset in SEMANTIC_PROFILE_MODELS
+        )
+        alternatives = [
+            preset for preset in PRESET_MODELS if preset.id != semantic.id
+        ]
         return OccasionResolveResponse(
             query=request.query,
             profile=semantic,
             match_type="semantic_match",
-            confidence=round(min(max(score, 0.7), 0.88), 2),
-            cached=True,
+            confidence=round(
+                min(max(score, 0.7), 0.88) if not is_semantic_profile else 0.9,
+                2,
+            ),
+            cached=not is_semantic_profile,
             alternatives=alternatives[:3],
             warning=None,
             request_id=request.request_id,

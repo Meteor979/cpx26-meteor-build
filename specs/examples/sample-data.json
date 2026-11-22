@@ -19,7 +19,6 @@
       "第一次去女朋友家吃饭"
     ],
     "suggestion_ids": [
-      "night-out",
       "club-speech",
       "first-date",
       "anniversary-date",
@@ -30,52 +29,10 @@
     "wardrobe_ready_count": 8
   },
   "presets": {
-    "version": 2,
+    "version": 3,
     "cached": true,
     "generated_at": "2026-11-20T10:00:00+08:00",
     "presets": [
-      {
-        "id": "night-out",
-        "name": "夜店",
-        "aliases": [
-          "去夜店",
-          "夜店",
-          "夜生活",
-          "派对",
-          "酒吧",
-          "clubbing"
-        ],
-        "description": "轻松、有个人表达，避免像商务会面或正式面试。",
-        "target_formality": "casual",
-        "allowed_formality": [
-          "casual",
-          "smart_casual"
-        ],
-        "required_slots": [
-          "top",
-          "bottom",
-          "shoes"
-        ],
-        "style_keywords": [
-          "夜间社交",
-          "个人表达",
-          "轻松",
-          "有辨识度"
-        ],
-        "avoid_rules": [
-          "避免全套商务正装",
-          "避免领带和过分拘谨的轮廓",
-          "避免像正式面试"
-        ],
-        "explanation_guidelines": [
-          "解释整体是否适合夜间社交",
-          "解释是否保留个人表达",
-          "解释是否避免商务正装感"
-        ],
-        "source": "precomputed",
-        "version": 2,
-        "generated_at": "2026-11-20T10:00:00+08:00"
-      },
       {
         "id": "first-date",
         "name": "初次约会",
@@ -112,7 +69,7 @@
           "解释是否适合当前温度"
         ],
         "source": "precomputed",
-        "version": 2,
+        "version": 3,
         "generated_at": "2026-11-20T10:00:00+08:00"
       },
       {
@@ -152,7 +109,7 @@
           "解释是否避免过度张扬"
         ],
         "source": "precomputed",
-        "version": 2,
+        "version": 3,
         "generated_at": "2026-11-20T10:00:00+08:00"
       },
       {
@@ -192,7 +149,7 @@
           "保留至少一处轻松元素"
         ],
         "source": "precomputed",
-        "version": 2,
+        "version": 3,
         "generated_at": "2026-11-20T10:00:00+08:00"
       },
       {
@@ -233,7 +190,7 @@
           "解释个人风格是否明确"
         ],
         "source": "precomputed",
-        "version": 2,
+        "version": 3,
         "generated_at": "2026-11-20T10:00:00+08:00"
       },
       {
@@ -272,11 +229,55 @@
           "解释是否方便走动和上台"
         ],
         "source": "precomputed",
-        "version": 2,
+        "version": 3,
         "generated_at": "2026-11-20T10:00:00+08:00"
       }
     ]
   },
+  "semantic_profiles": [
+    {
+      "id": "night-out",
+      "name": "夜店",
+      "aliases": [
+        "去夜店",
+        "夜店",
+        "夜生活",
+        "派对",
+        "酒吧",
+        "clubbing"
+      ],
+      "description": "轻松、有个人表达，避免像商务会面或正式面试。",
+      "target_formality": "casual",
+      "allowed_formality": [
+        "casual",
+        "smart_casual"
+      ],
+      "required_slots": [
+        "top",
+        "bottom",
+        "shoes"
+      ],
+      "style_keywords": [
+        "夜间社交",
+        "个人表达",
+        "轻松",
+        "有辨识度"
+      ],
+      "avoid_rules": [
+        "避免全套商务正装",
+        "避免领带和过分拘谨的轮廓",
+        "避免像正式面试"
+      ],
+      "explanation_guidelines": [
+        "解释整体是否适合夜间社交",
+        "解释是否保留个人表达",
+        "解释是否避免商务正装感"
+      ],
+      "source": "bundled",
+      "version": 1,
+      "generated_at": "2026-11-20T10:00:00+08:00"
+    }
+  ],
   "local_occasion_match_example": {
     "input": "第一次约会",
     "normalized": "第一次约会",

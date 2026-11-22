@@ -179,7 +179,8 @@ enum LocalPresetCatalog {
         description: "轻松、有个人表达，避免像商务会面。",
         formality: .casual,
         allowed: [.casual, .smartCasual],
-        keywords: ["夜间社交", "个人表达", "轻松", "有辨识度"]
+        keywords: ["夜间社交", "个人表达", "轻松", "有辨识度"],
+        source: "bundled"
     )
 
     static let all = choices + [
@@ -295,7 +296,8 @@ enum LocalPresetCatalog {
         description: String,
         formality: FormalityBand,
         allowed: [FormalityBand],
-        keywords: [String]
+        keywords: [String],
+        source: String = "precomputed"
     ) -> OccasionPreset {
         OccasionPreset(
             id: id,
@@ -308,7 +310,7 @@ enum LocalPresetCatalog {
             styleKeywords: keywords,
             avoidRules: ["避免过度正式", "避免颜色和图案过度复杂"],
             explanationGuidelines: ["解释正式程度", "解释颜色关系", "解释场合适配"],
-            source: "precomputed",
+            source: source,
             version: 1,
             generatedAt: nil
         )

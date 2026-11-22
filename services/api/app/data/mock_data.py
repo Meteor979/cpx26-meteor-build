@@ -1,10 +1,10 @@
 from typing import Any, Dict, List
 
-PRESET_VERSION = 2
+PRESET_VERSION = 3
 PRESET_GENERATED_AT = "2026-11-20T10:00:00+08:00"
 FALLBACK_GENERATED_AT = "2026-11-21T00:00:00+08:00"
 
-PRESETS: List[Dict[str, Any]] = [
+SEMANTIC_PROFILES: List[Dict[str, Any]] = [
     {
         "id": "night-out",
         "name": "夜店",
@@ -24,10 +24,13 @@ PRESETS: List[Dict[str, Any]] = [
             "解释是否保留个人表达",
             "解释是否避免商务正装感",
         ],
-        "source": "precomputed",
-        "version": 2,
+        "source": "bundled",
+        "version": 1,
         "generated_at": PRESET_GENERATED_AT,
-    },
+    }
+]
+
+PRESETS: List[Dict[str, Any]] = [
     {
         "id": "first-date",
         "name": "初次约会",
@@ -48,7 +51,7 @@ PRESETS: List[Dict[str, Any]] = [
             "解释是否适合当前温度",
         ],
         "source": "precomputed",
-        "version": 2,
+        "version": 3,
         "generated_at": PRESET_GENERATED_AT,
     },
     {
@@ -71,7 +74,7 @@ PRESETS: List[Dict[str, Any]] = [
             "解释是否避免过度张扬",
         ],
         "source": "precomputed",
-        "version": 2,
+        "version": 3,
         "generated_at": PRESET_GENERATED_AT,
     },
     {
@@ -94,7 +97,7 @@ PRESETS: List[Dict[str, Any]] = [
             "保留至少一处轻松元素",
         ],
         "source": "precomputed",
-        "version": 2,
+        "version": 3,
         "generated_at": PRESET_GENERATED_AT,
     },
     {
@@ -117,7 +120,7 @@ PRESETS: List[Dict[str, Any]] = [
             "解释个人风格是否明确",
         ],
         "source": "precomputed",
-        "version": 2,
+        "version": 3,
         "generated_at": PRESET_GENERATED_AT,
     },
     {
@@ -140,7 +143,7 @@ PRESETS: List[Dict[str, Any]] = [
             "解释是否方便走动和上台",
         ],
         "source": "precomputed",
-        "version": 2,
+        "version": 3,
         "generated_at": PRESET_GENERATED_AT,
     },
 ]

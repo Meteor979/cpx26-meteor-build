@@ -55,7 +55,7 @@ final class PresetService: PresetServiceProtocol {
     private func bundledResult() -> PresetLoadResult {
         PresetLoadResult(
             response: PresetListResponse(
-                version: 1,
+                version: 3,
                 cached: true,
                 generatedAt: nil,
                 presets: LocalPresetCatalog.choices
