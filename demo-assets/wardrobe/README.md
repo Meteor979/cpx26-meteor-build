@@ -75,7 +75,7 @@ open http://127.0.0.1:4173/demo-assets/wardrobe/preview.html
 ```
 
 `preview.html` validates the manifest, groups all 28 garments by category, and
-provides a one-click “载入演示衣柜” action that stores the manifest in
+provides a one-click “Import demo wardrobe” action that stores the manifest in
 browser-local storage.
 
 The reusable browser helper is `importer.js`.

@@ -1,26 +1,37 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>WearWise 演示衣柜资源预览</title>
+    <title>WearWise Demo Wardrobe</title>
     <style>
       :root {
         color-scheme: light dark;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+          "Helvetica Neue", Arial, sans-serif;
         background: Canvas;
         color: CanvasText;
+        font-optical-sizing: auto;
+        font-kerning: normal;
+        text-rendering: optimizeLegibility;
       }
       * { box-sizing: border-box; }
       body { margin: 0; }
       main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 56px; }
       header { display: grid; gap: 12px; margin-bottom: 28px; }
-      h1 { margin: 0; font-size: clamp(32px, 6vw, 56px); letter-spacing: -0.04em; }
-      p { margin: 0; line-height: 1.6; }
+      h1 {
+        max-width: 18ch;
+        margin: 0;
+        font-size: clamp(38px, 7vw, 68px);
+        line-height: 0.98;
+        letter-spacing: -0.045em;
+        text-wrap: balance;
+      }
+      p { max-width: 68ch; margin: 0; line-height: 1.6; text-wrap: pretty; }
       .notice { padding: 14px 16px; border: 2px solid CanvasText; border-radius: 14px; }
       .actions { display: flex; flex-wrap: wrap; gap: 10px; }
       button {
-        min-height: 52px;
+        min-height: 56px;
         padding: 12px 18px;
         border: 2px solid CanvasText;
         border-radius: 14px;
@@ -34,12 +45,18 @@
       button:focus-visible { outline: 4px solid Highlight; outline-offset: 3px; }
       #status { min-height: 24px; font-weight: 600; }
       section { margin-top: 34px; }
-      h2 { padding-bottom: 10px; border-bottom: 2px solid CanvasText; }
+      h2 {
+        padding-bottom: 10px;
+        border-bottom: 2px solid CanvasText;
+        font-size: clamp(24px, 4vw, 34px);
+        line-height: 1.15;
+        letter-spacing: -0.025em;
+      }
       .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
       article { padding: 10px; border: 1px solid CanvasText; border-radius: 16px; }
       img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: contain; background: Canvas; border-radius: 10px; }
-      h3 { margin: 10px 0 4px; font-size: 16px; }
-      small { display: block; line-height: 1.5; }
+      h3 { margin: 12px 0 6px; font-size: 17px; line-height: 1.3; letter-spacing: -0.01em; }
+      small { display: block; font-size: 16px; line-height: 1.55; }
       .missing { display: grid; min-height: 240px; place-items: center; border: 2px dashed CanvasText; border-radius: 10px; text-align: center; }
     </style>
   </head>
@@ -47,17 +64,17 @@
     <main>
       <header>
         <p><strong>DEMO WARDROBE · 28 ITEMS</strong></p>
-        <h1>演示衣柜照片包</h1>
-        <p>正式程度已分层；保暖评分等待天气模块接入。</p>
+        <h1>A photo wardrobe built for clearer decisions.</h1>
+        <p>Formality has been assigned. Warmth scoring is intentionally pending until the weather module is connected.</p>
         <div class="notice">
-          本页面只读取仓库内图片。点击“载入演示衣柜”后，数据仅保存在当前浏览器的
-          localStorage 中。
+          This page reads images from the repository. “Import demo wardrobe” stores
+          the validated data only in this browser’s localStorage.
         </div>
         <div class="actions">
-          <button id="import-button" class="primary" type="button">载入演示衣柜</button>
-          <button id="clear-button" type="button">清除浏览器数据</button>
+          <button id="import-button" class="primary" type="button">Import demo wardrobe</button>
+          <button id="clear-button" type="button">Clear browser data</button>
         </div>
-        <p id="status" role="status" aria-live="polite">正在读取分类清单…</p>
+        <p id="status" role="status" aria-live="polite">Loading the wardrobe manifest…</p>
       </header>
       <div id="wardrobe"></div>
     </main>
@@ -70,12 +87,12 @@
       } from "./importer.js";
 
       const labels = {
-        top: "上装",
-        bottom: "下装",
-        shoes: "鞋",
-        outerwear: "外套"
+        top: "Tops",
+        bottom: "Bottoms",
+        shoes: "Shoes",
+        outerwear: "Outerwear"
       };
-      const formalityLabels = ["", "休闲", "休闲", "智能休闲", "商务", "正式"];
+      const formalityLabels = ["", "Casual", "Casual", "Smart casual", "Business", "Formal"];
       const status = document.querySelector("#status");
       const wardrobeRoot = document.querySelector("#wardrobe");
       let wardrobe;
@@ -87,7 +104,7 @@
             const items = grouped[slot];
             return `
               <section aria-labelledby="section-${slot}">
-                <h2 id="section-${slot}">${label} · ${items.length} 件</h2>
+                <h2 id="section-${slot}">${label} · ${items.length} items</h2>
                 <div class="grid">
                   ${items
                     .map(
@@ -95,14 +112,14 @@
                         <article>
                           <img
                             src="${item.thumbnail_url}"
-                            alt="${item.name}的照片"
+                            alt="Photo of ${item.name}"
                             loading="lazy"
-                            onerror="this.outerHTML='<div class=&quot;missing&quot;>${item.name}<br>照片缺失</div>'"
+                            onerror="this.outerHTML='<div class=&quot;missing&quot;>${item.name}<br>Photo missing</div>'"
                           />
                           <h3>${item.name}</h3>
-                          <small>${item.colors.join("、")} · ${item.category}</small>
-                          <small>正式度 ${item.formality_score}/5 · ${formalityLabels[item.formality_score]}</small>
-                          <small>保暖评分待天气模块补充</small>
+                          <small>${item.colors.join(" / ")} · ${item.category}</small>
+                          <small>Formality ${item.formality_score}/5 · ${formalityLabels[item.formality_score]}</small>
+                          <small>Warmth score pending weather integration</small>
                         </article>
                       `
                     )
@@ -116,20 +133,20 @@
 
       document.querySelector("#import-button").addEventListener("click", () => {
         storeDemoWardrobe(wardrobe);
-        status.textContent = `已载入 ${wardrobe.garments.length} 件演示衣物。`;
+        status.textContent = `Imported ${wardrobe.garments.length} demo garments.`;
       });
 
       document.querySelector("#clear-button").addEventListener("click", () => {
         clearStoredDemoWardrobe();
-        status.textContent = "已清除当前浏览器中的演示衣柜数据。";
+        status.textContent = "Cleared the demo wardrobe from this browser.";
       });
 
       try {
         wardrobe = await loadDemoWardrobe();
         render();
-        status.textContent = `读取成功：${wardrobe.garments.length} 件衣物。`;
+        status.textContent = `Loaded ${wardrobe.garments.length} garments.`;
       } catch (error) {
-        status.textContent = `读取失败：${error.message}`;
+        status.textContent = `Could not load the wardrobe: ${error.message}`;
         status.setAttribute("role", "alert");
       }
     </script>
