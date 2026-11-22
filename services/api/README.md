@@ -153,6 +153,10 @@ AI_MODEL=<model name>
 AI_TIMEOUT_SECONDS=20
 ```
 
+Set these values in `services/api/.env` or export them in the server
+environment. The application loads `.env` at startup. Never add real values to
+`.env.example`.
+
 Remote AI may only:
 
 - Generate a structurally validated occasion policy when local matching misses.
