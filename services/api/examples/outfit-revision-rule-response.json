@@ -1,0 +1,24 @@
+{
+  "outfit": {
+    "id": "rule-outfit-revised",
+    "item_ids": [
+      "8267ef97-aec1-4342-95ca-f6ae049e537a",
+      "79b23691-31ba-4a6b-9892-00aef122943b",
+      "d6e1b0a5-aac3-49a0-b4e9-b5ffb95e904a"
+    ],
+    "title": "替换鞋后的规则方案",
+    "reasons": [
+      "衣物颜色记录为cream、black、brown，其中中性色占比稳定，主要通过明暗差和有文字标签形成层次",
+      "平均正式程度为 3.3/5，对应 smart_casual，目标场合为 smart_casual。",
+      "面向“第一次约会”，体感 15.0°C、降水概率 20%，当前组合优先兼顾场合适配和行动舒适度。"
+    ],
+    "tradeoffs": ["规则 Mock 只能依据已确认标签，无法判断真实面料垂感和个人偏好。"],
+    "source": "fallback",
+    "score": 0.9542
+  },
+  "fallback_used": true,
+  "warning": "当前为确定性规则 Mock，未调用真实 AI。",
+  "provider": "rule_engine_mock",
+  "generated_at": "2026-11-21T08:04:30.375856Z",
+  "request_id": "c8064499-c574-4100-b9ee-4f552f668508"
+}

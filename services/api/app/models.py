@@ -77,6 +77,8 @@ class OccasionResolveResponse(BaseModel):
 
 
 class WeatherData(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     temperature_c: float = Field(ge=-60, le=60)
     feels_like_c: float = Field(ge=-70, le=70)
     condition: Literal[
@@ -107,13 +109,13 @@ class RecommendationGarment(BaseModel):
     material: Optional[str] = None
     formality_score: int = Field(ge=1, le=5)
     warmth_score: int = Field(ge=1, le=5)
-    user_confirmed: bool
+    user_confirmed: Literal[True]
 
 
 class RecommendationRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    request_id: Optional[str] = None
+    request_id: Optional[str] = Field(default=None, min_length=1, max_length=128)
     preset_id: Optional[str] = None
     occasion: str = Field(min_length=1)
     weather: WeatherData
@@ -121,9 +123,12 @@ class RecommendationRequest(BaseModel):
     garments: List[RecommendationGarment] = Field(min_length=1)
 
 
-class Outfit(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class OutfitRevisionRequest(RecommendationRequest):
+    base_item_ids: List[str] = Field(min_length=2)
+    replacement_item_id: str = Field(min_length=1)
 
+
+class Outfit(BaseModel):
     id: str
     item_ids: List[str] = Field(min_length=2)
     title: str
@@ -135,7 +140,7 @@ class Outfit(BaseModel):
 
 class RecommendationResponse(BaseModel):
     outfits: List[Outfit] = Field(min_length=1, max_length=3)
-    requested_count: Literal[3]
+    requested_count: Literal[3] = 3
     result_count_reason: Literal[
         "three_available",
         "limited_candidates",
@@ -143,6 +148,15 @@ class RecommendationResponse(BaseModel):
     ]
     fallback_used: bool
     warning: Optional[str]
-    provider: str
+    provider: Optional[str] = None
+    generated_at: datetime
+    request_id: Optional[str] = None
+
+
+class OutfitRevisionResponse(BaseModel):
+    outfit: Outfit
+    fallback_used: bool
+    warning: Optional[str]
+    provider: Optional[str] = None
     generated_at: datetime
     request_id: Optional[str] = None

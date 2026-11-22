@@ -1,117 +1,302 @@
+import ast
 import copy
-import json
+from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
+from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
 from app.main import app
 
 client = TestClient(app)
-ROOT_DIR = Path(__file__).resolve().parents[3]
-SAMPLE_DATA = json.loads(
-    (ROOT_DIR / "specs" / "examples" / "sample-data.json").read_text(
-        encoding="utf-8"
-    )
-)
+APP_DIR = Path(__file__).resolve().parents[1] / "app"
+RULE_PROVIDER = "rule_engine_with_occasion_scoring"
 
 
-def recommendation_request(
+def _garment(
+    slot: str,
+    category: str,
+    formality: int,
+    warmth: int,
+    colors: List[str],
+) -> Dict[str, Any]:
+    return {
+        "id": str(uuid4()),
+        "brand": "Rule Mock",
+        "product_name": "%s sample" % category,
+        "slot": slot,
+        "category": category,
+        "colors": colors,
+        "pattern": "solid",
+        "fit": "regular",
+        "material": "cotton",
+        "formality_score": formality,
+        "warmth_score": warmth,
+        "user_confirmed": True,
+    }
+
+
+def _payload() -> Dict[str, Any]:
+    return {
+        "request_id": str(uuid4()),
+        "preset_id": "first-date",
+        "occasion": "第一次约会",
+        "weather": {
+            "temperature_c": 16,
+            "feels_like_c": 15,
+            "condition": "partly_cloudy",
+            "precipitation_probability": 0.2,
+            "wind_speed_kph": 12,
+        },
+        "formality": "smart_casual",
+        "garments": [
+            _garment("top", "shirt", 3, 2, ["light_blue"]),
+            _garment("top", "knitwear", 2, 4, ["cream"]),
+            _garment("bottom", "jeans", 2, 3, ["dark_blue"]),
+            _garment("bottom", "trousers", 3, 3, ["black"]),
+            _garment("shoes", "sneakers", 2, 2, ["white"]),
+            _garment("shoes", "loafers", 3, 2, ["brown"]),
+            _garment("outerwear", "cardigan", 2, 3, ["beige"]),
+        ],
+    }
+
+
+def _semantic_payload(
     preset_id: str,
     occasion: str,
     formality: str,
 ) -> Dict[str, Any]:
-    request = copy.deepcopy(
-        SAMPLE_DATA["recommendation_example"]["request"]
-    )
-    request["request_id"] = f"req-{preset_id}-semantic-regression"
-    request["preset_id"] = preset_id
-    request["occasion"] = occasion
-    request["formality"] = formality
-    return request
+    payload = _payload()
+    payload["preset_id"] = preset_id
+    payload["occasion"] = occasion
+    payload["formality"] = formality
+    return payload
+
+
+def test_recommendations_return_three_unique_valid_outfits() -> None:
+    payload = _payload()
+    response = client.post("/v1/recommendations", json=payload)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["requested_count"] == 3
+    assert body["result_count_reason"] == "three_available"
+    assert body["fallback_used"] is True
+    assert body["provider"] == RULE_PROVIDER
+    assert body["warning"]
+    assert len(body["outfits"]) == 3
+
+    request_ids = {garment["id"] for garment in payload["garments"]}
+    signatures = set()
+    for outfit in body["outfits"]:
+        assert outfit["source"] == "fallback"
+        assert set(outfit["item_ids"]) <= request_ids
+        assert len(outfit["item_ids"]) == len(set(outfit["item_ids"]))
+        assert len(outfit["reasons"]) >= 3
+        assert outfit["tradeoffs"]
+        signatures.add(tuple(outfit["item_ids"]))
+    assert len(signatures) == 3
 
 
 def test_night_out_and_interview_rank_different_combinations() -> None:
-    night_response = client.post(
+    night = client.post(
         "/v1/recommendations",
-        json=recommendation_request(
-            preset_id="night-out",
-            occasion="去夜店",
-            formality="business",
-        ),
-    )
-    interview_response = client.post(
+        json=_semantic_payload("night-out", "去夜店", "business"),
+    ).json()
+    interview = client.post(
         "/v1/recommendations",
-        json=recommendation_request(
-            preset_id="internship-interview",
-            occasion="实习面试",
-            formality="casual",
-        ),
-    )
+        json=_semantic_payload("internship-interview", "实习面试", "casual"),
+    ).json()
 
-    assert night_response.status_code == 200
-    assert interview_response.status_code == 200
-
-    night = night_response.json()
-    interview = interview_response.json()
     night_first = night["outfits"][0]
     interview_first = interview["outfits"][0]
 
     assert set(night_first["item_ids"]) != set(interview_first["item_ids"])
-
-    night_reasons = " ".join(night_first["reasons"])
-    interview_reasons = " ".join(interview_first["reasons"])
-    assert "夜间社交" in night_reasons
-    assert "商务会面" in night_reasons
-    assert "面试" in interview_reasons
-    assert "正式表达" in interview_reasons
+    assert "夜间社交" in " ".join(night_first["reasons"])
+    assert "商务会面" in " ".join(night_first["reasons"])
+    assert "实习面试" in " ".join(interview_first["reasons"])
+    assert "正式表达" in " ".join(interview_first["reasons"])
 
 
-def test_recommendation_uses_preset_not_client_formality() -> None:
+def test_recommendation_ignores_client_formality_for_known_preset() -> None:
     body = client.post(
         "/v1/recommendations",
-        json=recommendation_request(
-            preset_id="night-out",
-            occasion="去夜店",
-            formality="business",
-        ),
+        json=_semantic_payload("night-out", "去夜店", "business"),
     ).json()
 
-    first = body["outfits"][0]
-    assert "夜间社交" in " ".join(first["reasons"])
-    assert body["provider"] == "rule_engine_with_occasion_scoring"
+    assert "夜间社交" in " ".join(body["outfits"][0]["reasons"])
 
 
-def test_insufficient_wardrobe_returns_contract_error() -> None:
-    request = recommendation_request(
-        preset_id="night-out",
-        occasion="去夜店",
-        formality="casual",
-    )
-    request["garments"] = [
-        garment
-        for garment in request["garments"]
-        if garment["slot"] != "shoes"
+def test_mild_weather_primary_outfit_uses_three_core_slots() -> None:
+    payload = _payload()
+    response = client.post("/v1/recommendations", json=payload)
+
+    assert response.status_code == 200
+    first_ids = response.json()["outfits"][0]["item_ids"]
+    garment_by_id = {
+        garment["id"]: garment for garment in payload["garments"]
+    }
+    assert len(first_ids) == 3
+    assert {garment_by_id[item_id]["slot"] for item_id in first_ids} == {
+        "top",
+        "bottom",
+        "shoes",
+    }
+
+
+def test_missing_shoes_returns_insufficient_wardrobe() -> None:
+    payload = _payload()
+    payload["garments"] = [
+        garment for garment in payload["garments"] if garment["slot"] != "shoes"
     ]
 
-    response = client.post("/v1/recommendations", json=request)
+    response = client.post("/v1/recommendations", json=payload)
 
     assert response.status_code == 422
     assert response.json()["code"] == "INSUFFICIENT_WARDROBE"
     assert response.json()["details"]["missing_slots"] == ["shoes"]
 
 
-def test_recommendation_response_contains_no_local_photo_paths() -> None:
-    response = client.post(
-        "/v1/recommendations",
-        json=recommendation_request(
-            preset_id="night-out",
-            occasion="去夜店",
-            formality="casual",
-        ),
-    )
-    serialized = json.dumps(response.json(), ensure_ascii=False).lower()
+def test_unconfirmed_garment_returns_422() -> None:
+    payload = _payload()
+    payload["garments"][0]["user_confirmed"] = False
 
-    assert "local_photo_path" not in serialized
+    response = client.post("/v1/recommendations", json=payload)
+
+    assert response.status_code == 422
+    assert response.json()["code"] == "VALIDATION_ERROR"
+
+
+def test_duplicate_garment_id_returns_422() -> None:
+    payload = _payload()
+    payload["garments"].append(deepcopy(payload["garments"][0]))
+
+    response = client.post("/v1/recommendations", json=payload)
+
+    assert response.status_code == 422
+    assert response.json()["code"] == "DUPLICATE_GARMENT_ID"
+
+
+def test_limited_candidates_return_limited_reason() -> None:
+    payload = _payload()
+    payload["garments"] = [
+        _garment("top", "shirt", 3, 2, ["light_blue"]),
+        _garment("bottom", "trousers", 3, 3, ["black"]),
+        _garment("shoes", "loafers", 3, 2, ["brown"]),
+    ]
+
+    response = client.post("/v1/recommendations", json=payload)
+
+    assert response.status_code == 200
+    assert len(response.json()["outfits"]) == 1
+    assert response.json()["result_count_reason"] == "limited_candidates"
+
+
+def test_recommendations_do_not_include_photo_fields() -> None:
+    response = client.post("/v1/recommendations", json=_payload())
+    serialized = response.text.lower()
+
     assert "photo_path" not in serialized
+    assert "local_photo_path" not in serialized
     assert "image_url" not in serialized
+    assert "base64" not in serialized
+
+
+def _revision_payload() -> Dict[str, Any]:
+    payload = _payload()
+    recommendation = client.post(
+        "/v1/recommendations",
+        json=payload,
+    ).json()
+    base_ids = recommendation["outfits"][0]["item_ids"]
+    replacement = next(
+        garment
+        for garment in payload["garments"]
+        if garment["slot"] == "shoes" and garment["id"] not in base_ids
+    )
+    return {
+        **{
+            key: payload[key]
+            for key in ("request_id", "preset_id", "occasion")
+        },
+        "weather": payload["weather"],
+        "formality": payload["formality"],
+        "garments": payload["garments"],
+        "base_item_ids": base_ids,
+        "replacement_item_id": replacement["id"],
+    }
+
+
+def test_revision_changes_only_shoes_and_returns_complete_structure() -> None:
+    payload = _revision_payload()
+    before = copy.deepcopy(payload["base_item_ids"])
+    garment_by_id = {
+        garment["id"]: garment for garment in payload["garments"]
+    }
+
+    response = client.post("/v1/outfits/revise", json=payload)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["fallback_used"] is True
+    assert body["warning"]
+    assert body["provider"] == RULE_PROVIDER
+    assert body["generated_at"]
+    assert body["request_id"] == payload["request_id"]
+    outfit = body["outfit"]
+    assert set(outfit) >= {
+        "id",
+        "item_ids",
+        "title",
+        "reasons",
+        "tradeoffs",
+        "source",
+        "score",
+    }
+
+    before_by_slot = {
+        garment_by_id[item_id]["slot"]: item_id for item_id in before
+    }
+    after_by_slot = {
+        garment_by_id[item_id]["slot"]: item_id
+        for item_id in outfit["item_ids"]
+    }
+    assert after_by_slot["top"] == before_by_slot["top"]
+    assert after_by_slot["bottom"] == before_by_slot["bottom"]
+    assert after_by_slot["shoes"] != before_by_slot["shoes"]
+    assert set(before) ^ set(outfit["item_ids"]) == {
+        before_by_slot["shoes"],
+        payload["replacement_item_id"],
+    }
+
+
+def test_revision_rejects_different_slot() -> None:
+    payload = _revision_payload()
+    accessory = _garment("accessory", "watch", 3, 1, ["black"])
+    payload["garments"].append(accessory)
+    payload["replacement_item_id"] = accessory["id"]
+
+    response = client.post("/v1/outfits/revise", json=payload)
+
+    assert response.status_code == 422
+    assert response.json()["code"] == "SLOT_MISMATCH"
+
+
+def test_revision_rejects_unknown_replacement() -> None:
+    payload = _revision_payload()
+    payload["replacement_item_id"] = str(uuid4())
+
+    response = client.post("/v1/outfits/revise", json=payload)
+
+    assert response.status_code == 422
+    assert response.json()["code"] == "UNKNOWN_ITEM_ID"
+
+
+def test_python_39_syntax_check() -> None:
+    for source_file in APP_DIR.rglob("*.py"):
+        ast.parse(
+            source_file.read_text(encoding="utf-8"),
+            filename=str(source_file),
+            feature_version=(3, 9),
+        )
