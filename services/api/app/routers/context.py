@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Query, Response
+from fastapi import APIRouter, Depends, Query, Response
 
 from app.data.mock_data import PRESET_VERSION
 from app.models import (
@@ -9,6 +9,7 @@ from app.models import (
     PresetListResponse,
 )
 from app.services.occasion_matcher import list_presets, resolve_occasion
+from app.services.text_ai import get_text_ai_provider
 
 router = APIRouter()
 
@@ -36,5 +37,6 @@ def get_presets(
 )
 def post_occasion_resolve(
     request: OccasionResolveRequest,
+    ai_provider=Depends(get_text_ai_provider),
 ) -> OccasionResolveResponse:
-    return resolve_occasion(request)
+    return resolve_occasion(request, ai_provider=ai_provider)

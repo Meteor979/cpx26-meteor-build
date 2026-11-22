@@ -156,7 +156,7 @@ services/api/tests/test_models.py
 - 不要加入 `local_photo_path` 到推荐请求。
 - 推荐请求中的 `user_confirmed` 必须是 `true`。
 - Mock 至少包含：
-  - 4 个场合策略。
+  - 5 个场合策略。
   - 1 组衣物。
   - 3 套已经确认的推荐结果。
   - 1 个 fallback 推荐结果。

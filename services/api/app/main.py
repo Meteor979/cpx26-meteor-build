@@ -60,7 +60,7 @@ async def handle_validation_error(
         status_code=422,
         content={
             "code": "VALIDATION_ERROR",
-            "message": "请求字段不符合接口契约。",
+            "message": "Request fields do not match the API contract.",
             "request_id": _request_id_from_body(body),
             "details": {"errors": errors},
         },
