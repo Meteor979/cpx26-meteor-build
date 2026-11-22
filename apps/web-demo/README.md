@@ -2,6 +2,9 @@
 
 Static, dependency-free stage demo for the WearWise photo recommendation flow.
 
+The package contains 28 bundled demo garment photos. It runs without a backend,
+account, API key, CDN, or network connection after extraction.
+
 ## Flow
 
 1. Open the photo wardrobe and use the bundled demonstration garments or add
