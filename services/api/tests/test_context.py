@@ -16,7 +16,7 @@ SAMPLE_DATA = json.loads(
 
 
 def test_presets_return_fixed_sample_data() -> None:
-    response = client.get("/v1/presets", params={"limit": 4})
+    response = client.get("/v1/presets")
 
     assert response.status_code == 200
     assert response.json() == SAMPLE_DATA["presets"]
@@ -39,7 +39,7 @@ def test_presets_limit() -> None:
 
 
 def test_presets_version_not_modified() -> None:
-    response = client.get("/v1/presets", params={"version": 1})
+    response = client.get("/v1/presets", params={"version": 2})
 
     assert response.status_code == 304
     assert response.content == b""
@@ -79,6 +79,19 @@ def test_club_alias_resolves_to_club_speech() -> None:
     assert response.status_code == 200
     assert response.json()["profile"]["id"] == "club-speech"
     assert response.json()["match_type"] == "exact_preset"
+
+
+def test_night_out_alias_does_not_resolve_to_business() -> None:
+    response = client.post(
+        "/v1/occasions/resolve",
+        json={"query": "今晚去夜店"},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["profile"]["id"] == "night-out"
+    assert body["profile"]["target_formality"] == "casual"
+    assert body["match_type"] in {"exact_preset", "semantic_match"}
 
 
 def test_keyword_match_returns_semantic_result() -> None:

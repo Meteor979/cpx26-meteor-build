@@ -1,8 +1,9 @@
 from datetime import datetime, timezone
 from itertools import product
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from uuid import uuid4
 
+from app.data.mock_data import PRESETS
 from app.errors import ApiError
 from app.models import (
     FormalityBand,
@@ -13,9 +14,13 @@ from app.models import (
     RecommendationRequest,
     RecommendationResponse,
 )
+from app.services.text_ai import TextAIProvider, TextAIProviderError
 
 RULE_PROVIDER = "rule_engine_mock"
-RULE_WARNING = "当前为确定性规则 Mock，未调用真实 AI。"
+RULE_WARNING = (
+    "Deterministic local rules are in use; no live AI ranking "
+    "was applied."
+)
 FORMALITY_TARGET: Dict[FormalityBand, float] = {
     FormalityBand.CASUAL: 2.0,
     FormalityBand.SMART_CASUAL: 3.0,
@@ -47,11 +52,11 @@ NEUTRAL_COLORS = {
     "charcoal",
 }
 SLOT_LABELS: Dict[GarmentSlot, str] = {
-    GarmentSlot.TOP: "上装",
-    GarmentSlot.BOTTOM: "下装",
-    GarmentSlot.OUTERWEAR: "外套",
-    GarmentSlot.SHOES: "鞋",
-    GarmentSlot.ACCESSORY: "配饰",
+    GarmentSlot.TOP: "top",
+    GarmentSlot.BOTTOM: "bottom",
+    GarmentSlot.OUTERWEAR: "outerwear",
+    GarmentSlot.SHOES: "shoes",
+    GarmentSlot.ACCESSORY: "accessory",
 }
 
 
@@ -98,7 +103,7 @@ def _validate_unique_garment_ids(request: RecommendationRequest) -> None:
         raise ApiError(
             422,
             "DUPLICATE_GARMENT_ID",
-            "衣物 ID 不得重复。",
+            "Garment IDs must be unique.",
             {"duplicate_ids": duplicate_ids},
         )
 
@@ -114,7 +119,7 @@ def _ensure_required_slots(
         raise ApiError(
             422,
             "INSUFFICIENT_WARDROBE",
-            "至少需要一件上装、一件下装和一双鞋。",
+            "At least one top, one bottom, and one pair of shoes are required.",
             {"missing_slots": missing_slots},
         )
     return grouped
@@ -233,7 +238,8 @@ def _color_relation(garments: List[RecommendationGarment]) -> str:
     unique_colors = list(dict.fromkeys(colors))
     if len(unique_colors) == 1:
         return (
-            "衣物记录以%s为主，单色关系清楚，不依赖细微色差区分层次"
+            "The recorded palette centers on %s, creating a clear "
+            "single-tone relationship without relying on subtle color shifts."
             % unique_colors[0]
         )
     neutral_count = sum(
@@ -241,20 +247,28 @@ def _color_relation(garments: List[RecommendationGarment]) -> str:
     )
     if neutral_count:
         return (
-            "衣物颜色记录为%s，其中中性色占比稳定，"
-            "主要通过明暗差和有文字标签形成层次"
-            % "、".join(unique_colors)
+            "The recorded colors are %s. Neutral tones provide a stable "
+            "base, while light-dark contrast and labeled garment cards "
+            "create visual separation."
+            % ", ".join(unique_colors)
         )
     return (
-        "衣物颜色记录为%s，建议通过明暗对比和稳定边框辨认层次"
-        % "、".join(unique_colors)
+        "The recorded colors are %s. Use the light-dark contrast and "
+        "stable image frames to distinguish the layers."
+        % ", ".join(unique_colors)
     )
 
 
 def _tradeoff(garments: List[RecommendationGarment]) -> str:
     if any(garment.slot == GarmentSlot.OUTERWEAR for garment in garments):
-        return "增加外套能提升保暖和层次，但会多一个穿脱步骤。"
-    return "规则 Mock 只能依据已确认标签，无法判断真实面料垂感和个人偏好。"
+        return (
+            "An outer layer adds warmth and visual structure, "
+            "but introduces one more dressing step."
+        )
+    return (
+        "The local rule mock relies on confirmed labels and cannot judge "
+        "fabric drape or personal preference."
+    )
 
 
 def _outfit_reasons(
@@ -268,12 +282,18 @@ def _outfit_reasons(
     return [
         _color_relation(garments),
         (
-            "平均正式程度为 %.1f/5，对应 %s，目标场合为 %s。"
-            % (average_formality, actual_band.value, request.formality.value)
+            "The average formality is %.1f/5, close to %s for a "
+            "%s target."
+            % (
+                average_formality,
+                actual_band.value,
+                request.formality.value,
+            )
         ),
         (
-            "面向“%s”，体感 %.1f°C、降水概率 %.0f%%，"
-            "当前组合优先兼顾场合适配和行动舒适度。"
+            "For “%s,” the combination balances occasion fit and movement "
+            "at a feels-like temperature of %.1f°C with a %.0f%% "
+            "chance of precipitation."
             % (
                 request.occasion,
                 request.weather.feels_like_c,
@@ -289,9 +309,9 @@ def _to_outfit(
     request: RecommendationRequest,
 ) -> Outfit:
     titles = (
-        "清晰自然的规则方案",
-        "温和协调的规则方案",
-        "利落明确的规则方案",
+        "Clear and natural",
+        "Softly balanced",
+        "Sharp and composed",
     )
     return Outfit(
         id="rule-outfit-%s" % chr(ord("a") + index),
@@ -306,8 +326,31 @@ def _to_outfit(
 
 def create_recommendations(
     request: RecommendationRequest,
+    ai_provider: Optional[TextAIProvider] = None,
 ) -> RecommendationResponse:
     candidates = _candidates(request)
+    if ai_provider is not None:
+        ai_outfits = _try_ai_outfits(
+            request,
+            candidates,
+            ai_provider,
+        )
+        if ai_outfits is not None:
+            return RecommendationResponse(
+                outfits=ai_outfits,
+                requested_count=3,
+                result_count_reason=(
+                    "three_available"
+                    if len(ai_outfits) == 3
+                    else "limited_candidates"
+                ),
+                fallback_used=False,
+                warning=None,
+                provider=ai_provider.name,
+                generated_at=datetime.now(timezone.utc),
+                request_id=request.request_id or "req-%s" % uuid4().hex[:12],
+            )
+
     selected = candidates[:3]
     outfits = [
         _to_outfit(candidate, index, request)
@@ -329,6 +372,7 @@ def create_recommendations(
 
 def revise_outfit(
     request: OutfitRevisionRequest,
+    ai_provider: Optional[TextAIProvider] = None,
 ) -> Outfit:
     _validate_unique_garment_ids(request)
     _ensure_required_slots(request.garments)
@@ -342,7 +386,7 @@ def revise_outfit(
             raise ApiError(
                 422,
                 "DUPLICATE_BASE_ITEM_ID",
-                "base_item_ids 不得包含重复衣物 ID。",
+                "base_item_ids must not contain duplicate garment IDs.",
                 {"duplicate_ids": [item_id]},
             )
         seen_base[item_id] = True
@@ -354,7 +398,7 @@ def revise_outfit(
         raise ApiError(
             422,
             "UNKNOWN_ITEM_ID",
-            "base_item_ids 中存在未知衣物。",
+            "base_item_ids contains an unknown garment.",
             {"missing_item_ids": missing_base_ids},
         )
 
@@ -363,7 +407,7 @@ def revise_outfit(
         raise ApiError(
             422,
             "UNKNOWN_ITEM_ID",
-            "replacement_item_id 不存在于 garments。",
+            "replacement_item_id is not present in garments.",
             {"missing_item_ids": [request.replacement_item_id]},
         )
 
@@ -376,21 +420,24 @@ def revise_outfit(
         raise ApiError(
             422,
             "SLOT_MISMATCH",
-            "replacement_item_id 与基础搭配没有同槽位衣物。",
+            "replacement_item_id has no matching slot in the base outfit.",
             {"replacement_slot": replacement.slot.value},
         )
     if len(slot_matches) > 1:
         raise ApiError(
             422,
             "AMBIGUOUS_REPLACEMENT_SLOT",
-            "基础搭配中同一槽位存在多件衣物，无法确定替换目标。",
+            (
+                "The base outfit contains multiple garments in the replacement "
+                "slot, so the target is ambiguous."
+            ),
             {"slot": replacement.slot.value},
         )
     if slot_matches[0].id == replacement.id:
         raise ApiError(
             422,
             "INVALID_REVISION",
-            "replacement_item_id 与当前槽位衣物相同。",
+            "replacement_item_id already matches the current slot garment.",
             {"item_id": replacement.id},
         )
 
@@ -405,12 +452,223 @@ def revise_outfit(
         garments=revised_garments,
         score=_score_candidate(revised_garments, request),
     )
-    return Outfit(
+    local_outfit = Outfit(
         id="rule-outfit-revised",
         item_ids=revised_ids,
-        title="替换%s后的规则方案" % SLOT_LABELS[replacement.slot],
+        title="Revised %s selection" % SLOT_LABELS[replacement.slot],
         reasons=_outfit_reasons(revised_garments, request),
         tradeoffs=[_tradeoff(revised_garments)],
         source="fallback",
         score=candidate.score,
     )
+
+    if ai_provider is None:
+        return local_outfit
+
+    generated = _try_ai_revision(
+        request,
+        local_outfit,
+        revised_garments,
+        ai_provider,
+    )
+    return generated or local_outfit
+
+
+AI_RECOMMENDATION_SYSTEM_PROMPT = """
+You rank legal outfit candidates for a person with color-vision deficiency or
+low vision. Return one JSON object and no markdown.
+You may select only items from the supplied candidates. Never invent item IDs,
+duplicate a garment, alter weather, or add fields.
+Return up to three different outfits in display order.
+The occasion must materially affect ranking. Do not default unfamiliar social
+events to business. Use English for all title, reasons, and tradeoffs.
+Each outfit must contain one top, one bottom, one pair of shoes, and optionally
+one outerwear item. Write concise, concrete explanations that mention color or
+light-dark relationships, formality, occasion fit, and one tradeoff.
+The JSON shape must be:
+{"outfits":[{"item_ids":["..."],"title":"...","reasons":["..."],"tradeoffs":["..."]}]}
+Do not include commentary outside JSON.
+""".strip()
+
+
+AI_REVISION_SYSTEM_PROMPT = """
+You write replacement copy for one already-valid outfit.
+Return one JSON object and no markdown:
+{"title":"...","reasons":["..."],"tradeoffs":["..."]}
+You must not add or change item IDs. Use natural English.
+Explain the same-slot replacement, the unchanged surrounding garments,
+formality, color relationship, and one tradeoff.
+Do not include commentary outside JSON.
+""".strip()
+
+
+def _candidate_garment_payload(
+    garments: List[RecommendationGarment],
+) -> List[Dict[str, Any]]:
+    return [
+        {
+            "id": garment.id,
+            "slot": garment.slot.value,
+            "category": garment.category,
+            "colors": garment.colors,
+            "pattern": garment.pattern,
+            "fit": garment.fit,
+            "material": garment.material,
+            "formality_score": garment.formality_score,
+            "warmth_score": garment.warmth_score,
+        }
+        for garment in garments
+    ]
+
+
+def _try_ai_outfits(
+    request: RecommendationRequest,
+    candidates: List[Candidate],
+    ai_provider: TextAIProvider,
+) -> Optional[List[Outfit]]:
+    payload = {
+        "occasion": request.occasion,
+        "preset_id": request.preset_id,
+        "preset_context": _preset_context(request.preset_id),
+        "formality": request.formality.value,
+        "weather": request.weather.model_dump(mode="json"),
+        "candidates": [
+            {
+                "item_ids": candidate.item_ids,
+                "garments": _candidate_garment_payload(candidate.garments),
+                "rule_score": candidate.score,
+            }
+            for candidate in candidates[:8]
+        ],
+    }
+    try:
+        result = ai_provider.complete_json(
+            system_prompt=AI_RECOMMENDATION_SYSTEM_PROMPT,
+            payload=payload,
+            request_id=request.request_id or "recommendations",
+        )
+        raw_outfits = result.get("outfits")
+        if not isinstance(raw_outfits, list) or not 1 <= len(raw_outfits) <= 3:
+            return None
+
+        by_items = {
+            frozenset(candidate.item_ids): candidate
+            for candidate in candidates
+        }
+        seen_signatures: Dict[frozenset, bool] = {}
+        outfits: List[Outfit] = []
+        for index, raw in enumerate(raw_outfits):
+            if not isinstance(raw, dict):
+                return None
+            item_ids = raw.get("item_ids")
+            title = raw.get("title")
+            reasons = raw.get("reasons")
+            tradeoffs = raw.get("tradeoffs")
+            if (
+                not isinstance(item_ids, list)
+                or not item_ids
+                or not all(isinstance(item, str) for item in item_ids)
+                or len(item_ids) != len(set(item_ids))
+                or not isinstance(title, str)
+                or not title.strip()
+                or len(title) > 100
+                or not isinstance(reasons, list)
+                or not 1 <= len(reasons) <= 4
+                or not all(isinstance(reason, str) and reason.strip() for reason in reasons)
+                or not isinstance(tradeoffs, list)
+                or len(tradeoffs) > 3
+                or not all(isinstance(tradeoff, str) and tradeoff.strip() for tradeoff in tradeoffs)
+            ):
+                return None
+
+            signature = frozenset(item_ids)
+            candidate = by_items.get(signature)
+            if candidate is None or signature in seen_signatures:
+                return None
+            seen_signatures[signature] = True
+            outfits.append(
+                Outfit(
+                    id="ai-outfit-%s" % chr(ord("a") + index),
+                    item_ids=list(item_ids),
+                    title=title.strip(),
+                    reasons=[reason.strip() for reason in reasons],
+                    tradeoffs=[tradeoff.strip() for tradeoff in tradeoffs],
+                    source="remote_api",
+                    score=candidate.score,
+                )
+            )
+        return outfits
+    except (
+        TextAIProviderError,
+        TypeError,
+        ValueError,
+    ):
+        return None
+
+
+def _try_ai_revision(
+    request: OutfitRevisionRequest,
+    local_outfit: Outfit,
+    revised_garments: List[RecommendationGarment],
+    ai_provider: TextAIProvider,
+) -> Optional[Outfit]:
+    try:
+        result = ai_provider.complete_json(
+            system_prompt=AI_REVISION_SYSTEM_PROMPT,
+            payload={
+                "occasion": request.occasion,
+                "preset_id": request.preset_id,
+                "preset_context": _preset_context(request.preset_id),
+                "formality": request.formality.value,
+                "weather": request.weather.model_dump(mode="json"),
+                "item_ids": local_outfit.item_ids,
+                "garments": _candidate_garment_payload(revised_garments),
+            },
+            request_id=request.request_id or "revision",
+        )
+        title = result.get("title")
+        reasons = result.get("reasons")
+        tradeoffs = result.get("tradeoffs")
+        if (
+            not isinstance(title, str)
+            or not title.strip()
+            or len(title) > 100
+            or not isinstance(reasons, list)
+            or not 1 <= len(reasons) <= 4
+            or not all(isinstance(reason, str) and reason.strip() for reason in reasons)
+            or not isinstance(tradeoffs, list)
+            or len(tradeoffs) > 3
+            or not all(isinstance(tradeoff, str) and tradeoff.strip() for tradeoff in tradeoffs)
+        ):
+            return None
+        return Outfit(
+            id=local_outfit.id,
+            item_ids=local_outfit.item_ids,
+            title=title.strip(),
+            reasons=[reason.strip() for reason in reasons],
+            tradeoffs=[tradeoff.strip() for tradeoff in tradeoffs],
+            source="remote_api",
+            score=local_outfit.score,
+        )
+    except (
+        TextAIProviderError,
+        TypeError,
+        ValueError,
+    ):
+        return None
+
+
+def _preset_context(preset_id: Optional[str]) -> Optional[Dict[str, Any]]:
+    if not preset_id:
+        return None
+    for preset in PRESETS:
+        if preset.get("id") == preset_id:
+            return {
+                "name": preset.get("name"),
+                "description": preset.get("description"),
+                "target_formality": preset.get("target_formality"),
+                "allowed_formality": preset.get("allowed_formality"),
+                "style_keywords": preset.get("style_keywords"),
+                "avoid_rules": preset.get("avoid_rules"),
+            }
+    return None

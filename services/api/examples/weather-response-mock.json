@@ -1,0 +1,17 @@
+{
+  "status": "ok",
+  "location_label": "Shanghai",
+  "weather": {
+    "temperature_c": 16,
+    "feels_like_c": 15,
+    "condition": "partly_cloudy",
+    "precipitation_probability": 0.2,
+    "wind_speed_kph": 12
+  },
+  "observed_at": "2026-11-22T04:00:00Z",
+  "timezone": "Asia/Shanghai",
+  "cached": false,
+  "source": "mock",
+  "warning": "Demo weather is in use; no live weather provider is configured.",
+  "request_id": "req-weather-demo-001"
+}

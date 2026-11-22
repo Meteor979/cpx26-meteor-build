@@ -29,19 +29,20 @@
     "wardrobe_ready_count": 8
   },
   "presets": {
-    "version": 1,
+    "version": 2,
     "cached": true,
-    "generated_at": "2026-11-20T10:00:00+08:00",
+    "generated_at": "2026-11-22T12:00:00+08:00",
     "presets": [
       {
         "id": "first-date",
-        "name": "初次约会",
+        "name": "First date",
         "aliases": [
           "第一次约会",
           "首次约会",
-          "初次见面的约会"
+          "初次见面的约会",
+          "first date"
         ],
-        "description": "保持整洁、亲近和低压迫感。",
+        "description": "Polished, approachable and deliberately low-pressure.",
         "target_formality": "smart_casual",
         "allowed_formality": [
           "casual",
@@ -53,35 +54,36 @@
           "shoes"
         ],
         "style_keywords": [
-          "干净",
-          "亲近",
-          "自然",
-          "低压迫感"
+          "clean",
+          "approachable",
+          "natural",
+          "low-pressure"
         ],
         "avoid_rules": [
-          "避免全套正装",
-          "避免明显舞台化",
-          "避免颜色和配饰过度抢眼"
+          "Avoid a full formal suit",
+          "Avoid a heavily staged look",
+          "Avoid overly loud colors and accessories"
         ],
         "explanation_guidelines": [
-          "解释正式程度是否自然",
-          "解释颜色之间是否协调",
-          "解释是否适合当前温度"
+          "Explain whether the formality feels natural",
+          "Explain the relationship between the colors",
+          "Explain suitability for the current weather"
         ],
         "source": "precomputed",
-        "version": 1,
-        "generated_at": "2026-11-20T10:00:00+08:00"
+        "version": 2,
+        "generated_at": "2026-11-22T12:00:00+08:00"
       },
       {
         "id": "anniversary-date",
-        "name": "纪念日约会",
+        "name": "Anniversary date",
         "aliases": [
           "结婚纪念日约会",
           "纪念日",
           "周年约会",
-          "结婚纪念日"
+          "结婚纪念日",
+          "anniversary date"
         ],
-        "description": "在日常穿搭上增加适度的精致感和仪式感。",
+        "description": "A little more considered than daily wear without feeling theatrical.",
         "target_formality": "smart_casual",
         "allowed_formality": [
           "smart_casual",
@@ -93,35 +95,36 @@
           "shoes"
         ],
         "style_keywords": [
-          "精致",
-          "温和",
-          "浪漫",
-          "仪式感"
+          "refined",
+          "warm",
+          "romantic",
+          "considered"
         ],
         "avoid_rules": [
-          "避免完全日常",
-          "避免过度夸张",
-          "避免冰冷和攻击性的全黑组合"
+          "Avoid looking completely everyday",
+          "Avoid an exaggerated look",
+          "Avoid a cold, severe all-black combination"
         ],
         "explanation_guidelines": [
-          "解释整体是否比日常略精致",
-          "解释单品之间是否形成统一风格",
-          "保留至少一处轻松元素"
+          "Explain why the look is more considered than daily wear",
+          "Explain whether the pieces share one clear tone",
+          "Keep at least one relaxed element"
         ],
         "source": "precomputed",
-        "version": 1,
-        "generated_at": "2026-11-20T10:00:00+08:00"
+        "version": 2,
+        "generated_at": "2026-11-22T12:00:00+08:00"
       },
       {
         "id": "salon-performance",
-        "name": "沙龙表演",
+        "name": "Salon performance",
         "aliases": [
           "沙龙",
           "演奏会",
           "节目演出",
-          "小型演出"
+          "小型演出",
+          "salon performance"
         ],
-        "description": "兼顾舞台辨识度、行动便利和现场气质。",
+        "description": "Balances stage legibility, movement and a distinct personal tone.",
         "target_formality": "smart_casual",
         "allowed_formality": [
           "casual",
@@ -134,34 +137,37 @@
           "shoes"
         ],
         "style_keywords": [
-          "舞台辨识度",
-          "层次感",
-          "便于行动",
-          "个人表达"
+          "stage clarity",
+          "layered",
+          "movement-friendly",
+          "personal expression"
         ],
         "avoid_rules": [
-          "避免妨碍行动的紧身下装",
-          "避免距离较远时完全缺少层次",
-          "避免与表演主题冲突的过度商务化"
+          "Avoid restrictive bottoms that limit movement",
+          "Avoid a complete lack of visible layering",
+          "Avoid business styling that conflicts with the performance"
         ],
         "explanation_guidelines": [
-          "解释颜色和轮廓在舞台上的可识别度",
-          "解释衣物是否方便活动和演奏",
-          "解释个人风格是否明确"
+          "Explain color and silhouette clarity from a distance",
+          "Explain whether the clothes allow movement and performance",
+          "Explain whether the personal style is clear"
         ],
         "source": "precomputed",
-        "version": 1,
-        "generated_at": "2026-11-20T10:00:00+08:00"
+        "version": 2,
+        "generated_at": "2026-11-22T12:00:00+08:00"
       },
       {
         "id": "club-speech",
-        "name": "社团演讲",
+        "name": "Club presentation",
         "aliases": [
+          "社团演讲",
           "社团汇报",
           "社团分享",
-          "社团路演"
+          "社团路演",
+          "club presentation",
+          "club speech"
         ],
-        "description": "专业可信，但不因为全套正装而产生距离感。",
+        "description": "Credible and clear without the distance of a full formal suit.",
         "target_formality": "business",
         "allowed_formality": [
           "smart_casual",
@@ -173,24 +179,68 @@
           "shoes"
         ],
         "style_keywords": [
-          "可信",
-          "清晰",
-          "利落",
-          "可接近"
+          "credible",
+          "clear",
+          "composed",
+          "approachable"
         ],
         "avoid_rules": [
-          "避免过强休闲感",
-          "避免全套正装造成的僵硬距离感",
-          "避免过多分散注意力的图案"
+          "Avoid looking overly casual",
+          "Avoid a stiff full suit",
+          "Avoid distracting all-over patterns"
         ],
         "explanation_guidelines": [
-          "解释正式程度是否适合公开表达",
-          "解释整体轮廓是否利落",
-          "解释是否方便走动和上台"
+          "Explain whether the formality suits public speaking",
+          "Explain whether the silhouette is clear",
+          "Explain whether the outfit supports movement on and off stage"
         ],
         "source": "precomputed",
-        "version": 1,
-        "generated_at": "2026-11-20T10:00:00+08:00"
+        "version": 2,
+        "generated_at": "2026-11-22T12:00:00+08:00"
+      },
+      {
+        "id": "night-out",
+        "name": "Night out",
+        "aliases": [
+          "去夜店",
+          "夜店",
+          "酒吧",
+          "蹦迪",
+          "派对",
+          "night out",
+          "nightclub",
+          "clubbing"
+        ],
+        "description": "Expressive, mobile and deliberately less formal than office wear.",
+        "target_formality": "casual",
+        "allowed_formality": [
+          "casual",
+          "smart_casual"
+        ],
+        "required_slots": [
+          "top",
+          "bottom",
+          "shoes"
+        ],
+        "style_keywords": [
+          "expressive",
+          "nightlife",
+          "mobile",
+          "individual"
+        ],
+        "avoid_rules": [
+          "Avoid a full business suit",
+          "Avoid formal dress trousers",
+          "Avoid an overly conservative office look"
+        ],
+        "explanation_guidelines": [
+          "Explain the nightlife and social tone",
+          "Explain whether the outfit supports movement",
+          "Explain how the look preserves personal expression"
+        ],
+        "source": "precomputed",
+        "version": 2,
+        "generated_at": "2026-11-22T12:00:00+08:00"
       }
     ]
   },
