@@ -40,12 +40,19 @@ final class RecommendationService: RecommendationServiceProtocol {
                 RecommendationResponse.self,
                 from: data
             )
-            if response.outfits.count >= 3 {
+            if response.outfits.count >= 3,
+                response.outfits.allSatisfy(hasEnglishCopy)
+            {
                 return response
             }
-        } catch let error as APIError where error.statusCode == 422 {
+        } catch let error as APIError
+            where error.statusCode == 422 || error.isTimeout
+        {
             throw error
         } catch {
+            if Task.isCancelled {
+                throw CancellationError()
+            }
             // Local rules keep the prototype usable until the API is deployed.
         }
 
@@ -81,6 +88,9 @@ final class RecommendationService: RecommendationServiceProtocol {
         } catch let error as APIError where error.statusCode == 422 {
             throw error
         } catch {
+            if Task.isCancelled {
+                throw CancellationError()
+            }
             return LocalRecommendationEngine.revise(
                 currentOutfit: currentOutfit,
                 replacement: replacement,
@@ -92,6 +102,15 @@ final class RecommendationService: RecommendationServiceProtocol {
     private func requestID() -> String {
         "ios-\(UUID().uuidString.lowercased())"
     }
+
+    private func hasEnglishCopy(_ outfit: Outfit) -> Bool {
+        let visibleCopy =
+            ([outfit.title] + outfit.reasons + outfit.tradeoffs)
+            .joined(separator: " ")
+        return visibleCopy.unicodeScalars.allSatisfy {
+            !(0x4E00...0x9FFF).contains($0.value)
+        }
+    }
 }
 
 extension Garment {
@@ -102,7 +121,7 @@ extension Garment {
             productName: name,
             slot: slot,
             category: category.isEmpty ? slot.rawValue : category,
-            colors: colors.isEmpty ? ["未标注"] : colors,
+            colors: colors.isEmpty ? ["Not specified"] : colors,
             pattern: pattern.isEmpty ? nil : pattern,
             fit: fit.isEmpty ? nil : fit,
             material: material.isEmpty ? nil : material,
@@ -179,7 +198,7 @@ enum LocalRecommendationEngine {
             ? "three_available"
             : "fallback_degraded"
         let warning = distinctCount < 3
-            ? "当前衣柜组合有限，备用方案会复用同一组衣物照片。"
+            ? "The wardrobe has limited combinations. Fallback options reuse the same clothing photos."
             : nil
 
         return RecommendationResponse(
@@ -216,19 +235,22 @@ enum LocalRecommendationEngine {
         let revised = Outfit(
             id: "\(currentOutfit.id)-revised-\(replacement.id.uuidString.prefix(6).lowercased())",
             itemIDs: updatedIDs,
-            title: "已替换\(replacement.name)",
+            title: "Replaced \(replacement.name)",
             reasons: [
-                "\(replacement.name)已替换同槽位衣物，其他单品保持不变。",
-                "当前结果由本地规则生成，可继续调整或确认保存。"
+                "\(replacement.name) replaced the item in the same slot. Other items are unchanged.",
+                "This result was built with local rules and is ready for another review."
             ],
-            tradeoffs: currentOutfit.tradeoffs + ["手动替换后请再次确认整体风格。"],
+            tradeoffs: [
+                "This manual replacement uses local rules.",
+                "Review the overall style before confirming."
+            ],
             source: .manual,
             score: currentOutfit.score
         )
         return OutfitRevisionResponse(
             outfit: revised,
             fallbackUsed: true,
-            warning: "后端替换接口不可用，已使用本地替换。",
+            warning: "The backend revision was unavailable. A local replacement was used.",
             provider: "ios_local_rules",
             generatedAt: nowISO8601(),
             requestID: "local-\(UUID().uuidString.lowercased())"
@@ -245,27 +267,39 @@ enum LocalRecommendationEngine {
             / Double(max(1, items.count))
         let targetScore = Double(target.scoreRange.lowerBound)
         let score = max(0, 1 - abs(average - targetScore) / 4)
-        let titles = ["清晰而自然", "温和而有层次", "更利落的选择"]
+        let titles = [
+            "Clear and natural",
+            "Warm and layered",
+            "Sharper and more expressive"
+        ]
         let title = titles[index % titles.count]
         let top = items.first { $0.slot == .top }
         let bottom = items.first { $0.slot == .bottom }
         let colorReason: String
         if let top, let bottom {
-            colorReason = "\(top.colorLabel)与\(bottom.colorLabel)形成清楚的主次关系。"
+            colorReason =
+                "\(top.colorLabel) and \(bottom.colorLabel) create a clear visual hierarchy."
         } else {
-            colorReason = "上下装颜色关系清楚，整体容易辨认。"
+            colorReason = "The top and bottom have a clear, easy-to-read color relationship."
         }
-        let formalReason = "正式度接近\(target.label)，适合当前场合。"
+        let formalReason =
+            "The formality level is close to \(target.label) and suits this occasion."
         let names = items.map(\.name).joined(separator: "、")
         var reasons = [
             colorReason,
             formalReason,
-            "\(names)均来自本地照片衣柜。"
+            "Every item in \(names) comes from the local photo wardrobe."
         ]
-        var tradeoffs = ["当前为本地规则结果，未经过真实 AI 生成解释。"]
+        var tradeoffs = [
+            "This result uses local rules rather than generated AI explanations."
+        ]
         if isFallbackVariant {
-            reasons.append("当前为备用变体，复用同一组衣物照片。")
-            tradeoffs.append("如需更多不同组合，请继续添加同类衣物。")
+            reasons.append(
+                "This fallback variation reuses the same clothing photos."
+            )
+            tradeoffs.append(
+                "Add more items in the same slots for more distinct combinations."
+            )
         }
 
         return Outfit(

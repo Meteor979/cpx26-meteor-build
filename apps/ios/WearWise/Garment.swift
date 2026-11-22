@@ -10,10 +10,10 @@ enum GarmentSlot: String, CaseIterable, Codable, Identifiable, Hashable {
 
     var label: String {
         switch self {
-        case .top: "上装"
-        case .bottom: "下装"
-        case .shoes: "鞋"
-        case .outerwear: "外套"
+        case .top: "Top"
+        case .bottom: "Bottom"
+        case .shoes: "Shoes"
+        case .outerwear: "Outerwear"
         }
     }
 
@@ -43,9 +43,9 @@ enum GarmentSource: String, Codable {
 
     var label: String {
         switch self {
-        case .manual: "手动录入"
-        case .aiSuggestion: "AI 建议，已确认"
-        case .localMock: "本地样例"
+        case .manual: "Manual entry"
+        case .aiSuggestion: "AI suggestion, confirmed"
+        case .localMock: "Local sample"
         }
     }
 }
@@ -86,10 +86,10 @@ struct Garment: Identifiable, Codable, Equatable {
     }
 
     var colorLabel: String {
-        colors.isEmpty ? "颜色未填写" : colors.joined(separator: "、")
+        colors.isEmpty ? "Color not set" : colors.joined(separator: ", ")
     }
 
     var formalityLabel: String {
-        "正式度 \(formalityScore)/5"
+        "Formality \(formalityScore)/5"
     }
 }

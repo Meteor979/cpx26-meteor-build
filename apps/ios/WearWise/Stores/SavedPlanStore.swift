@@ -32,7 +32,7 @@ final class SavedPlanStore: ObservableObject {
             try ensureDirectory()
             try load()
         } catch {
-            errorMessage = "最近方案读取失败：\(error.localizedDescription)"
+            errorMessage = "Recent outfits could not be loaded: \(error.localizedDescription)"
         }
     }
 

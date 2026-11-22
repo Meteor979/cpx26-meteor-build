@@ -6,6 +6,7 @@ final class OccasionRecommendationViewModel: ObservableObject {
     @Published var query = ""
     @Published private(set) var formality: FormalityBand = .smartCasual
     @Published private(set) var profile: OccasionPreset?
+    @Published private(set) var resolvedProfileName = ""
     @Published private(set) var resolvedQuery = ""
     @Published private(set) var resolutionSource = ""
     @Published private(set) var presets = LocalPresetCatalog.choices
@@ -17,12 +18,27 @@ final class OccasionRecommendationViewModel: ObservableObject {
     @Published private(set) var isGenerating = false
     @Published private(set) var isRevising = false
     @Published private(set) var errorMessage: String?
+    @Published private(set) var operationMessage = ""
+    @Published private(set) var contextChanged = false
+    @Published private(set) var recommendationTimedOut = false
     @Published var showsRecommendations = false
 
     private let presetService: PresetServiceProtocol
     private let occasionService: OccasionServiceProtocol
     private let recommendationService: RecommendationServiceProtocol
     private let weather = WeatherData.demo
+    private var loadingTask: Task<Void, Never>?
+
+    static let resolvingMessages = [
+        "Resolving your occasion...",
+        "AI is refining the context...",
+        "Using local rules..."
+    ]
+    static let recommendationMessages = [
+        "Building three outfit options...",
+        "Comparing formality and weather...",
+        "Checking your wardrobe photos..."
+    ]
 
     init(
         presetService: PresetServiceProtocol = PresetService(),
@@ -56,29 +72,41 @@ final class OccasionRecommendationViewModel: ObservableObject {
         resolvedQuery = preset.name
         query = preset.name
         profile = nil
+        resolvedProfileName = ""
         resolutionSource = ""
         formality = preset.targetFormality
+        contextChanged = false
+        recommendationTimedOut = false
+        errorMessage = nil
     }
 
     func queryDidChange() {
         if query.trimmingCharacters(in: .whitespacesAndNewlines) != resolvedQuery {
             profile = nil
+            resolvedProfileName = ""
             resolutionSource = ""
             resolvedQuery = ""
             formality = .smartCasual
+            contextChanged = false
+            recommendationTimedOut = false
+            errorMessage = nil
         }
     }
 
     func resolveOccasion() async {
         guard canResolve else {
             errorMessage = query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                ? "请先输入场合。"
-                : "场合不能超过 240 个字符。"
+                ? "Enter an occasion first."
+                : "The occasion must be 240 characters or fewer."
             return
         }
         isResolving = true
         errorMessage = nil
-        defer { isResolving = false }
+        startLoading(messages: Self.resolvingMessages)
+        defer {
+            isResolving = false
+            stopLoading()
+        }
 
         do {
             let result = try await occasionService.resolve(
@@ -86,16 +114,28 @@ final class OccasionRecommendationViewModel: ObservableObject {
                 formalityHint: formality
             )
             profile = result.response.profile
+            resolvedProfileName = result.response.profile.name
             resolvedQuery = result.response.query
             formality = result.response.profile.targetFormality
             resolutionSource = result.sourceLabel
+            contextChanged = false
+            recommendationTimedOut = false
         } catch {
-            errorMessage = error.localizedDescription
+            if Task.isCancelled || error is CancellationError {
+                return
+            }
+            errorMessage = displayMessage(
+                for: error,
+                fallback: "The occasion could not be resolved. Check the input and try again."
+            )
         }
     }
 
     func adjustFormality(_ band: FormalityBand) {
         formality = band
+        contextChanged = profile != nil && band != profile?.targetFormality
+        recommendationTimedOut = false
+        errorMessage = nil
     }
 
     func generateRecommendations(garments: [Garment]) async {
@@ -104,33 +144,67 @@ final class OccasionRecommendationViewModel: ObservableObject {
         }
         let missing = missingRequiredSlots(in: garments)
         guard missing.isEmpty else {
-            errorMessage = "还需要添加：\(missing.map(\.label).joined(separator: "、"))。"
+            errorMessage =
+                "Add these wardrobe items first: "
+                + missing.map(\.label).joined(separator: ", ")
             return
         }
 
         isGenerating = true
         errorMessage = nil
-        defer { isGenerating = false }
+        recommendationTimedOut = false
+        startLoading(messages: Self.recommendationMessages)
+        defer {
+            isGenerating = false
+            stopLoading()
+        }
 
         do {
             let response = try await recommendationService.recommend(
                 context: recommendationContext,
                 garments: garments
             )
-            recommendations = Self.resolveOutfits(
-                response.outfits,
-                garments: garments
-            )
-            resultCountReason = response.resultCountReason
-            recommendationWarning = response.warning
-            selectedOutfitID = recommendations.first?.id
-            showsRecommendations = !recommendations.isEmpty
+            apply(response: response, garments: garments)
             if recommendations.isEmpty {
-                errorMessage = "当前衣柜无法组成完整搭配。"
+                errorMessage = "The wardrobe cannot form a complete outfit yet."
             }
         } catch {
-            errorMessage = error.localizedDescription
+            if Task.isCancelled || error is CancellationError {
+                return
+            }
+            if let apiError = error as? APIError, apiError.isTimeout {
+                recommendationTimedOut = true
+                errorMessage =
+                    "The AI request timed out. Try again or use local rules."
+                return
+            }
+            errorMessage = displayMessage(
+                for: error,
+                fallback: "Outfits could not be generated. Try again or use local rules."
+            )
         }
+    }
+
+    func retryRecommendations(garments: [Garment]) async {
+        await generateRecommendations(garments: garments)
+    }
+
+    func useLocalRecommendations(garments: [Garment]) {
+        recommendationTimedOut = false
+        errorMessage = nil
+        let response = LocalRecommendationEngine.recommend(
+            context: recommendationContext,
+            garments: garments
+        )
+        apply(response: response, garments: garments)
+    }
+
+    func cancelOperations() {
+        loadingTask?.cancel()
+        loadingTask = nil
+        operationMessage = ""
+        isResolving = false
+        isGenerating = false
     }
 
     func outfit(id: String) -> ResolvedOutfit? {
@@ -166,12 +240,17 @@ final class OccasionRecommendationViewModel: ObservableObject {
             let resolved = Self.resolveOutfit(
                 response.outfit,
                 garments: garments,
-                forceManual: response.outfit.source == .manual
+                forceManual: response.outfit.source == .manual,
+                provider: response.provider,
+                fallbackUsed: response.fallbackUsed
             )
             recommendations[index] = resolved
             selectedOutfitID = resolved.id
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = displayMessage(
+                for: error,
+                fallback: "The item could not be replaced. Your current outfit is unchanged."
+            )
         }
     }
 
@@ -194,13 +273,17 @@ final class OccasionRecommendationViewModel: ObservableObject {
 
     static func resolveOutfits(
         _ outfits: [Outfit],
-        garments: [Garment]
+        garments: [Garment],
+        provider: String? = nil,
+        fallbackUsed: Bool = false
     ) -> [ResolvedOutfit] {
         outfits.map {
             resolveOutfit(
                 $0,
                 garments: garments,
-                forceManual: $0.source == .manual
+                forceManual: $0.source == .manual,
+                provider: provider,
+                fallbackUsed: fallbackUsed
             )
         }
     }
@@ -208,7 +291,9 @@ final class OccasionRecommendationViewModel: ObservableObject {
     static func resolveOutfit(
         _ outfit: Outfit,
         garments: [Garment],
-        forceManual: Bool = false
+        forceManual: Bool = false,
+        provider: String? = nil,
+        fallbackUsed: Bool = false
     ) -> ResolvedOutfit {
         let garmentsByID = Dictionary(
             uniqueKeysWithValues: garments.map {
@@ -223,7 +308,12 @@ final class OccasionRecommendationViewModel: ObservableObject {
                     garment: garmentsByID[$0.lowercased()]
                 )
             },
-            isManualAdjusted: forceManual
+            isManualAdjusted: forceManual,
+            sourceLabelOverride: sourceLabel(
+                for: outfit,
+                provider: provider,
+                fallbackUsed: fallbackUsed
+            )
         )
     }
 
@@ -238,6 +328,84 @@ final class OccasionRecommendationViewModel: ObservableObject {
             formality: formality,
             weather: weather
         )
+    }
+
+    private static func sourceLabel(
+        for outfit: Outfit,
+        provider: String?,
+        fallbackUsed: Bool
+    ) -> String {
+        if outfit.source == .fallback {
+            return "Fallback result"
+        }
+        if outfit.source == .mock {
+            return "Local rules"
+        }
+        if fallbackUsed {
+            return "Fallback result"
+        }
+        let normalizedProvider = provider?.lowercased() ?? ""
+        if normalizedProvider.contains("rule")
+            || normalizedProvider.contains("mock")
+        {
+            return "Local rules"
+        }
+        return "AI result"
+    }
+
+    private func apply(
+        response: RecommendationResponse,
+        garments: [Garment]
+    ) {
+        recommendations = Self.resolveOutfits(
+            response.outfits,
+            garments: garments,
+            provider: response.provider,
+            fallbackUsed: response.fallbackUsed
+        )
+        resultCountReason = response.resultCountReason
+        recommendationWarning = response.warning
+        selectedOutfitID = recommendations.first?.id
+        showsRecommendations = !recommendations.isEmpty
+        contextChanged = false
+    }
+
+    private func startLoading(messages: [String]) {
+        loadingTask?.cancel()
+        operationMessage = messages.first ?? ""
+        loadingTask = Task { @MainActor [weak self] in
+            for message in messages.dropFirst() {
+                try? await Task.sleep(nanoseconds: 1_800_000_000)
+                guard !Task.isCancelled, let self else {
+                    return
+                }
+                self.operationMessage = message
+            }
+        }
+    }
+
+    private func stopLoading() {
+        loadingTask?.cancel()
+        loadingTask = nil
+        operationMessage = ""
+    }
+
+    private func displayMessage(
+        for error: Error,
+        fallback: String
+    ) -> String {
+        if let apiError = error as? APIError {
+            if apiError.isTimeout {
+                return "The AI request timed out. Try again or use local rules."
+            }
+            if apiError.statusCode == 422 {
+                return "Some information is invalid. Check the occasion and try again."
+            }
+            if case .network = apiError {
+                return "The backend is unavailable. Local rules remain available."
+            }
+        }
+        return fallback
     }
 
     private func missingRequiredSlots(in garments: [Garment]) -> [GarmentSlot] {

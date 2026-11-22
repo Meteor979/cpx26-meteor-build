@@ -10,10 +10,10 @@ enum FormalityBand: String, Codable, CaseIterable, Identifiable, Hashable {
 
     var label: String {
         switch self {
-        case .casual: "休闲"
-        case .smartCasual: "智能休闲"
-        case .business: "商务"
-        case .formal: "正式"
+        case .casual: "Casual"
+        case .smartCasual: "Smart casual"
+        case .business: "Business"
+        case .formal: "Formal"
         }
     }
 
@@ -126,60 +126,70 @@ enum LocalPresetCatalog {
     static let choices: [OccasionPreset] = [
         preset(
             id: "first-date",
-            name: "初次约会",
+            name: "First date",
             aliases: ["第一次约会", "首次约会", "初次见面的约会"],
-            description: "保持整洁、亲近和低压迫感。",
+            description: "Clean, approachable, and low-pressure.",
             formality: .smartCasual,
             allowed: [.casual, .smartCasual],
-            keywords: ["干净", "亲近", "自然"]
+            keywords: ["Clean", "Approachable", "Natural"]
         ),
         preset(
             id: "club-speech",
-            name: "社团演讲",
+            name: "Club speech",
             aliases: ["社团汇报", "社团分享", "社团路演"],
-            description: "专业可信，但不过度正式。",
+            description: "Credible and professional without feeling too formal.",
             formality: .business,
             allowed: [.smartCasual, .business],
-            keywords: ["可信", "清晰", "利落"]
+            keywords: ["Credible", "Clear", "Polished"]
         ),
         preset(
             id: "friends-dinner",
-            name: "朋友聚餐",
+            name: "Friends dinner",
             aliases: ["朋友吃饭", "同学聚餐", "朋友生日聚餐"],
-            description: "轻松、友好，保持整洁。",
+            description: "Relaxed, friendly, and tidy.",
             formality: .casual,
             allowed: [.casual, .smartCasual],
-            keywords: ["轻松", "友好", "自然"]
+            keywords: ["Relaxed", "Friendly", "Natural"]
         ),
         preset(
             id: "internship-interview",
-            name: "实习面试",
+            name: "Internship interview",
             aliases: ["面试", "实习面试", "工作面试"],
-            description: "清楚、可靠，避免过度张扬。",
+            description: "Clear and reliable without being flashy.",
             formality: .business,
             allowed: [.smartCasual, .business],
-            keywords: ["可靠", "清楚", "专业"]
+            keywords: ["Reliable", "Clear", "Professional"]
         )
     ]
 
     static let familyDinner = preset(
         id: "generated-family-dinner",
-        name: "第一次家庭聚餐",
+        name: "Family dinner",
         aliases: ["第一次去女朋友家吃饭", "第一次去对象家吃饭", "见家长前聚餐"],
-        description: "自然整洁，避免像正式面试。",
+        description: "Naturally tidy without looking like a formal interview.",
         formality: .smartCasual,
         allowed: [.casual, .smartCasual],
-        keywords: ["干净", "自然", "有礼貌", "不过度正式"]
+        keywords: ["Clean", "Natural", "Polite", "Not overdressed"]
     )
 
     static let nightOut = preset(
         id: "night-out",
-        name: "夜店",
-        aliases: ["去夜店", "夜店", "夜生活", "派对", "酒吧", "clubbing"],
-        description: "轻松、有个人表达，避免像商务会面。",
+        name: "Night out",
+        aliases: [
+            "去夜店",
+            "夜店",
+            "夜生活",
+            "派对",
+            "酒吧",
+            "clubbing",
+            "night out",
+            "nightclub",
+            "club night"
+        ],
+        description: "Relaxed and expressive, never like a business meeting.",
         formality: .casual,
         allowed: [.casual, .smartCasual],
-        keywords: ["夜间社交", "个人表达", "轻松", "有辨识度"],
+        keywords: ["Nightlife", "Self-expression", "Relaxed", "Distinctive"],
         source: "bundled"
     )
 
@@ -188,21 +198,21 @@ enum LocalPresetCatalog {
         nightOut,
         preset(
             id: "anniversary-date",
-            name: "纪念日约会",
+            name: "Anniversary date",
             aliases: ["纪念日", "周年约会", "结婚纪念日"],
-            description: "在日常基础上增加一点仪式感。",
+            description: "A polished step up from an everyday outfit.",
             formality: .smartCasual,
             allowed: [.smartCasual, .business],
-            keywords: ["精致", "温和", "仪式感"]
+            keywords: ["Polished", "Warm", "Occasion"]
         ),
         preset(
             id: "salon-performance",
-            name: "沙龙表演",
+            name: "Salon performance",
             aliases: ["沙龙", "演奏会", "节目演出", "小型演出"],
-            description: "兼顾舞台辨识度和行动便利。",
+            description: "Stage presence with freedom to move.",
             formality: .smartCasual,
             allowed: [.casual, .smartCasual, .business],
-            keywords: ["层次", "便于行动", "个人表达"]
+            keywords: ["Layered", "Mobile", "Expressive"]
         )
     ]
 
@@ -237,12 +247,12 @@ enum LocalPresetCatalog {
         let target = formalityHint ?? .smartCasual
         let fallback = preset(
             id: "fallback-general-occasion",
-            name: "通用场合策略",
+            name: "General occasion",
             aliases: [query],
-            description: "使用整洁自然的通用策略。",
+            description: "A clean, natural strategy for an unfamiliar occasion.",
             formality: target,
             allowed: neighboringFormality(for: target),
-            keywords: ["整洁", "自然", "可接近"]
+            keywords: ["Tidy", "Natural", "Approachable"]
         )
         return response(query: query, profile: fallback, matchType: "fallback")
     }
@@ -261,7 +271,7 @@ enum LocalPresetCatalog {
             alternatives: all.filter { $0.id != profile.id && $0.id != familyDinner.id }.prefix(3)
                 .map { $0 },
             warning: matchType == "fallback"
-                ? "未找到明确匹配，已使用本地通用策略。"
+                ? "No clear match was found. Local rules are being used."
                 : nil,
             requestID: nil
         )
@@ -308,8 +318,8 @@ enum LocalPresetCatalog {
             allowedFormality: allowed,
             requiredSlots: [.top, .bottom, .shoes],
             styleKeywords: keywords,
-            avoidRules: ["避免过度正式", "避免颜色和图案过度复杂"],
-            explanationGuidelines: ["解释正式程度", "解释颜色关系", "解释场合适配"],
+            avoidRules: ["Avoid excessive formality", "Avoid overly complex color and pattern combinations"],
+            explanationGuidelines: ["Explain formality", "Explain color relationships", "Explain occasion fit"],
             source: source,
             version: 1,
             generatedAt: nil

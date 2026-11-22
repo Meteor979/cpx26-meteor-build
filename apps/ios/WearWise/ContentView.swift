@@ -37,9 +37,9 @@ private struct HomeView: View {
             Label("WearWise", systemImage: "circle.grid.cross")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
-                .accessibilityLabel("WearWise 衣语")
+                .accessibilityLabel("WearWise")
 
-            Text("穿得更有把握。")
+            Text("Dress with confidence.")
                 .font(.system(.largeTitle, design: .rounded, weight: .bold))
                 .tracking(-1.2)
                 .fixedSize(horizontal: false, vertical: true)
@@ -53,27 +53,27 @@ private struct HomeView: View {
                 WardrobeView()
             } label: {
                 HomeActionCard(
-                    title: "我的衣柜",
+                    title: "My wardrobe",
                     detail: garmentStore.garments.isEmpty
-                        ? "添加第一件衣物"
-                        : "\(garmentStore.garments.count) 件衣物",
+                        ? "Add your first item"
+                        : "\(garmentStore.garments.count) items",
                     systemImage: "cabinet.fill"
                 )
             }
             .buttonStyle(WearWisePrimaryButtonStyle())
-            .accessibilityHint("打开照片衣柜")
+            .accessibilityHint("Open your photo wardrobe")
 
             NavigationLink {
                 OccasionInputView()
             } label: {
                 HomeActionCard(
-                    title: "今天穿什么？",
-                    detail: "输入场合，生成搭配",
+                    title: "What should I wear?",
+                    detail: "Enter an occasion",
                     systemImage: "wand.and.stars"
                 )
             }
             .buttonStyle(WearWiseSecondaryButtonStyle())
-            .accessibilityHint("输入场合并生成搭配")
+            .accessibilityHint("Enter an occasion and generate outfits")
         }
     }
 
@@ -81,7 +81,7 @@ private struct HomeView: View {
     private var recentPlan: some View {
         if let plan = planStore.latest {
             VStack(alignment: .leading, spacing: 12) {
-                Text("最近方案")
+                Text("Recent outfit")
                     .font(.title3.weight(.bold))
                     .accessibilityAddTraits(.isHeader)
 
@@ -113,7 +113,7 @@ private struct HomeView: View {
                     .wearWiseCard()
                 }
                 .buttonStyle(.plain)
-                .accessibilityHint("重新查看已保存方案")
+                .accessibilityHint("Review the saved outfit")
             }
         }
     }
@@ -132,7 +132,7 @@ private struct HomeView: View {
                         .frame(width: 58)
                 } else {
                     GarmentPlaceholderView(
-                        name: "无法映射",
+                        name: "Unmapped",
                         systemImage: "photo.badge.exclamationmark"
                     )
                     .frame(width: 58)
@@ -146,7 +146,7 @@ private struct HomeView: View {
     private var recentWardrobe: some View {
         if !garmentStore.garments.isEmpty {
             VStack(alignment: .leading, spacing: 14) {
-                Text("最近添加")
+                Text("Recently added")
                     .font(.title3.weight(.bold))
                     .accessibilityAddTraits(.isHeader)
 
@@ -246,7 +246,7 @@ private struct SavedPlanDetailView: View {
                             VStack(alignment: .leading, spacing: 5) {
                                 Text(item.displayName)
                                     .font(.headline)
-                                Text(item.slot?.label ?? "衣物记录无法映射")
+                                Text(item.slot?.label ?? "Wardrobe record unavailable")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }
@@ -265,7 +265,7 @@ private struct SavedPlanDetailView: View {
             .frame(maxWidth: .infinity)
         }
         .background(Color.wearWiseBackground)
-        .navigationTitle("已保存方案")
+        .navigationTitle("Saved outfit")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.visible, for: .navigationBar)
     }

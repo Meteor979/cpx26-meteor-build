@@ -3,6 +3,7 @@ import Foundation
 enum APIError: LocalizedError {
     case notModified
     case network(String)
+    case timeout
     case invalidResponse
     case server(status: Int, code: String?, message: String)
     case decoding(String)
@@ -10,15 +11,17 @@ enum APIError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .notModified:
-            "内容没有变化。"
+            "The content has not changed."
         case let .network(message):
             message
+        case .timeout:
+            "The request timed out. Try again or use local rules."
         case .invalidResponse:
-            "服务器返回了无法识别的响应。"
+            "The server returned an unreadable response."
         case let .server(_, _, message):
             message
         case let .decoding(message):
-            "数据格式无法识别：\(message)"
+            "The response format is invalid: \(message)"
         }
     }
 
@@ -27,6 +30,13 @@ enum APIError: LocalizedError {
             return status
         }
         return nil
+    }
+
+    var isTimeout: Bool {
+        if case .timeout = self {
+            return true
+        }
+        return false
     }
 }
 
@@ -46,6 +56,14 @@ enum AppConfiguration {
         }
         return URL(string: "http://127.0.0.1:8000")!
     }
+}
+
+enum APIRequestTimeout {
+    static let presets: TimeInterval = 5
+    static let occasionResolution: TimeInterval = 15
+    static let recommendations: TimeInterval = 20
+    static let outfitRevision: TimeInterval = 15
+    static let weatherCurrent: TimeInterval = 8
 }
 
 enum JSONCoding {
@@ -83,8 +101,8 @@ struct APIClient: APIClientProtocol {
             self.session = session
         } else {
             let configuration = URLSessionConfiguration.default
-            configuration.timeoutIntervalForRequest = 4
-            configuration.timeoutIntervalForResource = 8
+            configuration.timeoutIntervalForRequest = 25
+            configuration.timeoutIntervalForResource = 30
             configuration.waitsForConnectivity = false
             self.session = URLSession(configuration: configuration)
         }
@@ -96,14 +114,20 @@ struct APIClient: APIClientProtocol {
         if let version {
             query.append(URLQueryItem(name: "version", value: String(version)))
         }
-        return try await send(path: "/v1/presets", method: "GET", query: query)
+        return try await send(
+            path: "/v1/presets",
+            method: "GET",
+            query: query,
+            timeout: APIRequestTimeout.presets
+        )
     }
 
     func resolveOccasion(_ request: OccasionResolveRequest) async throws -> Data {
         try await send(
             path: "/v1/occasions/resolve",
             method: "POST",
-            body: try encoder.encode(request)
+            body: try encoder.encode(request),
+            timeout: APIRequestTimeout.occasionResolution
         )
     }
 
@@ -111,7 +135,8 @@ struct APIClient: APIClientProtocol {
         try await send(
             path: "/v1/recommendations",
             method: "POST",
-            body: try encoder.encode(request)
+            body: try encoder.encode(request),
+            timeout: APIRequestTimeout.recommendations
         )
     }
 
@@ -119,7 +144,8 @@ struct APIClient: APIClientProtocol {
         try await send(
             path: "/v1/outfits/revise",
             method: "POST",
-            body: try encoder.encode(request)
+            body: try encoder.encode(request),
+            timeout: APIRequestTimeout.outfitRevision
         )
     }
 
@@ -127,7 +153,8 @@ struct APIClient: APIClientProtocol {
         path: String,
         method: String,
         query: [URLQueryItem] = [],
-        body: Data? = nil
+        body: Data? = nil,
+        timeout: TimeInterval
     ) async throws -> Data {
         guard
             var components = URLComponents(
@@ -146,7 +173,7 @@ struct APIClient: APIClientProtocol {
 
         var request = URLRequest(url: url)
         request.httpMethod = method
-        request.timeoutInterval = 4
+        request.timeoutInterval = timeout
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         if let body {
             request.httpBody = body
@@ -158,6 +185,12 @@ struct APIClient: APIClientProtocol {
         do {
             (data, response) = try await session.data(for: request)
         } catch {
+            if
+                let urlError = error as? URLError,
+                urlError.code == .timedOut
+            {
+                throw APIError.timeout
+            }
             throw APIError.network(error.localizedDescription)
         }
 
@@ -172,7 +205,7 @@ struct APIClient: APIClientProtocol {
             throw APIError.server(
                 status: httpResponse.statusCode,
                 code: payload?.code,
-                message: payload?.message ?? "请求失败，请稍后重试。"
+                message: payload?.message ?? "Request failed. Please try again."
             )
         }
         return data

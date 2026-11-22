@@ -61,15 +61,15 @@ struct AddGarmentView: View {
 
     private var saveButtonTitle: String {
         if isSaving {
-            return "正在保存"
+            return "Saving"
         }
         if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return "请填写衣物名称"
+            return "Enter a clothing name"
         }
         if imageData == nil, editingGarment == nil {
-            return "请先选择照片"
+            return "Choose a photo first"
         }
-        return editingGarment == nil ? "保存衣物" : "保存修改"
+        return editingGarment == nil ? "Save clothing" : "Save changes"
     }
 
     var body: some View {
@@ -87,11 +87,13 @@ struct AddGarmentView: View {
                 .frame(maxWidth: .infinity)
             }
             .background(Color.wearWiseBackground)
-            .navigationTitle(editingGarment == nil ? "添加衣物" : "编辑衣物")
+            .navigationTitle(
+                editingGarment == nil ? "Add clothing" : "Edit clothing"
+            )
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") {
+                    Button("Cancel") {
                         dismiss()
                     }
                 }
@@ -112,24 +114,24 @@ struct AddGarmentView: View {
                 loadPhoto(item)
             }
             .alert(
-                "无法保存衣物",
+                "Unable to save clothing",
                 isPresented: Binding(
                     get: { errorMessage != nil },
                     set: { if !$0 { errorMessage = nil } }
                 )
             ) {
-                Button("知道了") {
+                Button("OK") {
                     errorMessage = nil
                 }
             } message: {
-                Text(errorMessage ?? "请稍后重试。")
+                Text(errorMessage ?? "Please try again.")
             }
         }
     }
 
     private var photoSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("衣物照片")
+            Text("Clothing photo")
                 .font(.title3.weight(.bold))
                 .accessibilityAddTraits(.isHeader)
 
@@ -142,7 +144,7 @@ struct AddGarmentView: View {
                 matching: .images,
                 photoLibrary: .shared()
             ) {
-                Label("从相册选择", systemImage: "photo.on.rectangle.angled")
+                Label("Choose from library", systemImage: "photo.on.rectangle.angled")
             }
             .buttonStyle(WearWiseSecondaryButtonStyle())
 
@@ -150,7 +152,7 @@ struct AddGarmentView: View {
                 showsCamera = true
             } label: {
                 Label(
-                    cameraAvailable ? "拍摄衣物" : "当前设备没有相机",
+                    cameraAvailable ? "Take clothing photo" : "No camera on this device",
                     systemImage: cameraAvailable ? "camera.fill" : "camera.badge.ellipsis"
                 )
             }
@@ -158,13 +160,13 @@ struct AddGarmentView: View {
             .disabled(!cameraAvailable)
 
             if !cameraAvailable {
-                Text("模拟器请从相册选择。")
+                Text("Use the photo library in Simulator.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
 
             if isReadingPhoto {
-                Label("正在读取照片", systemImage: "hourglass")
+                Label("Reading photo", systemImage: "hourglass")
                     .font(.subheadline.weight(.semibold))
                     .accessibilityAddTraits(.updatesFrequently)
             }
@@ -187,7 +189,7 @@ struct AddGarmentView: View {
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
                         .stroke(Color.wearWiseInk, lineWidth: 2)
                 }
-                .accessibilityLabel("待保存的衣物照片")
+                .accessibilityLabel("Clothing photo to save")
         } else if
             let editingGarment,
             let image = garmentStore.image(for: editingGarment, thumbnail: false)
@@ -202,7 +204,7 @@ struct AddGarmentView: View {
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
                         .stroke(Color.wearWiseInk, lineWidth: 2)
                 }
-                .accessibilityLabel("当前衣物照片")
+                .accessibilityLabel("Current clothing photo")
         } else {
             ZStack {
                 Color.wearWiseSurface
@@ -210,7 +212,7 @@ struct AddGarmentView: View {
                     Image(systemName: "camera.viewfinder")
                         .font(.system(size: 46, weight: .medium))
                         .accessibilityHidden(true)
-                    Text("选择照片后会在这里预览")
+                    Text("Your photo preview will appear here")
                         .font(.headline)
                         .multilineTextAlignment(.center)
                 }
@@ -229,14 +231,14 @@ struct AddGarmentView: View {
 
     private var basicFields: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("基本信息")
+            Text("Basic details")
                 .font(.title3.weight(.bold))
                 .accessibilityAddTraits(.isHeader)
 
-            field("衣物名称", text: $name, prompt: "例如：浅蓝牛津衬衫")
+            field("Clothing name", text: $name, prompt: "e.g. Light blue oxford shirt")
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("衣物类型")
+                Text("Clothing type")
                     .font(.subheadline.weight(.semibold))
 
                 LazyVGrid(columns: typeColumns, spacing: 10) {
@@ -284,20 +286,20 @@ struct AddGarmentView: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel(
-                            "\(slot.label)，\(self.slot == slot ? "已选择" : "未选择")"
+                            "\(slot.label), \(self.slot == slot ? "selected" : "not selected")"
                         )
                     }
                 }
             }
 
             field(
-                "颜色名称",
+                "Color name",
                 text: $colorText,
-                prompt: "例如：浅蓝、深蓝（用顿号分隔）"
+                prompt: "e.g. Light blue, navy"
             )
 
             Stepper(value: $formalityScore, in: 1...5) {
-                Label("正式度 \(formalityScore)/5", systemImage: "chart.bar.fill")
+                Label("Formality \(formalityScore)/5", systemImage: "chart.bar.fill")
                     .font(.body)
             }
             .frame(minHeight: 52)
@@ -307,20 +309,20 @@ struct AddGarmentView: View {
     private var reviewFields: some View {
         DisclosureGroup(isExpanded: $showsMoreDetails) {
             VStack(spacing: 14) {
-                field("类别", text: $category, prompt: "例如：衬衫")
-                field("图案", text: $pattern, prompt: "例如：纯色、条纹")
-                field("版型", text: $fit, prompt: "例如：常规、宽松")
-                field("材质", text: $material, prompt: "例如：棉、羊毛混纺")
+                field("Category", text: $category, prompt: "e.g. Shirt")
+                field("Pattern", text: $pattern, prompt: "e.g. Solid, striped")
+                field("Fit", text: $fit, prompt: "e.g. Regular, relaxed")
+                field("Material", text: $material, prompt: "e.g. Cotton, wool blend")
 
                 Stepper(value: $warmthScore, in: 1...5) {
-                    Label("保暖度 \(warmthScore)/5", systemImage: "thermometer.medium")
+                    Label("Warmth \(warmthScore)/5", systemImage: "thermometer.medium")
                         .font(.body)
                 }
                 .frame(minHeight: 52)
             }
             .padding(.top, 14)
         } label: {
-            Label("补充标签信息", systemImage: "tag")
+            Label("Additional details", systemImage: "tag")
                 .font(.headline)
         }
         .padding(16)
@@ -343,7 +345,7 @@ struct AddGarmentView: View {
         }
         .buttonStyle(WearWisePrimaryButtonStyle())
         .disabled(!canSave)
-        .accessibilityHint("保存照片和审核后的衣物信息到本机")
+        .accessibilityHint("Save the photo and reviewed clothing details locally")
     }
 
     private func field(

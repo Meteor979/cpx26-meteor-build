@@ -88,21 +88,22 @@ final class OccasionService: OccasionServiceProtocol {
             throw APIError.server(
                 status: 422,
                 code: "VALIDATION_ERROR",
-                message: "请先输入场合。"
+                message: "Please enter an occasion."
             )
         }
 
-        if let local = LocalPresetCatalog.resolve(
+        let localMatch = LocalPresetCatalog.resolve(
             cleanQuery,
             formalityHint: formalityHint
-        ),
+        )
+        if let local = localMatch,
             local.matchType != "fallback",
             local.profile.id != "night-out",
             local.matchType != "generated"
         {
             return OccasionResolution(
                 response: local,
-                sourceLabel: "本地预设"
+                sourceLabel: "Local rules"
             )
         }
 
@@ -119,13 +120,28 @@ final class OccasionService: OccasionServiceProtocol {
                 OccasionResolveResponse.self,
                 from: data
             )
+            if
+                localMatch?.profile.id == "night-out",
+                response.profile.id != "night-out"
+                    || response.profile.targetFormality != .casual
+            {
+                return OccasionResolution(
+                    response: localMatch!,
+                    sourceLabel: "Fallback result"
+                )
+            }
             return OccasionResolution(
                 response: response,
-                sourceLabel: "后端结果"
+                sourceLabel: resolutionSourceLabel(for: response)
             )
         } catch let error as APIError where error.statusCode == 422 {
             throw error
+        } catch is CancellationError {
+            throw CancellationError()
         } catch {
+            if Task.isCancelled {
+                throw CancellationError()
+            }
             guard let fallback = LocalPresetCatalog.resolve(
                 cleanQuery,
                 formalityHint: formalityHint
@@ -134,8 +150,20 @@ final class OccasionService: OccasionServiceProtocol {
             }
             return OccasionResolution(
                 response: fallback,
-                sourceLabel: "本地备用"
+                sourceLabel: "Fallback result"
             )
         }
+    }
+
+    private func resolutionSourceLabel(
+        for response: OccasionResolveResponse
+    ) -> String {
+        if response.cached {
+            return "Cached result"
+        }
+        if response.matchType == "generated" {
+            return "AI result"
+        }
+        return "Local rules"
     }
 }

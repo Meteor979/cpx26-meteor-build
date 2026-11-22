@@ -5,7 +5,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>zh_CN</string>
     <key>CFBundleDisplayName</key>
-    <string>衣语</string>
+    <string>WearWise</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -23,11 +23,11 @@
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>NSCameraUsageDescription</key>
-    <string>衣语使用相机拍摄你的衣物，并把照片只保存在这台设备上。</string>
+    <string>WearWise uses the camera to photograph your clothing. Photos stay on this device.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>衣语从照片中选择衣物图片，并把副本只保存在这台设备上。</string>
+    <string>WearWise lets you choose clothing photos from your library and stores copies on this device.</string>
     <key>NSLocalNetworkUsageDescription</key>
-    <string>衣语连接本机开发服务，以生成当前场合的搭配结果。</string>
+    <string>WearWise connects to the local development service to generate outfit results.</string>
     <key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsLocalNetworking</key>

@@ -9,9 +9,9 @@ enum GarmentStoreError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .garmentNotFound:
-            "没有找到这件衣物。"
+            "The clothing item could not be found."
         case .incompleteImageUpdate:
-            "图片数据不完整，请重新选择照片。"
+            "The image data is incomplete. Choose the photo again."
         }
     }
 }
@@ -45,7 +45,7 @@ final class GarmentStore: ObservableObject {
             try ensureDirectory()
             try loadMetadata()
         } catch {
-            errorMessage = "衣柜数据读取失败：\(error.localizedDescription)"
+            errorMessage = "Wardrobe data could not be loaded: \(error.localizedDescription)"
         }
     }
 

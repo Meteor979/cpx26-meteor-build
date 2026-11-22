@@ -33,7 +33,7 @@ struct RecommendationResultsView: View {
             .frame(maxWidth: .infinity)
         }
         .background(Color.wearWiseBackground)
-        .navigationTitle("三套搭配")
+        .navigationTitle("Three outfits")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.visible, for: .navigationBar)
     }
@@ -58,7 +58,7 @@ struct RecommendationResultsView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("方案 \(outfitCode(resolved.id))")
+                    Text("Outfit \(outfitCode(resolved.id))")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.secondary)
                     Text(resolved.outfit.title)
@@ -97,7 +97,7 @@ struct RecommendationResultsView: View {
                     viewModel.selectOutfit(id: resolved.id)
                 }
             } label: {
-                Label("查看详情", systemImage: "arrow.right.circle.fill")
+                Label("View details", systemImage: "arrow.right.circle.fill")
             }
             .buttonStyle(WearWiseSecondaryButtonStyle())
         }
@@ -115,7 +115,7 @@ struct RecommendationResultsView: View {
         }
         .overlay(alignment: .topTrailing) {
             if viewModel.selectedOutfitID == resolved.id {
-                Label("已选择", systemImage: "checkmark.circle.fill")
+                Label("Selected", systemImage: "checkmark.circle.fill")
                     .font(.caption.weight(.bold))
                     .padding(.horizontal, 10)
                     .frame(minHeight: 30)
@@ -129,11 +129,11 @@ struct RecommendationResultsView: View {
     private var countExplanation: String {
         switch viewModel.resultCountReason {
         case "limited_candidates":
-            "衣柜中的组合有限，当前只展示可组成的方案。"
+            "The wardrobe has limited combinations. Only valid options are shown."
         case "fallback_degraded":
-            "后端暂不可用，当前展示本地备用方案。"
+            "The backend is unavailable. Local fallback outfits are shown."
         default:
-            "当前结果少于三套。"
+            "Fewer than three outfits are available."
         }
     }
 
@@ -157,7 +157,9 @@ private struct ResolvedOutfitItemView: View {
                     name: item.displayName,
                     systemImage: "photo.badge.exclamationmark"
                 )
-                .accessibilityLabel("\(item.displayName)，照片或衣物记录无法映射")
+                .accessibilityLabel(
+                    "\(item.displayName), photo or wardrobe record unavailable"
+                )
             }
 
             Text(item.displayName)

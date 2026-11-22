@@ -1,10 +1,19 @@
 import SwiftUI
 
+enum OccasionUICopy {
+    static let parse = "Parse occasion"
+    static let generate = "Generate three outfits"
+    static let tryAgain = "Try again"
+    static let useLocalRules = "Use local rules"
+    static let contextChanged = "Context changed. Generate again."
+}
+
 struct OccasionInputView: View {
     @EnvironmentObject private var garmentStore: GarmentStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @StateObject private var viewModel = OccasionRecommendationViewModel()
     @FocusState private var queryFocused: Bool
+    @State private var operationTask: Task<Void, Never>?
 
     private var presetColumns: [GridItem] {
         dynamicTypeSize >= .xxxLarge
@@ -34,14 +43,22 @@ struct OccasionInputView: View {
             .frame(maxWidth: .infinity)
         }
         .background(Color.wearWiseBackground)
-        .navigationTitle("场合")
+        .navigationTitle("Occasion")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.visible, for: .navigationBar)
         .task {
             await viewModel.loadPresets()
         }
         .onChange(of: viewModel.query) { _, _ in
+            operationTask?.cancel()
+            operationTask = nil
+            viewModel.cancelOperations()
             viewModel.queryDidChange()
+        }
+        .onDisappear {
+            operationTask?.cancel()
+            operationTask = nil
+            viewModel.cancelOperations()
         }
         .navigationDestination(isPresented: $viewModel.showsRecommendations) {
             RecommendationResultsView(viewModel: viewModel)
@@ -51,12 +68,12 @@ struct OccasionInputView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("今晚去哪里？")
+            Text("Where are you going?")
                 .font(.system(.largeTitle, design: .rounded, weight: .bold))
                 .tracking(-1.1)
                 .accessibilityAddTraits(.isHeader)
 
-            Text("说出场合，我们会用衣柜照片生成搭配。")
+            Text("Describe the occasion in Chinese or English.")
                 .font(.body)
                 .foregroundStyle(.secondary)
         }
@@ -65,7 +82,7 @@ struct OccasionInputView: View {
     private var queryField: some View {
         VStack(alignment: .leading, spacing: 8) {
             TextField(
-                "例如：第一次去女朋友家吃饭",
+                "e.g. dinner with my partner's family",
                 text: $viewModel.query,
                 axis: .vertical
             )
@@ -75,7 +92,7 @@ struct OccasionInputView: View {
             .submitLabel(.go)
             .focused($queryFocused)
             .onSubmit {
-                Task { await viewModel.resolveOccasion() }
+                startResolve()
             }
             .font(.body)
             .padding(.horizontal, 16)
@@ -89,12 +106,12 @@ struct OccasionInputView: View {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .stroke(Color.wearWiseBorder, lineWidth: 1)
             }
-            .accessibilityLabel("自由输入场合")
+            .accessibilityLabel("Occasion description")
 
             if
                 viewModel.query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             {
-                Label("输入场合后可解析", systemImage: "info.circle")
+                Label("Enter an occasion to continue", systemImage: "info.circle")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
@@ -103,12 +120,15 @@ struct OccasionInputView: View {
 
     private var presetsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("常用场合")
+            Text("Common occasions")
                 .font(.headline)
 
             LazyVGrid(columns: presetColumns, spacing: 10) {
                 ForEach(viewModel.presets.prefix(4)) { preset in
                     Button {
+                        operationTask?.cancel()
+                        operationTask = nil
+                        viewModel.cancelOperations()
                         viewModel.usePreset(preset)
                         queryFocused = true
                     } label: {
@@ -116,7 +136,7 @@ struct OccasionInputView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .buttonStyle(WearWiseSecondaryButtonStyle())
-                    .accessibilityHint("填入场合输入框")
+                    .accessibilityHint("Fill in the occasion field")
                 }
             }
         }
@@ -125,22 +145,28 @@ struct OccasionInputView: View {
     private var resolveButton: some View {
         Button {
             queryFocused = false
-            Task { await viewModel.resolveOccasion() }
+            startResolve()
         } label: {
             if viewModel.isResolving {
                 HStack {
                     ProgressView()
                         .tint(Color(uiColor: .systemBackground))
-                    Text("正在理解")
+                    Text(
+                        viewModel.operationMessage.isEmpty
+                            ? "Resolving your occasion..."
+                            : viewModel.operationMessage
+                    )
                 }
             } else {
-                Label("解析场合", systemImage: "sparkles")
+                Label(OccasionUICopy.parse, systemImage: "sparkles")
             }
         }
         .buttonStyle(WearWisePrimaryButtonStyle())
         .disabled(!viewModel.canResolve)
         .accessibilityHint(
-            viewModel.canResolve ? "解析输入并确认正式程度" : "请先输入场合"
+            viewModel.canResolve
+                ? "Resolve the occasion and confirm formality"
+                : "Enter an occasion first"
         )
     }
 
@@ -148,9 +174,11 @@ struct OccasionInputView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("理解为")
+                    Text("Understood as")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
+                    Text(viewModel.resolvedProfileName)
+                        .font(.headline)
                     Text(viewModel.formality.label)
                         .font(.title2.weight(.bold))
                 }
@@ -181,7 +209,7 @@ struct OccasionInputView: View {
                 }
             } label: {
                 Label(
-                    "调整正式程度：\(viewModel.formality.label)",
+                    "Adjust formality: \(viewModel.formality.label)",
                     systemImage: "slider.horizontal.3"
                 )
                 .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
@@ -194,29 +222,38 @@ struct OccasionInputView: View {
             .foregroundStyle(Color.wearWiseInk)
 
             Button {
-                Task {
-                    await viewModel.generateRecommendations(
-                        garments: garmentStore.garments
-                    )
-                }
+                startGenerate()
             } label: {
                 if viewModel.isGenerating {
                     HStack {
                         ProgressView()
                             .tint(Color(uiColor: .systemBackground))
-                        Text("正在生成")
+                        Text(
+                            viewModel.operationMessage.isEmpty
+                                ? "Building three outfit options..."
+                                : viewModel.operationMessage
+                        )
                     }
                 } else {
-                    Label("生成三套搭配", systemImage: "square.grid.2x2")
+                    Label(OccasionUICopy.generate, systemImage: "square.grid.2x2")
                 }
             }
             .buttonStyle(WearWisePrimaryButtonStyle())
             .disabled(viewModel.isGenerating)
+
+            if viewModel.contextChanged {
+                Label(
+                    OccasionUICopy.contextChanged,
+                    systemImage: "exclamationmark.circle"
+                )
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+            }
         }
         .wearWiseCard()
         .accessibilityElement(children: .contain)
         .accessibilityLabel(
-            "理解为\(viewModel.formality.label)，适合\(viewModel.resolvedQuery)，重点\(viewModel.resolutionHighlights)"
+            "Understood as \(viewModel.formality.label), for \(viewModel.resolvedQuery), focus \(viewModel.resolutionHighlights)"
         )
     }
 
@@ -229,12 +266,47 @@ struct OccasionInputView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(message)
                     .font(.body)
-                Button("重试") {
-                    Task { await viewModel.resolveOccasion() }
+                Button(OccasionUICopy.tryAgain) {
+                    if viewModel.recommendationTimedOut {
+                        startGenerate()
+                    } else {
+                        startResolve()
+                    }
                 }
                 .buttonStyle(WearWiseSecondaryButtonStyle())
+
+                if viewModel.recommendationTimedOut {
+                    Button(OccasionUICopy.useLocalRules) {
+                        viewModel.useLocalRecommendations(
+                            garments: garmentStore.garments
+                        )
+                    }
+                    .buttonStyle(WearWiseSecondaryButtonStyle())
+                }
             }
         }
         .wearWiseCard()
+    }
+
+    private func startResolve() {
+        guard !viewModel.isResolving else {
+            return
+        }
+        operationTask?.cancel()
+        operationTask = Task {
+            await viewModel.resolveOccasion()
+        }
+    }
+
+    private func startGenerate() {
+        guard !viewModel.isGenerating else {
+            return
+        }
+        operationTask?.cancel()
+        operationTask = Task {
+            await viewModel.generateRecommendations(
+                garments: garmentStore.garments
+            )
+        }
     }
 }

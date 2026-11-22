@@ -40,28 +40,28 @@ struct OutfitDetailView: View {
                 .frame(maxWidth: .infinity)
             } else {
                 ContentUnavailableView(
-                    "方案不存在",
+                    "Outfit not found",
                     systemImage: "exclamationmark.circle",
-                    description: Text("请返回三套搭配重新选择。")
+                    description: Text("Return to the outfits and choose again.")
                 )
             }
         }
         .background(Color.wearWiseBackground)
-        .navigationTitle("搭配详情")
+        .navigationTitle("Outfit details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.visible, for: .navigationBar)
         .alert(
-            "无法保存",
+            "Unable to save",
             isPresented: Binding(
                 get: { saveError != nil },
                 set: { if !$0 { saveError = nil } }
             )
         ) {
-            Button("知道了") {
+            Button("OK") {
                 saveError = nil
             }
         } message: {
-            Text(saveError ?? "请稍后重试。")
+            Text(saveError ?? "Please try again.")
         }
     }
 
@@ -90,11 +90,11 @@ struct OutfitDetailView: View {
                             name: item.displayName,
                             systemImage: "photo.badge.exclamationmark"
                         )
-                        .accessibilityLabel("\(item.displayName)，照片缺失")
+                        .accessibilityLabel("\(item.displayName), photo missing")
                     }
                     Text(item.displayName)
                         .font(.subheadline.weight(.semibold))
-                    Text(item.slot?.label ?? "衣物记录无法映射")
+                    Text(item.slot?.label ?? "Wardrobe record unavailable")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -105,8 +105,8 @@ struct OutfitDetailView: View {
 
     private func explanation(_ outfit: ResolvedOutfit) -> some View {
         VStack(alignment: .leading, spacing: 18) {
-            detailSection(title: "推荐理由", items: outfit.outfit.reasons)
-            detailSection(title: "取舍", items: outfit.outfit.tradeoffs)
+            detailSection(title: "Why it works", items: outfit.outfit.reasons)
+            detailSection(title: "Tradeoffs", items: outfit.outfit.tradeoffs)
         }
     }
 
@@ -132,7 +132,7 @@ struct OutfitDetailView: View {
             Menu {
                 replacementMenuContent(for: outfit)
             } label: {
-                Label("替换单品", systemImage: "arrow.triangle.2.circlepath")
+                Label("Replace item", systemImage: "arrow.triangle.2.circlepath")
                     .frame(maxWidth: .infinity, minHeight: 56)
                     .overlay {
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -151,7 +151,7 @@ struct OutfitDetailView: View {
                 }
             } label: {
                 Label(
-                    isSaved ? "已保存到最近方案" : "确认这套",
+                    isSaved ? "Saved to recent outfits" : "Confirm this outfit",
                     systemImage: isSaved ? "checkmark.circle.fill" : "checkmark.circle"
                 )
             }
@@ -161,12 +161,12 @@ struct OutfitDetailView: View {
             Button {
                 dismiss()
             } label: {
-                Label("返回三套搭配", systemImage: "chevron.left")
+                Label("Back to outfits", systemImage: "chevron.left")
             }
             .buttonStyle(WearWiseSecondaryButtonStyle())
 
             if viewModel.isRevising {
-                Label("正在替换", systemImage: "hourglass")
+                Label("Replacing item", systemImage: "hourglass")
                     .font(.subheadline.weight(.semibold))
             }
         }
@@ -176,7 +176,7 @@ struct OutfitDetailView: View {
     private func replacementMenuContent(for outfit: ResolvedOutfit) -> some View {
         let replaceable = outfit.items.compactMap(\.garment)
         if replaceable.isEmpty {
-            Text("没有可替换的衣物")
+            Text("No replaceable items")
         } else {
             ForEach(replaceable) { current in
                 let candidates = replacementCandidates(for: current)

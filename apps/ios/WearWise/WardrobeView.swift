@@ -23,10 +23,10 @@ struct WardrobeView: View {
                 Button {
                     activeSheet = .add
                 } label: {
-                    Label("添加衣物", systemImage: "camera.fill")
+                    Label("Add clothing", systemImage: "camera.fill")
                 }
                 .buttonStyle(WearWisePrimaryButtonStyle())
-                .accessibilityHint("拍摄衣物或从相册选择")
+                .accessibilityHint("Take a photo or choose one from your library")
 
                 if garmentStore.garments.isEmpty {
                     emptyState
@@ -40,7 +40,7 @@ struct WardrobeView: View {
             .frame(maxWidth: .infinity)
         }
         .background(Color.wearWiseBackground)
-        .navigationTitle("我的衣柜")
+        .navigationTitle("My wardrobe")
         .navigationBarTitleDisplayMode(.large)
         .toolbar(.visible, for: .navigationBar)
         .sheet(item: $activeSheet) { sheet in
@@ -54,29 +54,29 @@ struct WardrobeView: View {
             }
         }
         .alert(
-            "衣柜出现问题",
+            "Wardrobe problem",
             isPresented: Binding(
                 get: { garmentStore.errorMessage != nil },
                 set: { if !$0 { garmentStore.clearError() } }
             )
         ) {
-            Button("知道了") {
+            Button("OK") {
                 garmentStore.clearError()
             }
         } message: {
-            Text(garmentStore.errorMessage ?? "请稍后重试。")
+            Text(garmentStore.errorMessage ?? "Please try again.")
         }
     }
 
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {
-            Text("照片衣柜")
+            Text("Photo wardrobe")
                 .font(.title2.weight(.bold))
                 .accessibilityAddTraits(.isHeader)
 
             Spacer(minLength: 12)
 
-            Text("\(garmentStore.garments.count) 件")
+            Text("\(garmentStore.garments.count) items")
                 .font(.headline)
                 .padding(.horizontal, 12)
                 .frame(minHeight: 36)
@@ -84,19 +84,21 @@ struct WardrobeView: View {
                     Capsule()
                         .stroke(Color.wearWiseInk, lineWidth: 1.5)
                 }
-                .accessibilityLabel("衣柜中共有 \(garmentStore.garments.count) 件衣物")
+                .accessibilityLabel(
+                    "The wardrobe contains \(garmentStore.garments.count) items"
+                )
         }
     }
 
     private var emptyState: some View {
         VStack(spacing: 18) {
-            GarmentPlaceholderView(name: "还没有衣物照片", systemImage: "cabinet")
+            GarmentPlaceholderView(name: "No clothing photos yet", systemImage: "cabinet")
                 .frame(maxWidth: 290)
 
             VStack(spacing: 6) {
-                Text("先拍下第一件衣物")
+                Text("Add your first clothing photo")
                     .font(.title3.weight(.bold))
-                Text("照片只保存在本机。")
+                Text("Photos stay on this device.")
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -116,7 +118,7 @@ struct WardrobeView: View {
                             .font(.title3.weight(.bold))
                             .accessibilityAddTraits(.isHeader)
                         Spacer()
-                        Text("\(items.count) 件")
+                        Text("\(items.count) items")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.secondary)
                     }
@@ -131,10 +133,10 @@ struct WardrobeView: View {
                                 Button {
                                     activeSheet = .edit(garment)
                                 } label: {
-                                    Label("编辑衣物", systemImage: "pencil")
+                                    Label("Edit clothing", systemImage: "pencil")
                                 }
                                 .buttonStyle(WearWiseSecondaryButtonStyle())
-                                .accessibilityHint("修改衣物类型和标签")
+                                .accessibilityHint("Change the clothing type and tags")
                             }
                         }
                     }
@@ -161,7 +163,7 @@ private struct SwipeableGarmentCard: View {
                 VStack(spacing: 7) {
                     Image(systemName: "pencil")
                         .font(.title3.weight(.semibold))
-                    Text("编辑")
+                    Text("Edit")
                         .font(.caption.weight(.bold))
                 }
                 .foregroundStyle(Color(uiColor: .systemBackground))
@@ -170,7 +172,7 @@ private struct SwipeableGarmentCard: View {
                 .background(Color.wearWiseInk)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("编辑\(garment.name)")
+            .accessibilityLabel("Edit \(garment.name)")
 
             GarmentCard(garment: garment)
                 .background(Color.wearWiseBackground)
@@ -215,7 +217,7 @@ private struct SwipeableGarmentCard: View {
             reduceMotion ? nil : .easeOut(duration: 0.18),
             value: offset
         )
-        .accessibilityHint("向左滑动可显示编辑操作")
+        .accessibilityHint("Swipe left to reveal editing")
     }
 
     private func closeActions() {
@@ -247,7 +249,7 @@ private struct GarmentCard: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
 
-                Label("点击或左滑编辑", systemImage: "pencil")
+                Label("Tap or swipe to edit", systemImage: "pencil")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
             }
@@ -294,13 +296,13 @@ struct GarmentPhotoView: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
-                    .accessibilityLabel("\(garment.name)的照片")
+                    .accessibilityLabel("Photo of \(garment.name)")
             } else {
                 GarmentPlaceholderView(
                     name: garment.name,
                     systemImage: "photo.badge.exclamationmark"
                 )
-                .accessibilityLabel("\(garment.name)的照片缺失")
+                .accessibilityLabel("\(garment.name), photo missing")
             }
         }
         .aspectRatio(3.0 / 4.0, contentMode: .fit)
@@ -333,7 +335,7 @@ struct GarmentPlaceholderView: View {
                     .lineLimit(3)
                     .padding(.horizontal, 12)
 
-                Text("照片缺失")
+                Text("Photo missing")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
             }

@@ -8,10 +8,10 @@ enum OutfitSource: String, Codable, Hashable {
 
     var label: String {
         switch self {
-        case .mock: "本地样例"
-        case .remoteAPI: "后端结果"
-        case .fallback: "本地备用"
-        case .manual: "手动调整"
+        case .mock: "Local rules"
+        case .remoteAPI: "Backend result"
+        case .fallback: "Fallback result"
+        case .manual: "Manual adjustment"
         }
     }
 }
@@ -138,7 +138,7 @@ struct ResolvedOutfitItem: Identifiable {
     var id: String { remoteID }
 
     var displayName: String {
-        garment?.name ?? "无法映射的衣物 \(remoteID.prefix(8))"
+        garment?.name ?? "Unmapped item \(remoteID.prefix(8))"
     }
 
     var slot: GarmentSlot? {
@@ -146,7 +146,7 @@ struct ResolvedOutfitItem: Identifiable {
     }
 
     var mappingWarning: String? {
-        garment == nil ? "照片或衣物记录无法映射" : nil
+        garment == nil ? "Photo or wardrobe record is unavailable" : nil
     }
 }
 
@@ -154,11 +154,15 @@ struct ResolvedOutfit: Identifiable {
     let outfit: Outfit
     let items: [ResolvedOutfitItem]
     let isManualAdjusted: Bool
+    let sourceLabelOverride: String?
 
     var id: String { outfit.id }
 
     var sourceLabel: String {
-        isManualAdjusted ? OutfitSource.manual.label : outfit.source.label
+        if isManualAdjusted {
+            return OutfitSource.manual.label
+        }
+        return sourceLabelOverride ?? outfit.source.label
     }
 }
 

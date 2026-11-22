@@ -12,8 +12,8 @@ enum GarmentImageError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .unreadableImage: "无法读取这张照片。"
-        case .encodingFailed: "无法压缩这张照片。"
+        case .unreadableImage: "This photo could not be read."
+        case .encodingFailed: "This photo could not be processed."
         }
     }
 }

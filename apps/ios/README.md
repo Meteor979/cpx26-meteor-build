@@ -121,6 +121,24 @@ The occasion/recommendation suite also covers empty input, local matches,
 snake-case decoding, network fallback, 422 responses, 304 cache reuse, UUID
 mapping, reduced result counts, replacement, and saved-plan reload.
 
+## AI request states
+
+The client calls only `WEARWISE_API_BASE_URL`; AI provider credentials remain on
+the backend. Endpoint timeouts are 5 seconds for presets, 15 for occasion
+resolution, 20 for recommendations, 15 for revisions, and 8 for current weather
+when that endpoint is available. A recommendation timeout preserves existing
+results and offers retry or local rules. Source labels distinguish AI results,
+local rules, cached results, fallback results, and manual adjustments.
+
+## AI-backed request states
+
+The app calls only `WEARWISE_API_BASE_URL`; model credentials remain on the
+backend. Request timeouts are endpoint-specific: 5 seconds for presets, 15 for
+occasion resolution, 20 for recommendations, 15 for revisions, and 8 for
+current weather when that endpoint is available. A recommendation timeout keeps
+existing results visible and offers retry or local rules. Source labels are
+derived from backend provider/source/fallback values and manual local changes.
+
 ## Acceptance flow
 
 ```text
