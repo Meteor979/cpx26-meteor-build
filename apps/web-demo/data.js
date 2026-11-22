@@ -1,137 +1,505 @@
 (function () {
   "use strict";
 
-  function garmentIllustration(type, color, accent = "#ffffff") {
-    const drawings = {
-      shirt:
-        '<path d="M140 105 230 58l56 48 56-48 90 47-38 104-55-23v198H233V186l-55 23Z" fill="' +
-        color +
-        '"/><path d="M230 58l56 48 56-48-24 76h-64Z" fill="' +
-        accent +
-        '" opacity=".9"/>',
-      sweater:
-        '<path d="M145 115 225 66h62l80 49-42 110-50-22v178H237V203l-50 22Z" fill="' +
-        color +
-        '"/><path d="M225 66h62l-31 43Z" fill="' +
-        accent +
-        '"/>',
-      jeans:
-        '<path d="M202 62h108l19 322h-67l-6-191-7 191h-67l-6-191-6 191h-67Z" fill="' +
-        color +
-        '"/><path d="M202 62h108v24H202Z" fill="' +
-        accent +
-        '" opacity=".8"/>',
-      trousers:
-        '<path d="M198 58h116l18 330h-73l-3-205-4 205h-73l-4-205-4 205h-73Z" fill="' +
-        color +
-        '"/><path d="M198 58h116v22H198Z" fill="' +
-        accent +
-        '" opacity=".75"/>',
-      sneakers:
-        '<path d="M92 303c43 1 75 15 110 52 27 29 63 32 126 37 50 4 74 20 70 45H91Z" fill="' +
-        color +
-        '"/><path d="M91 420h307v18H91Z" fill="' +
-        accent +
-        '"/>',
-      loafers:
-        '<path d="M104 326c56-4 90 18 116 48 28 32 73 40 142 44 51 3 69 19 64 40H104Z" fill="' +
-        color +
-        '"/><path d="M165 331c44 4 72 20 92 45-39 11-77-5-124-28Z" fill="' +
-        accent +
-        '" opacity=".75"/>',
-      cardigan:
-        '<path d="M128 129 213 67h86l85 62-45 118-42-25v177H215V222l-42 25Z" fill="' +
-        color +
-        '"/><path d="M256 70v329" stroke="' +
-        accent +
-        '" stroke-width="8"/><circle cx="256" cy="150" r="7" fill="' +
-        accent +
-        '"/><circle cx="256" cy="215" r="7" fill="' +
-        accent +
-        '"/><circle cx="256" cy="280" r="7" fill="' +
-        accent +
-        '"/>'
-    };
-    const svg =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">' +
-      '<rect width="512" height="512" fill="#efeff1"/>' +
-      drawings[type] +
-      "</svg>";
-    return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
-  }
-
   window.WEARWISE_DEMO_DATA = {
-    presets: [
-      ["初次约会", "smart_casual"],
-      ["社团演讲", "business"],
-      ["朋友聚餐", "casual"],
-      ["实习面试", "business"]
+  "presets": [
+    [
+      "First date",
+      "smart_casual"
     ],
-    garments: [
-      {
-        id: "demo-shirt",
-        name: "浅蓝牛津衬衫",
-        slot: "top",
-        category: "shirt",
-        colors: ["浅蓝", "白"],
-        formality: 3,
-        photo: garmentIllustration("shirt", "#83a9d6")
-      },
-      {
-        id: "demo-knit",
-        name: "米白针织衫",
-        slot: "top",
-        category: "knitwear",
-        colors: ["米白"],
-        formality: 2,
-        photo: garmentIllustration("sweater", "#ddd4c5")
-      },
-      {
-        id: "demo-jeans",
-        name: "深蓝直筒牛仔裤",
-        slot: "bottom",
-        category: "jeans",
-        colors: ["深蓝"],
-        formality: 2,
-        photo: garmentIllustration("jeans", "#344d72")
-      },
-      {
-        id: "demo-trousers",
-        name: "黑色西装裤",
-        slot: "bottom",
-        category: "trousers",
-        colors: ["黑"],
-        formality: 4,
-        photo: garmentIllustration("trousers", "#242426")
-      },
-      {
-        id: "demo-sneakers",
-        name: "白色运动鞋",
-        slot: "shoes",
-        category: "sneakers",
-        colors: ["白"],
-        formality: 2,
-        photo: garmentIllustration("sneakers", "#f7f7f5", "#d4d4d6")
-      },
-      {
-        id: "demo-loafers",
-        name: "棕色乐福鞋",
-        slot: "shoes",
-        category: "loafers",
-        colors: ["棕"],
-        formality: 4,
-        photo: garmentIllustration("loafers", "#65432f", "#b58d69")
-      },
-      {
-        id: "demo-cardigan",
-        name: "米色开衫",
-        slot: "outerwear",
-        category: "cardigan",
-        colors: ["米色"],
-        formality: 2,
-        photo: garmentIllustration("cardigan", "#d7cbb6")
-      }
+    [
+      "Club presentation",
+      "business"
     ],
-    garmentIllustration
-  };
+    [
+      "Friends dinner",
+      "casual"
+    ],
+    [
+      "Internship interview",
+      "business"
+    ],
+    [
+      "Night out",
+      "casual"
+    ]
+  ],
+  "garments": [
+    {
+      "id": "top-navy-striped-polo",
+      "name": "Navy Striped Polo Shirt",
+      "slot": "top",
+      "category": "polo",
+      "colors": [
+        "Navy",
+        "Cream",
+        "Brown"
+      ],
+      "pattern": "Horizontal stripes",
+      "fit": "Regular",
+      "material": "Knit",
+      "formality": 3,
+      "formalityBand": "smart_casual",
+      "photo": "assets/wardrobe/thumbnails/top-navy-striped-polo.jpg",
+      "fullPhoto": "assets/wardrobe/tops/top-navy-striped-polo.jpg"
+    },
+    {
+      "id": "top-white-crew-tee",
+      "name": "White Crew-neck T-shirt",
+      "slot": "top",
+      "category": "t_shirt",
+      "colors": [
+        "White"
+      ],
+      "pattern": "Solid",
+      "fit": "Regular",
+      "material": "Cotton",
+      "formality": 1,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/top-white-crew-tee.jpg",
+      "fullPhoto": "assets/wardrobe/tops/top-white-crew-tee.jpg"
+    },
+    {
+      "id": "top-light-blue-graphic-tee",
+      "name": "Light Blue Graphic T-shirt",
+      "slot": "top",
+      "category": "t_shirt",
+      "colors": [
+        "Light blue",
+        "White"
+      ],
+      "pattern": "Graphic print",
+      "fit": "Regular",
+      "material": "Cotton",
+      "formality": 1,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/top-light-blue-graphic-tee.jpg",
+      "fullPhoto": "assets/wardrobe/tops/top-light-blue-graphic-tee.jpg"
+    },
+    {
+      "id": "top-beige-half-zip",
+      "name": "Stone Half-zip Sweatshirt",
+      "slot": "top",
+      "category": "pullover",
+      "colors": [
+        "Stone",
+        "Light khaki"
+      ],
+      "pattern": "Solid",
+      "fit": "Relaxed",
+      "material": "Cotton blend",
+      "formality": 2,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/top-beige-half-zip.jpg",
+      "fullPhoto": "assets/wardrobe/tops/top-beige-half-zip.jpg"
+    },
+    {
+      "id": "bottom-light-gray-tailored-trousers",
+      "name": "Light Gray Tailored Trousers",
+      "slot": "bottom",
+      "category": "trousers",
+      "colors": [
+        "Light gray"
+      ],
+      "pattern": "Solid",
+      "fit": "Straight",
+      "material": "Blend",
+      "formality": 4,
+      "formalityBand": "business",
+      "photo": "assets/wardrobe/thumbnails/bottom-light-gray-tailored-trousers.jpg",
+      "fullPhoto": "assets/wardrobe/bottoms/bottom-light-gray-tailored-trousers.jpg"
+    },
+    {
+      "id": "bottom-dark-blue-straight-jeans",
+      "name": "Dark Blue Straight Jeans",
+      "slot": "bottom",
+      "category": "jeans",
+      "colors": [
+        "Dark blue"
+      ],
+      "pattern": "Washed denim",
+      "fit": "Straight",
+      "material": "Denim",
+      "formality": 2,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/bottom-dark-blue-straight-jeans.jpg",
+      "fullPhoto": "assets/wardrobe/bottoms/bottom-dark-blue-straight-jeans.jpg"
+    },
+    {
+      "id": "bottom-navy-plaid-tailored-trousers",
+      "name": "Navy Windowpane Trousers",
+      "slot": "bottom",
+      "category": "trousers",
+      "colors": [
+        "Navy",
+        "Light blue"
+      ],
+      "pattern": "Windowpane check",
+      "fit": "Slim straight",
+      "material": "Wool blend",
+      "formality": 4,
+      "formalityBand": "business",
+      "photo": "assets/wardrobe/thumbnails/bottom-navy-plaid-tailored-trousers.jpg",
+      "fullPhoto": "assets/wardrobe/bottoms/bottom-navy-plaid-tailored-trousers.jpg"
+    },
+    {
+      "id": "bottom-light-gray-cargo-joggers",
+      "name": "Light Gray Cargo Joggers",
+      "slot": "bottom",
+      "category": "cargo",
+      "colors": [
+        "Light gray"
+      ],
+      "pattern": "Solid",
+      "fit": "Relaxed tapered",
+      "material": "Cotton blend",
+      "formality": 2,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/bottom-light-gray-cargo-joggers.jpg",
+      "fullPhoto": "assets/wardrobe/bottoms/bottom-light-gray-cargo-joggers.jpg"
+    },
+    {
+      "id": "bottom-dark-brown-cargo-trousers",
+      "name": "Dark Brown Cargo Trousers",
+      "slot": "bottom",
+      "category": "cargo",
+      "colors": [
+        "Dark brown",
+        "Black"
+      ],
+      "pattern": "Solid",
+      "fit": "Relaxed",
+      "material": "Cotton",
+      "formality": 2,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/bottom-dark-brown-cargo-trousers.jpg",
+      "fullPhoto": "assets/wardrobe/bottoms/bottom-dark-brown-cargo-trousers.jpg"
+    },
+    {
+      "id": "bottom-light-wash-wide-leg-jeans",
+      "name": "Light Wash Wide-leg Jeans",
+      "slot": "bottom",
+      "category": "jeans",
+      "colors": [
+        "Light blue"
+      ],
+      "pattern": "Light wash",
+      "fit": "Wide leg",
+      "material": "Denim",
+      "formality": 2,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/bottom-light-wash-wide-leg-jeans.jpg",
+      "fullPhoto": "assets/wardrobe/bottoms/bottom-light-wash-wide-leg-jeans.jpg"
+    },
+    {
+      "id": "bottom-charcoal-tapered-trousers",
+      "name": "Charcoal Tapered Trousers",
+      "slot": "bottom",
+      "category": "trousers",
+      "colors": [
+        "Charcoal"
+      ],
+      "pattern": "Solid",
+      "fit": "Tapered",
+      "material": "Cotton blend",
+      "formality": 3,
+      "formalityBand": "smart_casual",
+      "photo": "assets/wardrobe/thumbnails/bottom-charcoal-tapered-trousers.jpg",
+      "fullPhoto": "assets/wardrobe/bottoms/bottom-charcoal-tapered-trousers.jpg"
+    },
+    {
+      "id": "bottom-charcoal-wide-leg-trousers",
+      "name": "Charcoal Wide-leg Trousers",
+      "slot": "bottom",
+      "category": "trousers",
+      "colors": [
+        "Charcoal"
+      ],
+      "pattern": "Solid",
+      "fit": "Wide leg",
+      "material": "Cotton blend",
+      "formality": 3,
+      "formalityBand": "smart_casual",
+      "photo": "assets/wardrobe/thumbnails/bottom-charcoal-wide-leg-trousers.jpg",
+      "fullPhoto": "assets/wardrobe/bottoms/bottom-charcoal-wide-leg-trousers.jpg"
+    },
+    {
+      "id": "bottom-cream-linen-wide-leg-trousers",
+      "name": "Cream Linen Wide-leg Trousers",
+      "slot": "bottom",
+      "category": "trousers",
+      "colors": [
+        "Cream",
+        "Light beige"
+      ],
+      "pattern": "Solid",
+      "fit": "Wide leg",
+      "material": "Linen blend",
+      "formality": 3,
+      "formalityBand": "smart_casual",
+      "photo": "assets/wardrobe/thumbnails/bottom-cream-linen-wide-leg-trousers.jpg",
+      "fullPhoto": "assets/wardrobe/bottoms/bottom-cream-linen-wide-leg-trousers.jpg"
+    },
+    {
+      "id": "shoes-brown-shearling-boots",
+      "name": "Brown Shearling Ankle Boots",
+      "slot": "shoes",
+      "category": "boots",
+      "colors": [
+        "Brown",
+        "Cream"
+      ],
+      "pattern": "Solid",
+      "fit": "Regular",
+      "material": "Suede",
+      "formality": 2,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/shoes-brown-shearling-boots.jpg",
+      "fullPhoto": "assets/wardrobe/shoes/shoes-brown-shearling-boots.jpg"
+    },
+    {
+      "id": "shoes-cream-platform-sneakers",
+      "name": "Cream Platform Sneakers",
+      "slot": "shoes",
+      "category": "sneakers",
+      "colors": [
+        "Cream",
+        "Black"
+      ],
+      "pattern": "Color-block",
+      "fit": "Regular",
+      "material": "Canvas",
+      "formality": 2,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/shoes-cream-platform-sneakers.jpg",
+      "fullPhoto": "assets/wardrobe/shoes/shoes-cream-platform-sneakers.jpg"
+    },
+    {
+      "id": "shoes-nude-patent-pumps",
+      "name": "Nude Patent Pumps",
+      "slot": "shoes",
+      "category": "heels",
+      "colors": [
+        "Nude",
+        "Blush"
+      ],
+      "pattern": "Solid",
+      "fit": "Pointed toe",
+      "material": "Patent leather",
+      "formality": 4,
+      "formalityBand": "business",
+      "photo": "assets/wardrobe/thumbnails/shoes-nude-patent-pumps.jpg",
+      "fullPhoto": "assets/wardrobe/shoes/shoes-nude-patent-pumps.jpg"
+    },
+    {
+      "id": "shoes-white-platform-sneakers",
+      "name": "White Platform Sneakers",
+      "slot": "shoes",
+      "category": "sneakers",
+      "colors": [
+        "White"
+      ],
+      "pattern": "Solid",
+      "fit": "Regular",
+      "material": "Leather",
+      "formality": 2,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/shoes-white-platform-sneakers.jpg",
+      "fullPhoto": "assets/wardrobe/shoes/shoes-white-platform-sneakers.jpg"
+    },
+    {
+      "id": "shoes-beige-green-sneakers",
+      "name": "Beige and Green Sneakers",
+      "slot": "shoes",
+      "category": "sneakers",
+      "colors": [
+        "Beige",
+        "Green",
+        "Brown"
+      ],
+      "pattern": "Striped trim",
+      "fit": "Regular",
+      "material": "Leather and textile",
+      "formality": 2,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/shoes-beige-green-sneakers.jpg",
+      "fullPhoto": "assets/wardrobe/shoes/shoes-beige-green-sneakers.jpg"
+    },
+    {
+      "id": "shoes-brown-chukka-boots",
+      "name": "Brown Chukka Boots",
+      "slot": "shoes",
+      "category": "boots",
+      "colors": [
+        "Brown",
+        "Dark brown"
+      ],
+      "pattern": "Solid",
+      "fit": "Regular",
+      "material": "Leather",
+      "formality": 3,
+      "formalityBand": "smart_casual",
+      "photo": "assets/wardrobe/thumbnails/shoes-brown-chukka-boots.jpg",
+      "fullPhoto": "assets/wardrobe/shoes/shoes-brown-chukka-boots.jpg"
+    },
+    {
+      "id": "shoes-black-high-top-sneakers",
+      "name": "Black High-top Sneakers",
+      "slot": "shoes",
+      "category": "sneakers",
+      "colors": [
+        "Black",
+        "White"
+      ],
+      "pattern": "Color-block",
+      "fit": "High top",
+      "material": "Canvas",
+      "formality": 1,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/shoes-black-high-top-sneakers.jpg",
+      "fullPhoto": "assets/wardrobe/shoes/shoes-black-high-top-sneakers.jpg"
+    },
+    {
+      "id": "shoes-orange-leather-loafers",
+      "name": "Orange Leather Loafers",
+      "slot": "shoes",
+      "category": "loafers",
+      "colors": [
+        "Orange",
+        "Black"
+      ],
+      "pattern": "Solid",
+      "fit": "Regular",
+      "material": "Leather",
+      "formality": 3,
+      "formalityBand": "smart_casual",
+      "photo": "assets/wardrobe/thumbnails/shoes-orange-leather-loafers.jpg",
+      "fullPhoto": "assets/wardrobe/shoes/shoes-orange-leather-loafers.jpg"
+    },
+    {
+      "id": "shoes-navy-suede-loafers",
+      "name": "Navy Suede Loafers",
+      "slot": "shoes",
+      "category": "loafers",
+      "colors": [
+        "Navy",
+        "Dark blue"
+      ],
+      "pattern": "Solid",
+      "fit": "Regular",
+      "material": "Suede",
+      "formality": 3,
+      "formalityBand": "smart_casual",
+      "photo": "assets/wardrobe/thumbnails/shoes-navy-suede-loafers.jpg",
+      "fullPhoto": "assets/wardrobe/shoes/shoes-navy-suede-loafers.jpg"
+    },
+    {
+      "id": "shoes-black-patent-pumps",
+      "name": "Black Patent Pumps",
+      "slot": "shoes",
+      "category": "heels",
+      "colors": [
+        "Black"
+      ],
+      "pattern": "Solid",
+      "fit": "Pointed toe",
+      "material": "Patent leather",
+      "formality": 5,
+      "formalityBand": "formal",
+      "photo": "assets/wardrobe/thumbnails/shoes-black-patent-pumps.jpg",
+      "fullPhoto": "assets/wardrobe/shoes/shoes-black-patent-pumps.jpg"
+    },
+    {
+      "id": "outerwear-white-utility-jacket",
+      "name": "Off-white Utility Jacket",
+      "slot": "outerwear",
+      "category": "jacket",
+      "colors": [
+        "Off-white",
+        "White"
+      ],
+      "pattern": "Solid",
+      "fit": "Relaxed",
+      "material": "Cotton blend",
+      "formality": 2,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/outerwear-white-utility-jacket.jpg",
+      "fullPhoto": "assets/wardrobe/outerwear/outerwear-white-utility-jacket.jpg"
+    },
+    {
+      "id": "outerwear-denim-jacket",
+      "name": "Blue Denim Jacket",
+      "slot": "outerwear",
+      "category": "jacket",
+      "colors": [
+        "Blue",
+        "Dark blue"
+      ],
+      "pattern": "Washed denim",
+      "fit": "Regular",
+      "material": "Denim",
+      "formality": 2,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/outerwear-denim-jacket.jpg",
+      "fullPhoto": "assets/wardrobe/outerwear/outerwear-denim-jacket.jpg"
+    },
+    {
+      "id": "outerwear-rust-overshirt",
+      "name": "Rust Overshirt",
+      "slot": "outerwear",
+      "category": "overshirt",
+      "colors": [
+        "Rust",
+        "Orange",
+        "White"
+      ],
+      "pattern": "Solid",
+      "fit": "Relaxed",
+      "material": "Cotton",
+      "formality": 3,
+      "formalityBand": "smart_casual",
+      "photo": "assets/wardrobe/thumbnails/outerwear-rust-overshirt.jpg",
+      "fullPhoto": "assets/wardrobe/outerwear/outerwear-rust-overshirt.jpg"
+    },
+    {
+      "id": "outerwear-white-belted-trench",
+      "name": "White Belted Trench Coat",
+      "slot": "outerwear",
+      "category": "trench_coat",
+      "colors": [
+        "White",
+        "Off-white"
+      ],
+      "pattern": "Solid",
+      "fit": "Belted longline",
+      "material": "Woven fabric",
+      "formality": 4,
+      "formalityBand": "business",
+      "photo": "assets/wardrobe/thumbnails/outerwear-white-belted-trench.jpg",
+      "fullPhoto": "assets/wardrobe/outerwear/outerwear-white-belted-trench.jpg"
+    },
+    {
+      "id": "outerwear-gray-windbreaker",
+      "name": "Charcoal Windbreaker",
+      "slot": "outerwear",
+      "category": "windbreaker",
+      "colors": [
+        "Charcoal",
+        "White"
+      ],
+      "pattern": "Solid",
+      "fit": "Relaxed",
+      "material": "Nylon",
+      "formality": 2,
+      "formalityBand": "casual",
+      "photo": "assets/wardrobe/thumbnails/outerwear-gray-windbreaker.jpg",
+      "fullPhoto": "assets/wardrobe/outerwear/outerwear-gray-windbreaker.jpg"
+    }
+  ],
+  "meta": {
+    "assetVersion": "1.0.0",
+    "warmthScoring": "pending_weather_module",
+    "count": 28
+  }
+};
 })();

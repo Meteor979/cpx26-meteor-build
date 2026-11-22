@@ -8,8 +8,8 @@
   }
 
   const STORAGE = {
-    garments: "wearwise-web-garments-v1",
-    recent: "wearwise-web-recent-plan-v1",
+    garments: "wearwise-web-garments-v2",
+    recent: "wearwise-web-recent-plan-v2",
     contrast: "wearwise-web-high-contrast"
   };
 
@@ -51,7 +51,7 @@
     try {
       localStorage.setItem(STORAGE.garments, JSON.stringify(state.garments));
     } catch {
-      showToast("照片过大，本次展示已生效，但无法写入浏览器本地存储。");
+      showToast("The photo is too large for browser storage. It remains available for this session.");
     }
   }
 
@@ -136,19 +136,23 @@
   function renderHome() {
     const count = state.garments.length;
     document.querySelector("#wardrobe-summary").textContent =
-      count ? `${count} 件衣物` : "添加第一件衣物";
+      count ? `${count} garments` : "Add your first garment";
     renderRecentPlan();
   }
 
-  function photoMarkup(garment) {
-    if (!garment?.photo) {
+  function photoMarkup(garment, useFullPhoto = false) {
+    const source =
+      useFullPhoto && garment?.fullPhoto
+        ? garment.fullPhoto
+        : garment?.photo;
+    if (!source) {
       return `<div class="missing-photo">${escapeHTML(
-        garment?.name || "衣物"
-      )}，照片缺失</div>`;
+        garment?.name || "Garment"
+      )}<br>Photo missing</div>`;
     }
-    return `<img src="${garment.photo}" alt="${escapeHTML(
+    return `<img src="${source}" alt="Photo of ${escapeHTML(
       garment.name
-    )}的照片" />`;
+    )}" />`;
   }
 
   function garmentCard(garment) {
@@ -157,8 +161,8 @@
         <div class="photo-frame">${photoMarkup(garment)}</div>
         <div class="garment-name">${escapeHTML(garment.name)}</div>
         <div class="garment-meta">${engine.SLOT_LABEL[garment.slot]} · ${escapeHTML(
-          garment.colors.join("、")
-        )} · 正式度 ${garment.formality}</div>
+          garment.colors.join(" / ")
+        )} · Formality ${garment.formality}/5</div>
       </article>
     `;
   }
@@ -184,7 +188,7 @@
           <article class="outfit-card">
             <div class="outfit-header">
               <div>
-                <p class="eyebrow">方案</p>
+                <p class="eyebrow">OUTFIT</p>
                 <h2>${escapeHTML(outfit.title)}</h2>
               </div>
               <span class="source-badge">${escapeHTML(outfit.source)}</span>
@@ -192,7 +196,7 @@
             <div class="outfit-photos">${photos}</div>
             <p class="outfit-reason">${escapeHTML(outfit.reasons[0])}</p>
             <button class="outline-button detail-button" type="button" data-outfit-id="${outfit.id}">
-              查看详情
+              View details
             </button>
           </article>
         `;
@@ -215,7 +219,7 @@
       .map(
         (item) => `
           <article class="garment-card">
-            <div class="photo-frame">${photoMarkup(item)}</div>
+            <div class="photo-frame">${photoMarkup(item, true)}</div>
             <div class="garment-name">${escapeHTML(item.name)}</div>
             <div class="garment-meta">${engine.SLOT_LABEL[item.slot]}</div>
           </article>
@@ -240,7 +244,7 @@
     });
 
     detailContent.innerHTML = `
-      <p class="eyebrow">搭配详情</p>
+      <p class="eyebrow">OUTFIT DETAILS</p>
       <h2>${escapeHTML(outfit.title)}</h2>
       <p class="lead">${escapeHTML(engine.FORMALITY_LABEL[state.occasion.formality])} · ${escapeHTML(
         state.occasion.name
@@ -249,20 +253,20 @@
       <ul class="detail-list">
         ${outfit.reasons.map((reason) => `<li>${escapeHTML(reason)}</li>`).join("")}
       </ul>
-      <p><strong>取舍：</strong>${escapeHTML(outfit.tradeoffs.join(" "))}</p>
-      <p><strong>来源：</strong>${escapeHTML(outfit.source)}</p>
+      <p><strong>Tradeoff:</strong> ${escapeHTML(outfit.tradeoffs.join(" "))}</p>
+      <p><strong>Source:</strong> ${escapeHTML(outfit.source)}</p>
       ${
         options.length
           ? `<div class="replace-row">
-              <label>替换同槽位单品
+              <label>Replace with another item in the same category
                 <select id="replacement-select">${options.join("")}</select>
               </label>
-              <button id="replace-button" class="outline-button" type="button">替换单品</button>
+              <button id="replace-button" class="outline-button" type="button">Replace item</button>
             </div>`
-          : "<p>没有可替换的同槽位衣物。</p>"
+          : "<p>No other item is available in this category.</p>"
       }
-      <button id="save-outfit-button" class="primary-button" type="button">确认这套</button>
-      <button id="return-results-button" class="outline-button" type="button">返回三套搭配</button>
+      <button id="save-outfit-button" class="primary-button" type="button">Confirm this outfit</button>
+      <button id="return-results-button" class="outline-button" type="button">Back to outfits</button>
     `;
 
     detailContent
@@ -281,7 +285,7 @@
         if (index >= 0) state.outfits[index] = state.activeOutfit;
         renderOutfits();
         openDetail(state.activeOutfit);
-        showToast("已替换同槽位单品");
+        showToast("Replacement applied.");
       });
     detailContent
       .querySelector("#save-outfit-button")
@@ -308,7 +312,7 @@
       savedAt: new Date().toISOString()
     };
     localStorage.setItem(STORAGE.recent, JSON.stringify(recent));
-    showToast("已保存到最近方案");
+    showToast("Saved to recent outfit.");
     closeDetail();
     renderRecentPlan();
   }
@@ -339,7 +343,7 @@
               recent.source
             )}</p>
           </div>
-          <span class="source-badge">已保存</span>
+          <span class="source-badge">Saved</span>
         </div>
         <div class="outfit-photos">
           ${items
@@ -361,7 +365,7 @@
   function generate() {
     const query = occasionInput.value.trim();
     if (!query) {
-      showToast("请先输入场合");
+      showToast("Enter an occasion first.");
       occasionInput.focus();
       return;
     }
@@ -373,11 +377,11 @@
     const result = engine.createRecommendations(state.garments, occasion);
     occasionResult.hidden = false;
     occasionResult.innerHTML = `
-      <p class="eyebrow">理解为 · ${escapeHTML(occasion.source)}</p>
+      <p class="eyebrow">UNDERSTOOD · ${escapeHTML(occasion.source)}</p>
       <h2>${escapeHTML(occasion.name)} · ${escapeHTML(
         engine.FORMALITY_LABEL[occasion.formality]
       )}</h2>
-      <p class="lead">重点：${escapeHTML(occasion.keywords.join("、"))}</p>
+      <p class="lead">Focus: ${escapeHTML(occasion.keywords.join(", "))}</p>
     `;
     if (result.error) {
       showToast(result.error);
@@ -432,7 +436,7 @@
   document.querySelector("#garment-form").addEventListener("submit", (event) => {
     event.preventDefault();
     if (!state.pendingPhoto) {
-      showToast("请先选择衣物照片");
+      showToast("Choose a garment photo first.");
       return;
     }
     const name = document.querySelector("#garment-name").value.trim();
@@ -447,7 +451,7 @@
       name,
       slot,
       category: slot,
-      colors: colors.length ? colors : ["未标注"],
+      colors: colors.length ? colors : ["Unspecified"],
       formality: Number(document.querySelector("#garment-formality").value),
       photo: state.pendingPhoto
     };
@@ -457,7 +461,7 @@
     state.pendingPhoto = null;
     renderWardrobe();
     renderHome();
-    showToast("衣物已保存到本地衣柜");
+    showToast("Garment saved to the local wardrobe.");
   });
 
   document.querySelector("#load-demo-button").addEventListener("click", () => {
@@ -465,7 +469,7 @@
     persistGarments();
     renderWardrobe();
     renderHome();
-    showToast("已载入演示衣柜");
+    showToast("Demo wardrobe loaded.");
   });
 
   document.querySelector("#generate-button").addEventListener("click", generate);

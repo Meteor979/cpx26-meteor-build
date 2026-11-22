@@ -1,29 +1,29 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="WearWise 衣语：使用已有衣物照片生成三套可解释搭配。"
+      content="WearWise: turn your own clothing photos into three explainable outfits."
     />
     <meta name="theme-color" content="#f5f5f7" />
-    <title>WearWise 衣语</title>
+    <title>WearWise</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <a class="skip-link" href="#main">跳到主要内容</a>
+    <a class="skip-link" href="#main">Skip to main content</a>
 
     <header class="topbar">
-      <button class="brand" type="button" data-route="home" aria-label="返回首页">
+      <button class="brand" type="button" data-route="home" aria-label="Return home">
         <span class="brand-mark" aria-hidden="true">◌</span>
         <span>WearWise</span>
       </button>
-      <nav aria-label="主要导航">
-        <button type="button" data-route="wardrobe">衣柜</button>
-        <button type="button" data-route="occasion">搭配</button>
+      <nav aria-label="Main navigation">
+        <button type="button" data-route="wardrobe">Wardrobe</button>
+        <button type="button" data-route="occasion">Style me</button>
         <button id="contrast-button" type="button" aria-pressed="false">
-          高对比
+          Contrast
         </button>
       </nav>
     </header>
@@ -31,23 +31,23 @@
     <main id="main" tabindex="-1">
       <section id="home-screen" class="screen" data-screen="home">
         <p class="eyebrow">WEARWISE</p>
-        <h1>穿得更有把握。</h1>
-        <p class="lead">照片保留真实颜色，界面只做清楚的黑白层级。</p>
+        <h1>Dress with more confidence.</h1>
+        <p class="lead">Your photos keep their real color. The interface stays clear, monochrome, and easy to scan.</p>
 
         <div class="hero-actions">
           <button class="action-card primary" type="button" data-route="wardrobe">
             <span class="action-icon" aria-hidden="true">⌂</span>
             <span>
-              <strong>我的衣柜</strong>
-              <small id="wardrobe-summary">载入中</small>
+              <strong>My wardrobe</strong>
+              <small id="wardrobe-summary">Loading</small>
             </span>
             <span aria-hidden="true">›</span>
           </button>
           <button class="action-card" type="button" data-route="occasion">
             <span class="action-icon" aria-hidden="true">✦</span>
             <span>
-              <strong>今天穿什么？</strong>
-              <small>输入场合，生成三套搭配</small>
+              <strong>What should I wear?</strong>
+              <small>Enter an occasion and get three outfits</small>
             </span>
             <span aria-hidden="true">›</span>
           </button>
@@ -55,7 +55,7 @@
 
         <section id="recent-plan-section" class="section" hidden>
           <div class="section-heading">
-            <h2>最近方案</h2>
+            <h2>Recent outfit</h2>
           </div>
           <div id="recent-plan"></div>
         </section>
@@ -64,88 +64,88 @@
       <section id="wardrobe-screen" class="screen" data-screen="wardrobe" hidden>
         <div class="section-heading">
           <div>
-            <p class="eyebrow">照片衣柜</p>
-            <h1>我的衣物</h1>
+            <p class="eyebrow">PHOTO WARDROBE</p>
+            <h1>My clothes</h1>
           </div>
           <button id="load-demo-button" class="outline-button" type="button">
-            载入演示衣柜
+            Load demo wardrobe
           </button>
         </div>
 
         <form id="garment-form" class="panel form-panel">
-          <h2>添加衣物</h2>
+          <h2>Add a garment</h2>
           <div class="form-grid">
             <label>
-              衣物照片
+              Garment photo
               <input id="garment-photo" type="file" accept="image/*" required />
             </label>
             <label>
-              衣物名称
-              <input id="garment-name" type="text" placeholder="浅蓝牛津衬衫" required />
+              Garment name
+              <input id="garment-name" type="text" placeholder="Light blue Oxford shirt" required />
             </label>
             <label>
-              衣物类型
+              Garment type
               <select id="garment-slot" required>
-                <option value="top">上装</option>
-                <option value="bottom">下装</option>
-                <option value="shoes">鞋</option>
-                <option value="outerwear">外套</option>
+                <option value="top">Top</option>
+                <option value="bottom">Bottom</option>
+                <option value="shoes">Shoes</option>
+                <option value="outerwear">Outerwear</option>
               </select>
             </label>
             <label>
-              颜色
-              <input id="garment-colors" type="text" placeholder="浅蓝、白" />
+              Colors
+              <input id="garment-colors" type="text" placeholder="Light blue, white" />
             </label>
             <label>
-              正式度
+              Formality
               <select id="garment-formality">
-                <option value="1">1 · 很休闲</option>
-                <option value="2">2 · 休闲</option>
-                <option value="3" selected>3 · 智能休闲</option>
-                <option value="4">4 · 商务</option>
-                <option value="5">5 · 正式</option>
+                <option value="1">1 · Very casual</option>
+                <option value="2">2 · Casual</option>
+                <option value="3" selected>3 · Smart casual</option>
+                <option value="4">4 · Business</option>
+                <option value="5">5 · Formal</option>
               </select>
             </label>
           </div>
-          <button class="primary-button" type="submit">保存衣物</button>
+          <button class="primary-button" type="submit">Save garment</button>
         </form>
 
         <div id="wardrobe-grid" class="wardrobe-grid"></div>
       </section>
 
       <section id="occasion-screen" class="screen" data-screen="occasion" hidden>
-        <p class="eyebrow">场合</p>
-        <h1>今晚去哪里？</h1>
+        <p class="eyebrow">OCCASION</p>
+        <h1>Where are you going?</h1>
 
         <label class="large-field">
-          <span>输入场合</span>
+          <span>Describe the occasion</span>
           <input
             id="occasion-input"
             type="text"
-            placeholder="例如：第一次去女朋友家吃饭"
+            placeholder="For example: first dinner with my partner's family"
             autocomplete="off"
           />
         </label>
 
         <label class="single-field">
-          <span>正式程度</span>
+          <span>Formality</span>
           <select id="occasion-formality">
-            <option value="casual">休闲</option>
-            <option value="smart_casual" selected>智能休闲</option>
-            <option value="business">商务</option>
-            <option value="formal">正式</option>
+            <option value="casual">Casual</option>
+            <option value="smart_casual" selected>Smart casual</option>
+            <option value="business">Business</option>
+            <option value="formal">Formal</option>
           </select>
         </label>
 
-        <div class="preset-list" aria-label="常用场合">
-          <button type="button" data-preset="初次约会">初次约会</button>
-          <button type="button" data-preset="社团演讲">社团演讲</button>
-          <button type="button" data-preset="朋友聚餐">朋友聚餐</button>
-          <button type="button" data-preset="实习面试">实习面试</button>
+        <div class="preset-list" aria-label="Suggested occasions">
+          <button type="button" data-preset="First date">First date</button>
+          <button type="button" data-preset="Club presentation">Club presentation</button>
+          <button type="button" data-preset="Friends dinner">Friends dinner</button>
+          <button type="button" data-preset="Internship interview">Internship interview</button>
         </div>
 
         <button id="generate-button" class="primary-button" type="button">
-          生成三套搭配
+          Generate three outfits
         </button>
 
         <section id="occasion-result" class="panel result-summary" hidden></section>
@@ -154,11 +154,11 @@
       <section id="results-screen" class="screen" data-screen="results" hidden>
         <div class="section-heading">
           <div>
-            <p class="eyebrow">三套搭配</p>
-            <h1 id="results-title">为你生成</h1>
+            <p class="eyebrow">THREE OUTFITS</p>
+            <h1 id="results-title">Your edit</h1>
           </div>
           <button class="outline-button" type="button" data-route="occasion">
-            修改场合
+            Change occasion
           </button>
         </div>
         <p id="results-note" class="lead"></p>
@@ -167,7 +167,7 @@
     </main>
 
     <dialog id="detail-dialog" class="detail-dialog">
-      <button id="close-detail" class="dialog-close" type="button" aria-label="关闭">
+      <button id="close-detail" class="dialog-close" type="button" aria-label="Close">
         ×
       </button>
       <div id="detail-content"></div>

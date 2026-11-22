@@ -8,16 +8,16 @@
     formal: 5
   };
   const FORMALITY_LABEL = {
-    casual: "休闲",
-    smart_casual: "智能休闲",
-    business: "商务",
-    formal: "正式"
+    casual: "Casual",
+    smart_casual: "Smart casual",
+    business: "Business",
+    formal: "Formal"
   };
   const SLOT_LABEL = {
-    top: "上装",
-    bottom: "下装",
-    shoes: "鞋",
-    outerwear: "外套"
+    top: "Tops",
+    bottom: "Bottoms",
+    shoes: "Shoes",
+    outerwear: "Outerwear"
   };
 
   function normalize(value) {
@@ -28,48 +28,48 @@
 
   function resolveOccasion(query, formalityHint) {
     const value = normalize(query);
-    if (/去夜店|夜店|夜生活|派对|酒吧|clubbing/.test(value)) {
+    if (/去夜店|夜店|夜生活|派对|酒吧|clubbing|nightclub|nightout|party/.test(value)) {
       return {
         id: "night-out",
-        name: "夜店",
+        name: "Night out",
         formality: "casual",
-        keywords: ["夜间社交", "个人表达", "轻松"],
-        source: "本地语义"
+        keywords: ["nightlife", "self-expression", "relaxed"],
+        source: "Local rules"
       };
     }
-    if (/实习面试|面试|校招/.test(value)) {
+    if (/实习面试|面试|校招|interview/.test(value)) {
       return {
         id: "internship-interview",
-        name: "实习面试",
+        name: "Internship interview",
         formality: "business",
-        keywords: ["专业", "清晰", "可靠"],
-        source: "本地语义"
+        keywords: ["professional", "clear", "credible"],
+        source: "Local rules"
       };
     }
-    if (/社团演讲|社团汇报|路演/.test(value)) {
+    if (/社团演讲|社团汇报|路演|clubpresentation|clubspeech/.test(value)) {
       return {
         id: "club-speech",
-        name: "社团演讲",
+        name: "Club presentation",
         formality: "business",
-        keywords: ["可信", "清晰", "可接近"],
-        source: "本地语义"
+        keywords: ["credible", "clear", "approachable"],
+        source: "Local rules"
       };
     }
-    if (/第一次约会|初次约会|约会/.test(value)) {
+    if (/第一次约会|初次约会|约会|firstdate|date/.test(value)) {
       return {
         id: "first-date",
-        name: "初次约会",
+        name: "First date",
         formality: "smart_casual",
-        keywords: ["自然", "干净", "低压迫感"],
-        source: "本地语义"
+        keywords: ["natural", "clean", "low-pressure"],
+        source: "Local rules"
       };
     }
     return {
       id: "fallback-general",
-      name: query.trim() || "通用场合",
+      name: query.trim() || "General occasion",
       formality: formalityHint || "smart_casual",
-      keywords: ["整洁", "自然", "可接近"],
-      source: "本地备用"
+      keywords: ["clean", "natural", "approachable"],
+      source: "Fallback rules"
     };
   }
 
@@ -117,7 +117,7 @@
     );
     if (missing.length) {
       return {
-        error: "还缺少：" + missing.map((slot) => SLOT_LABEL[slot]).join("、"),
+        error: "Missing: " + missing.map((slot) => SLOT_LABEL[slot]).join(", "),
         outfits: []
       };
     }
@@ -147,38 +147,38 @@
     const selected = candidates.slice(0, 3).map((candidate, index) => {
       const titles =
         occasion.id === "night-out"
-          ? ["轻松，有个人表达", "保持轻松，增加层次", "更适合走动"]
+          ? ["Relaxed with personal expression", "Easy layers for the night", "Ready to move"]
           : occasion.id === "internship-interview"
-            ? ["清晰，可信", "稳妥的专业感", "更轻松的正式表达"]
-            : ["清晰自然", "温和协调", "利落明确"];
+            ? ["Clear and credible", "A composed professional look", "Formal without feeling stiff"]
+            : ["Clear and natural", "Softly balanced", "Sharp and composed"];
       const lead =
         occasion.id === "night-out"
-          ? "整体更接近夜间社交，避免像商务会面。"
+          ? "The combination reads as social and mobile rather than business-like."
           : occasion.id === "internship-interview"
-            ? "整体面向实习面试，强调清楚、可靠和正式表达。"
-            : "整体正式度与当前场合匹配。";
+            ? "The combination supports a clear, credible internship interview."
+            : "The formality is aligned with the selected occasion.";
       return {
         id: `outfit-${index + 1}`,
         title: titles[index],
         items: candidate.items,
         score: candidate.score,
-        source: "本地样例",
+        source: "Local demo rules",
         reasons: [
           lead,
-          `${candidate.items[0].name}与${candidate.items[1].name}形成清楚的上下装关系。`,
-          `正式度接近${FORMALITY_LABEL[occasion.formality]}，并直接使用本地衣柜照片。`
+          `${candidate.items[0].name} and ${candidate.items[1].name} create a clear top-to-bottom relationship.`,
+          `The formality is close to ${FORMALITY_LABEL[occasion.formality]}, using photos from the local wardrobe only.`
         ],
         tradeoffs:
           occasion.id === "night-out"
-            ? ["部分偏商务单品会削弱夜间社交感。"]
-            : ["单套方案仍值得通过详情页再次确认。"]
+            ? ["Any business-leaning piece can weaken the nightlife tone."]
+            : ["Review the outfit once more before confirming it."]
       };
     });
 
     return {
       outfits: selected,
       countReason:
-        selected.length < 3 ? "当前衣柜组合有限，只展示可组成的方案。" : ""
+        selected.length < 3 ? "The current wardrobe supports fewer than three distinct outfits." : ""
     };
   }
 
@@ -193,12 +193,12 @@
     return {
       ...outfit,
       id: outfit.id + "-edited",
-      title: `已替换${replacement.name}`,
+      title: `Updated with ${replacement.name}`,
       items,
-      source: "手动调整",
+      source: "Manual adjustment",
       reasons: [
-        `${replacement.name}已替换同槽位衣物，其他单品保持不变。`,
-        "当前为本地手动调整结果。"
+        `${replacement.name} replaced the previous same-slot item while the rest of the outfit stayed locked.`,
+        "This is a local manual adjustment."
       ]
     };
   }

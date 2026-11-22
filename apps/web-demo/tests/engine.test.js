@@ -19,7 +19,7 @@ function assert(condition, message) {
 }
 
 const night = engine.resolveOccasion("去夜店", "business");
-const interview = engine.resolveOccasion("实习面试", "casual");
+const interview = engine.resolveOccasion("Internship interview", "casual");
 assert(night.id === "night-out", "Night club must resolve to night-out");
 assert(night.formality === "casual", "Night club must remain casual");
 assert(
@@ -44,11 +44,11 @@ assert(
   "Night and interview first outfits must differ"
 );
 assert(
-  nightResult.outfits[0].reasons[0].includes("夜间社交"),
+  nightResult.outfits[0].reasons[0].toLowerCase().includes("social"),
   "Night reasons must describe nightlife"
 );
 assert(
-  interviewResult.outfits[0].reasons[0].includes("实习面试"),
+  interviewResult.outfits[0].reasons[0].toLowerCase().includes("interview"),
   "Interview reasons must describe the interview"
 );
 
@@ -62,7 +62,7 @@ const revised = engine.replaceItem(
   replacement,
   data.garments
 );
-assert(revised.source === "手动调整", "Replacement source must be manual");
+assert(revised.source === "Manual adjustment", "Replacement source must be manual");
 assert(
   revised.items.some((item) => item.id === replacement.id),
   "Replacement must update the shoe"

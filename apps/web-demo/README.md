@@ -23,6 +23,17 @@ python3 -m http.server 4173 --directory apps/web-demo
 
 Open `http://127.0.0.1:4173/`.
 
+The extracted submission package can also be started on macOS by double-clicking
+`start-demo.command`, or by running:
+
+```bash
+chmod +x start-demo.command
+./start-demo.command
+```
+
+No network connection is required after the HTML, CSS, JavaScript, and 28
+wardrobe photos have been extracted.
+
 ## Test
 
 ```bash
