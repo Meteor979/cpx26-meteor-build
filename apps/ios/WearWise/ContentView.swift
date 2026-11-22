@@ -19,6 +19,7 @@ private struct HomeView: View {
             VStack(alignment: .leading, spacing: 26) {
                 header
                 mainActions
+                WeatherContextView()
                 recentPlan
                 recentWardrobe
             }

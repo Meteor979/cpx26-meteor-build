@@ -17,21 +17,23 @@ final class OccasionRecommendationViewModel: ObservableObject {
     @Published private(set) var isGenerating = false
     @Published private(set) var isRevising = false
     @Published private(set) var errorMessage: String?
+    @Published private(set) var weatherContext: WeatherContext
     @Published var showsRecommendations = false
 
     private let presetService: PresetServiceProtocol
     private let occasionService: OccasionServiceProtocol
     private let recommendationService: RecommendationServiceProtocol
-    private let weather = WeatherData.demo
 
     init(
         presetService: PresetServiceProtocol = PresetService(),
         occasionService: OccasionServiceProtocol = OccasionService(),
-        recommendationService: RecommendationServiceProtocol = RecommendationService()
+        recommendationService: RecommendationServiceProtocol = RecommendationService(),
+        weatherContext: WeatherContext = .demo
     ) {
         self.presetService = presetService
         self.occasionService = occasionService
         self.recommendationService = recommendationService
+        self.weatherContext = weatherContext
     }
 
     var canResolve: Bool {
@@ -96,6 +98,10 @@ final class OccasionRecommendationViewModel: ObservableObject {
 
     func adjustFormality(_ band: FormalityBand) {
         formality = band
+    }
+
+    func updateWeatherContext(_ context: WeatherContext) {
+        weatherContext = context
     }
 
     func generateRecommendations(garments: [Garment]) async {
@@ -182,7 +188,7 @@ final class OccasionRecommendationViewModel: ObservableObject {
             itemIDs: outfit.outfit.itemIDs,
             occasion: resolvedQuery.isEmpty ? query : resolvedQuery,
             formality: formality,
-            weather: weather,
+            weather: weatherContext.weather,
             recommendationSource: outfit.sourceLabel,
             savedAt: Date()
         )
@@ -228,7 +234,7 @@ final class OccasionRecommendationViewModel: ObservableObject {
     }
 
     var contextSummary: String {
-        "\(formality.label) · \(weather.summary)"
+        "\(formality.label) · \(weatherContext.weather.summary)"
     }
 
     private var recommendationContext: RecommendationContext {
@@ -236,7 +242,7 @@ final class OccasionRecommendationViewModel: ObservableObject {
             occasion: resolvedQuery.isEmpty ? query : resolvedQuery,
             presetID: profile?.id,
             formality: formality,
-            weather: weather
+            weather: weatherContext.weather
         )
     }
 

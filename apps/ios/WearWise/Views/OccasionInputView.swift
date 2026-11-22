@@ -2,6 +2,7 @@ import SwiftUI
 
 struct OccasionInputView: View {
     @EnvironmentObject private var garmentStore: GarmentStore
+    @EnvironmentObject private var weatherStore: WeatherContextStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @StateObject private var viewModel = OccasionRecommendationViewModel()
     @FocusState private var queryFocused: Bool
@@ -39,6 +40,12 @@ struct OccasionInputView: View {
         .toolbar(.visible, for: .navigationBar)
         .task {
             await viewModel.loadPresets()
+        }
+        .onAppear {
+            viewModel.updateWeatherContext(weatherStore.context)
+        }
+        .onChange(of: weatherStore.context) { _, context in
+            viewModel.updateWeatherContext(context)
         }
         .onChange(of: viewModel.query) { _, _ in
             viewModel.queryDidChange()

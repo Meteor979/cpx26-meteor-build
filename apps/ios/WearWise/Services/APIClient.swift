@@ -65,6 +65,7 @@ enum JSONCoding {
 protocol APIClientProtocol {
     func fetchPresets(version: Int?) async throws -> Data
     func resolveOccasion(_ request: OccasionResolveRequest) async throws -> Data
+    func fetchCurrentWeather(_ request: WeatherRequest) async throws -> Data
     func createRecommendations(_ request: RecommendationRequest) async throws -> Data
     func reviseOutfit(_ request: OutfitRevisionRequest) async throws -> Data
 }
@@ -102,6 +103,14 @@ struct APIClient: APIClientProtocol {
     func resolveOccasion(_ request: OccasionResolveRequest) async throws -> Data {
         try await send(
             path: "/v1/occasions/resolve",
+            method: "POST",
+            body: try encoder.encode(request)
+        )
+    }
+
+    func fetchCurrentWeather(_ request: WeatherRequest) async throws -> Data {
+        try await send(
+            path: "/v1/weather/current",
             method: "POST",
             body: try encoder.encode(request)
         )

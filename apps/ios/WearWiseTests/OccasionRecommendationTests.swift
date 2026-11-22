@@ -434,6 +434,14 @@ private final class StubAPIClient: APIClientProtocol {
         )
     }
 
+    func fetchCurrentWeather(_ request: WeatherRequest) async throws -> Data {
+        throw APIError.server(
+            status: 503,
+            code: "PROVIDER_UNAVAILABLE",
+            message: "Weather unavailable"
+        )
+    }
+
     func createRecommendations(_ request: RecommendationRequest) async throws -> Data {
         if let recommendationError {
             throw recommendationError

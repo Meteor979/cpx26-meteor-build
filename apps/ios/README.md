@@ -29,6 +29,9 @@ permission is not requested in this milestone.
 - Three local photo outfit cards with outfit detail and source labels.
 - Same-slot replacement with local fallback.
 - Saved-plan persistence and a recent-plan card on the home screen.
+- Optional current weather requested only after tapping **Use current weather**.
+- Approximate, one-shot location with a 60-minute local weather cache.
+- Demo-weather fallback that never blocks recommendations.
 
 ## Architecture
 
@@ -60,6 +63,14 @@ WEARWISE_API_BASE_URL=http://<Mac-LAN-IP>:8000
 
 The bundled `NSAppTransportSecurity` exception only enables local network
 development. Do not use it for a public backend.
+
+## Weather privacy
+
+The app does not request location at launch. When the user taps **Use current
+weather**, it may request While In Use permission and one approximate location.
+Coordinates are rounded to two decimals and are not persisted. The cache stores
+only weather data, source, observation time, a coarse location label, and a
+hashed cache key. Users can return to demo weather at any time.
 
 ## Photo storage
 

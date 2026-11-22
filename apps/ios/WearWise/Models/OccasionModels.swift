@@ -102,7 +102,7 @@ struct PresetLoadResult {
     let source: PresetLoadSource
 }
 
-struct WeatherData: Codable {
+struct WeatherData: Codable, Equatable {
     let temperatureC: Double
     let feelsLikeC: Double
     let condition: String
