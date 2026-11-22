@@ -65,8 +65,7 @@
       ["初次约会", "smart_casual"],
       ["社团演讲", "business"],
       ["朋友聚餐", "casual"],
-      ["实习面试", "business"],
-      ["去夜店", "casual"]
+      ["实习面试", "business"]
     ],
     garments: [
       {
