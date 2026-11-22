@@ -32,6 +32,10 @@
   const detailDialog = document.querySelector("#detail-dialog");
   const detailContent = document.querySelector("#detail-content");
   const toast = document.querySelector("#toast");
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  );
+  let navigationTimer = null;
 
   function loadGarments() {
     try {
@@ -69,16 +73,64 @@
   }
 
   function go(route) {
-    screens.forEach((screen) => {
-      screen.hidden = screen.dataset.screen !== route;
-    });
+    if (navigationTimer) return;
+    const next = screens.find(
+      (screen) => screen.dataset.screen === route
+    );
+    if (!next) return;
+
+    if (route === "wardrobe") renderWardrobe();
+    if (route === "home") renderHome();
+    const current = screens.find((screen) => !screen.hidden);
+
     const heading = document.querySelector(
       `[data-screen="${route}"] h1`
     );
-    heading?.focus?.();
-    if (route === "wardrobe") renderWardrobe();
-    if (route === "home") renderHome();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    heading?.setAttribute?.("tabindex", "-1");
+
+    const showNext = () => {
+      next.hidden = false;
+      next.classList.remove("is-leaving");
+      next.classList.add("is-entering");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          next.classList.remove("is-entering");
+          navigationTimer = null;
+          heading?.focus?.();
+          window.scrollTo({
+            top: 0,
+            behavior: reduceMotion.matches ? "auto" : "smooth"
+          });
+        });
+      });
+    };
+
+    if (!current || current === next) {
+      showNext();
+      return;
+    }
+
+    current.classList.remove("is-entering");
+    current.classList.add("is-leaving");
+    navigationTimer = setTimeout(
+      () => {
+        current.hidden = true;
+        current.classList.remove("is-leaving");
+        showNext();
+      },
+      reduceMotion.matches ? 0 : 165
+    );
+  }
+
+  function closeDetail() {
+    if (!detailDialog.open) return;
+    detailDialog.classList.remove("is-visible");
+    setTimeout(
+      () => {
+        if (detailDialog.open) detailDialog.close();
+      },
+      reduceMotion.matches ? 0 : 150
+    );
   }
 
   function renderHome() {
@@ -236,8 +288,14 @@
       ?.addEventListener("click", saveActiveOutfit);
     detailContent
       .querySelector("#return-results-button")
-      ?.addEventListener("click", () => detailDialog.close());
-    detailDialog.showModal();
+      ?.addEventListener("click", closeDetail);
+    if (!detailDialog.open) {
+      detailDialog.classList.remove("is-visible");
+      detailDialog.showModal();
+    }
+    requestAnimationFrame(() => {
+      detailDialog.classList.add("is-visible");
+    });
   }
 
   function saveActiveOutfit() {
@@ -251,7 +309,7 @@
     };
     localStorage.setItem(STORAGE.recent, JSON.stringify(recent));
     showToast("已保存到最近方案");
-    detailDialog.close();
+    closeDetail();
     renderRecentPlan();
   }
 
@@ -415,7 +473,11 @@
     if (event.key === "Enter") generate();
   });
   document.querySelector("#close-detail").addEventListener("click", () => {
-    detailDialog.close();
+    closeDetail();
+  });
+  detailDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeDetail();
   });
 
   const contrastButton = document.querySelector("#contrast-button");
