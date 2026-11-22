@@ -1,8 +1,9 @@
 # WearWise Backend
 
 Backend service for WearWise. The current milestone implements health, occasion
-context, rule-based recommendation, and outfit revision with deterministic Mock
-data. It does not call external AI, weather, or search services.
+context, rule-based recommendation, outfit revision, and weather context with
+deterministic Mock data. It does not call external AI, weather, or search
+services.
 
 ## Requirements
 
@@ -103,6 +104,32 @@ curl.exe -i -X POST "http://127.0.0.1:8000/v1/outfits/revise" `
 The recommendation endpoints return deterministic rules with
 `provider=rule_engine_mock`, `fallback_used=true`, and an explicit warning. They
 return only stable garment IDs and never include local photo paths or image URLs.
+
+## Weather context
+
+`POST /v1/weather/current` accepts coarse coordinates, accuracy, timezone, and
+an optional target time. It uses `MockWeatherProvider` until a live provider is
+configured.
+
+```bash
+curl -i \
+  -X POST \
+  http://127.0.0.1:8000/v1/weather/current \
+  -H "Content-Type: application/json" \
+  --data-binary @examples/weather-request.json
+```
+
+The response:
+
+- Uses English warning text and `source: "mock"`.
+- Returns structured temperature, feels-like temperature, condition,
+  precipitation probability, and wind speed.
+- Never echoes latitude or longitude.
+- Does not persist coordinates.
+- Returns `status: "unavailable"` and `weather: null` if the provider fails.
+
+Weather is optional to the client. A weather failure must not block
+recommendations; the iOS client should use a recent cache or demo weather.
 
 Do not commit `.env`, credentials, recordings, personal photos, or generated
 build output.

@@ -1,0 +1,8 @@
+{
+  "request_id": "req-weather-demo-001",
+  "latitude": 31.23,
+  "longitude": 121.47,
+  "accuracy_m": 1200,
+  "timezone": "Asia/Shanghai",
+  "target_at": null
+}
