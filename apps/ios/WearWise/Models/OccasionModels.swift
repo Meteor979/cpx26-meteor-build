@@ -127,7 +127,12 @@ enum LocalPresetCatalog {
         preset(
             id: "first-date",
             name: "First date",
-            aliases: ["第一次约会", "首次约会", "初次见面的约会"],
+            aliases: [
+                "第一次约会",
+                "首次约会",
+                "初次见面的约会",
+                "first date"
+            ],
             description: "Clean, approachable, and low-pressure.",
             formality: .smartCasual,
             allowed: [.casual, .smartCasual],
@@ -136,7 +141,13 @@ enum LocalPresetCatalog {
         preset(
             id: "club-speech",
             name: "Club speech",
-            aliases: ["社团汇报", "社团分享", "社团路演"],
+            aliases: [
+                "社团演讲",
+                "社团汇报",
+                "社团分享",
+                "社团路演",
+                "club speech"
+            ],
             description: "Credible and professional without feeling too formal.",
             formality: .business,
             allowed: [.smartCasual, .business],
@@ -145,7 +156,13 @@ enum LocalPresetCatalog {
         preset(
             id: "friends-dinner",
             name: "Friends dinner",
-            aliases: ["朋友吃饭", "同学聚餐", "朋友生日聚餐"],
+            aliases: [
+                "朋友聚餐",
+                "朋友吃饭",
+                "同学聚餐",
+                "朋友生日聚餐",
+                "friends dinner"
+            ],
             description: "Relaxed, friendly, and tidy.",
             formality: .casual,
             allowed: [.casual, .smartCasual],
@@ -154,7 +171,12 @@ enum LocalPresetCatalog {
         preset(
             id: "internship-interview",
             name: "Internship interview",
-            aliases: ["面试", "实习面试", "工作面试"],
+            aliases: [
+                "面试",
+                "实习面试",
+                "工作面试",
+                "internship interview"
+            ],
             description: "Clear and reliable without being flashy.",
             formality: .business,
             allowed: [.smartCasual, .business],
@@ -199,7 +221,12 @@ enum LocalPresetCatalog {
         preset(
             id: "anniversary-date",
             name: "Anniversary date",
-            aliases: ["纪念日", "周年约会", "结婚纪念日"],
+            aliases: [
+                "纪念日",
+                "周年约会",
+                "结婚纪念日",
+                "anniversary date"
+            ],
             description: "A polished step up from an everyday outfit.",
             formality: .smartCasual,
             allowed: [.smartCasual, .business],
@@ -208,7 +235,13 @@ enum LocalPresetCatalog {
         preset(
             id: "salon-performance",
             name: "Salon performance",
-            aliases: ["沙龙", "演奏会", "节目演出", "小型演出"],
+            aliases: [
+                "沙龙",
+                "演奏会",
+                "节目演出",
+                "小型演出",
+                "salon performance"
+            ],
             description: "Stage presence with freedom to move.",
             formality: .smartCasual,
             allowed: [.casual, .smartCasual, .business],
