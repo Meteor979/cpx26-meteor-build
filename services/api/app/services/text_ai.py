@@ -51,9 +51,7 @@ class RemoteTextAIProvider:
                 "Remote text AI is selected but its configuration is incomplete."
             )
 
-        endpoint = self._base_url.rstrip("/")
-        if not endpoint.endswith("/chat/completions"):
-            endpoint = endpoint + "/v1/chat/completions"
+        endpoint = chat_completions_endpoint(self._base_url)
 
         request_body = {
             "model": self._model,
@@ -112,6 +110,15 @@ class RemoteTextAIProvider:
         if not isinstance(parsed, dict):
             raise TextAIProviderError("Text AI JSON root must be an object.")
         return parsed
+
+
+def chat_completions_endpoint(base_url: str) -> str:
+    normalized = base_url.rstrip("/")
+    if normalized.endswith("/chat/completions"):
+        return normalized
+    if normalized.endswith("/v1"):
+        return normalized + "/chat/completions"
+    return normalized + "/v1/chat/completions"
 
 
 def get_text_ai_provider() -> Optional[TextAIProvider]:
