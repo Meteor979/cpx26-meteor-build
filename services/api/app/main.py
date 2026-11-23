@@ -5,9 +5,12 @@ from fastapi import FastAPI
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from dotenv import load_dotenv
 
 from app.errors import ApiError
-from app.routers import context, recommendations, system
+from app.routers import context, recommendations, system, weather
+
+load_dotenv()
 
 app = FastAPI(
     title="WearWise API",
@@ -17,6 +20,7 @@ app = FastAPI(
 app.include_router(system.router)
 app.include_router(context.router)
 app.include_router(recommendations.router)
+app.include_router(weather.router)
 
 
 def _request_id_from_body(body: Any) -> Optional[str]:
@@ -59,7 +63,7 @@ async def handle_validation_error(
         status_code=422,
         content={
             "code": "VALIDATION_ERROR",
-            "message": "请求字段不符合接口契约。",
+            "message": "Request fields do not match the API contract.",
             "request_id": _request_id_from_body(body),
             "details": {"errors": errors},
         },
